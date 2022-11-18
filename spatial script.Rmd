@@ -20,7 +20,7 @@ library(corrplot)
 ```{r}
 #load escapement data
 options(scipen=10000)
-escdata<-fread("~/R/PSF Hatchery Review/PSE Data/esc-WCVI-with-enhancement-rankings.csv")%>%
+escdata<-fread("esc-WCVI-with-enhancement-rankings.csv")%>%
   select(-V1)
 escdata$escapement[escdata$escapement==0]<-NA
 
@@ -31,14 +31,13 @@ unique(escdata$SPP)
 
 ```{r}
 #function to extract data and group it
+
 getridofggplotlinesbetweenpoints<-function(data,colstokeep,yearcolumnname) {
-
-d2<-data%>%select(year=yearcolumnname,colstokeep)
-
-idx <- c(1, diff(d2$year))
-i2 <- c(1,which(idx != 1), nrow(d2)+1)
-d2$grp <- rep(1:length(diff(i2)), diff(i2))
-d2
+  d2 <- data%>%select(year=yearcolumnname,colstokeep)
+  idx <- c(1, diff(d2$year))
+  i2 <- c(1,which(idx != 1), nrow(d2)+1)
+  d2$grp <- rep(1:length(diff(i2)), diff(i2))
+  d2
 }
 ```
 
@@ -133,9 +132,9 @@ ggsave("~/R/PSF Hatchery Review/analysis/spatial/CN A25 incl escapement streams 
 names(df)
 str(df)
 
-names(esc.cm)
-
 esc.cm<-esc.s%>%select(-n10,-u.esc,-Enhancement_Rank)%>%data.frame()
+
+names(esc.cm)
 
 rownames(esc.cm)<-esc.cm$SYS_NM
 
@@ -179,11 +178,9 @@ res<-cor(test,use="complete.obs")
 res
 d2
 
-library(corrplot)
-
 
 ```
-RELEASES
+RELEASES - IGNORE FOR NOW PER ANDY
 ```{r}
 setwd("R/PSF hatchery review/releases")
 
