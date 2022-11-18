@@ -1,0 +1,257 @@
+---
+title: "Spatial Analysis"
+author: "Coastland"
+date: "22/10/2021"
+output: html_document
+editor_options: 
+  chunk_output_type: console
+---
+
+```{r setup, include=FALSE}
+#load libraries
+knitr::opts_chunk$set(echo = TRUE)
+
+library(data.table)
+library(tidyverse)
+library(corrplot)
+
+```
+
+```{r}
+#load escapement data
+options(scipen=10000)
+escdata<-fread("~/R/PSF Hatchery Review/PSE Data/esc-WCVI-with-enhancement-rankings.csv")%>%
+  select(-V1)
+escdata$escapement[escdata$escapement==0]<-NA
+
+names(escdata)
+unique(escdata$SPP)
+```
+
+
+```{r}
+#function to extract data and group it
+getridofggplotlinesbetweenpoints<-function(data,colstokeep,yearcolumnname) {
+
+d2<-data%>%select(year=yearcolumnname,colstokeep)
+
+idx <- c(1, diff(d2$year))
+i2 <- c(1,which(idx != 1), nrow(d2)+1)
+d2$grp <- rep(1:length(diff(i2)), diff(i2))
+d2
+}
+```
+
+
+```{r}
+df<-escdata%>%filter(SPP=="CM"&Area==25)
+
+ggplot(df,aes(x=Year,y=SYS_NM,color=Enhancement_Rank,size=escapement))+
+  geom_point(alpha=.5)+
+  scale_colour_manual(breaks=c("NONE","LOW","HIGH"),
+                      values=c("grey50","steelblue","darkred"))+
+  labs(y="Escapement",color="Enhancement",x="Year",size="Escapement")+
+  theme_bw()+
+  theme(legend.position="bottom")
+
+ggsave("~/R/PSF Hatchery Review/analysis/spatial/CN A25 ALL streams.png",dpi=600,height=10,width=8)
+
+```
+
+```{r}
+
+#included systems
+
+escdata
+
+dfwide<-df%>%select(SYS_NM,Enhancement_Rank,Year,escapement)%>%
+  pivot_wider(names_from="Year",values_from="escapement")
+
+names(dfwide)
+
+dfwide$n10<-apply(dfwide[,3:70],1,function(x) x=sum(!is.na(x[61:71])))
+
+esc.incl1<-subset(dfwide,n10>3)
+
+esc.incl2<-esc.incl1%>%select(-n10)%>%pivot_longer(3:71,names_to="year",values_to="escapement")%>%
+  mutate(year=as.numeric(year))
+
+esc.incl3<-getridofggplotlinesbetweenpoints(esc.incl2,c("escapement","Enhancement_Rank","SYS_NM"),"year")
+
+str(esc.incl2)
+
+ggplot(esc.incl3,aes(x=year,y=escapement,color=Enhancement_Rank,group=grp))+
+  geom_point()+geom_line()+
+  #scale_colour_manual(breaks=c("NONE","LOW","HIGH"),
+  #                    values=c("grey50","steelblue","darkred"))+
+  facet_wrap(~SYS_NM,ncol=3,scale="free_y")+
+  labs(y="Escapement",color="Enhancement",x="Year")+
+  theme_bw()+
+  theme(legend.position="bottom")
+
+ggsave("~/R/PSF Hatchery Review/analysis/spatial/CN A25 included escapement streams.png",dpi=600,height=10,width=8)
+
+ggplot(esc.incl3,aes(y=SYS_NM,x=escapement,fill=Enhancement_Rank))+
+  geom_boxplot()+
+  #scale_colour_manual(breaks=c("NONE","LOW","HIGH"),
+  #                    values=c("grey50","steelblue","darkred"))+
+  labs(y="System Name",fill="Enhancement",x="Escapement")+
+  #scale_x_log10()+
+  theme_bw()+
+  theme(legend.position="bottom")
+
+ggsave("~/R/PSF Hatchery Review/analysis/spatial/CN A25 included escapement streams boxplot.png",dpi=600,height=10,width=8)
+
+##standardized escapements
+esc.s<-esc.incl1
+names(esc.s)
+
+esc.s$u.esc<-apply(esc.s[3:71],1,function(x) mean(x,na.rm=TRUE))
+
+esc.s[3:71]<-esc.s[3:71]/esc.s$u.esc
+
+esc.s2<-esc.s%>%select(-n10,-u.esc)%>%pivot_longer(3:71,names_to="year",values_to="s.esc")%>%
+  mutate(year=as.numeric(year))
+
+esc.s3<-getridofggplotlinesbetweenpoints(esc.s2,c("s.esc","Enhancement_Rank","SYS_NM"),"year")
+
+ggplot(esc.s3,aes(x=year,y=s.esc,color=Enhancement_Rank,group=grp))+
+  geom_point()+geom_line()+
+  #scale_colour_manual(breaks=c("NONE","LOW","HIGH"),
+  #                    values=c("grey50","steelblue","darkred"))+
+  facet_wrap(~SYS_NM,ncol=3)+
+  labs(y="Standardized Escapement",color="Enhancement",x="Year")+
+  geom_hline(yintercept=1,linetype="dashed")+
+  theme_bw()+
+  theme(legend.position="bottom")
+
+ggsave("~/R/PSF Hatchery Review/analysis/spatial/CN A25 incl escapement streams standardized.png",dpi=600,height=10,width=8)
+
+```
+
+```{r}
+names(df)
+str(df)
+
+names(esc.cm)
+
+esc.cm<-esc.s%>%select(-n10,-u.esc,-Enhancement_Rank)%>%data.frame()
+
+rownames(esc.cm)<-esc.cm$SYS_NM
+
+cm<-cor(t(esc.cm[,-1]),use="complete.obs")
+
+png("~/R/PSF Hatchery Review/analysis/spatial/CN a25 correlation in stand escapement.png",
+    units='in',res=600,height=8,width=8)
+
+corrplot(cm,type="upper",order="hclust",method="square",tl.col="black")
+
+dev.off()
+```
+
+
+```{r}
+esc.cm26<-t(esc.cm[,-1])
+esc.cm25<-t(esc.cm[,-1])
+
+a2627<-cbind(esc.cm25,esc.cm26)
+
+cm<-cor(a2627,use="complete.obs")
+
+png("~/R/PSF Hatchery Review/analysis/spatial/CM a26 a27 correlation in stand escapement.png",
+    units='in',res=600,height=8,width=8)
+
+corrplot(cm,type="upper",order="hclust",method="square",tl.col="black")
+
+dev.off()
+#d2<-df%>%
+#  group_by(SYS_NM)%>%
+#  mutate(row=row_number())%>%
+#pivot_wider(names_from="SYS_NM",values_from=)%>%select(-row)
+
+
+
+test<-d2[,2:7]
+d2[,8]
+
+res<-cor(test,use="complete.obs")
+
+res
+d2
+
+library(corrplot)
+
+
+```
+RELEASES
+```{r}
+setwd("R/PSF hatchery review/releases")
+
+rel<-fread("~/R/PSF hatchery review/releases/AllSEPReleases_2020-04-21_Original.csv")
+
+allreleases<-rel%>%select(SPECIES_NAME,STOCK_NAME,FACILITY_NAME,RELEASE_SITE_NAME,RELEASE_STAGE_NAME,TotalRelease,RELEASE_YEAR)%>%
+  group_by(SPECIES_NAME,STOCK_NAME,RELEASE_SITE_NAME,FACILITY_NAME,RELEASE_STAGE_NAME,RELEASE_YEAR)%>%
+  summarise(releases=sum(as.numeric(TotalRelease)),n=n())
+
+cd<-allreleases%>%filter(SPECIES_NAME=="Chum")
+
+getall<-unique(c(grep("Conuma",cd$RELEASE_SITE_NAME),
+          grep("Conuma",cd$STOCK_NAME),
+          grep("Canton",cd$RELEASE_SITE_NAME),
+          grep("Canton",cd$STOCK_NAME),
+          grep("Sucwoa",cd$RELEASE_SITE_NAME),
+          grep("Sucwoa",cd$STOCK_NAME),
+          grep("Tlupana",cd$RELEASE_SITE_NAME),
+          grep("Tlupana",cd$STOCK_NAME),
+          grep("Zeballos",cd$RELEASE_SITE_NAME),
+          grep("Zeballos",cd$STOCK_NAME)))
+          
+a26.rel.prep<-cd[getall,]
+
+ggplot(a26.rel.prep,aes(x=RELEASE_YEAR,y=releases,color=RELEASE_STAGE_NAME))+
+  geom_point()+geom_line()+
+  facet_grid(RELEASE_SITE_NAME~STOCK_NAME)+
+  theme_bw()+
+  theme(legend.position = "bottom")
+
+ggplot(a26.rel.prep,aes(x=RELEASE_YEAR,y=releases,color=RELEASE_STAGE_NAME,shape=STOCK_NAME))+
+  geom_point()+geom_line()+
+  facet_wrap(~RELEASE_SITE_NAME,scale="free_y",ncol=1)+
+  theme_bw()+
+  theme(legend.position = "bottom")
+```
+
+
+```{r}
+cd%>%filter(RELEASE_SITE_NAME)
+
+atup<-cd%>%filter(RELEASE_SITE_NAME=="Atnarko R Up"&SPECIES_NAME=="Chinook")
+atlow<-cd%>%filter(RELEASE_SITE_NAME=="Atnarko R Low"&SPECIES_NAME=="Chinook")
+#nimp<-cd%>%filter(RELEASE_SITE_NAME=="Nimpkish R"&SPECIES_NAME=="Chinook")
+kitimat<-cd%>%filter(RELEASE_SITE_NAME=="Kitimat R"&SPECIES_NAME=="Chinook")
+
+nimpCN<-cd%>%filter(RELEASE_SITE_NAME=="Nimpkish R"&SPECIES_NAME=="Chinook")
+nimpall<-cd%>%filter(RELEASE_SITE_NAME=="Nimpkish R")
+atn<-rbind(atup,atlow)
+
+ggdata<-kitimat
+
+idx <- c(1, diff(ggdata$RELEASE_YEAR))
+i2 <- c(1,which(idx != 1), nrow(ggdata)+1)
+#adds a grouping column for ggplot to use
+ggdata$grp <- rep(1:length(diff(i2)), diff(i2))
+
+
+ggplot(ggdata,aes(x=RELEASE_YEAR,y=releases,color=RELEASE_STAGE_NAME,shape=RELEASE_SITE_NAME,group=grp))+
+  geom_line()+
+  geom_point()+
+  #facet_wrap(~STOCK_NAME+SPECIES_NAME,ncol=2,scales="free_y")+
+  facet_wrap(~STOCK_NAME,ncol=1,scales="free_y")+
+  #facet_grid(STOCK_NAME~SPECIES_NAME,scales="free_y")+
+  labs(y="Releases",x="Release Year",color="Release Stage",shape="Release Site Name")+
+  theme_bw()+
+  theme(legend.position="bottom",legend.box = "vertical")
+
+ggsave("Nimpkish CN only releases facet grid.png",dpi=600,height=10,width=8)
+```
+
