@@ -18,7 +18,6 @@ library(tidyverse)
 library(corrplot)
 library(ggpubr)
 library(zoo)
-library(ggdendro)
 
 options(scipen=10000)
 
@@ -26,21 +25,21 @@ options(scipen=10000)
 
 
 ```{r functions, echo=FALSE,message=FALSE,warning=FALSE}
-
 #function to extract data and group it
 getridofggplotlinesbetweenpoints<-function(data,colstokeep,yearcolumnname) {
-  d2<-data%>%select(year=yearcolumnname,colstokeep)
-  idx <- c(1, diff(d2$year))
-  i2 <- c(1,which(idx != 1), nrow(d2)+1)
-  d2$grp <- rep(1:length(diff(i2)), diff(i2))
-  d2
-}
 
+d2<-data%>%select(year=yearcolumnname,colstokeep)
+
+idx <- c(1, diff(d2$year))
+i2 <- c(1,which(idx != 1), nrow(d2)+1)
+d2$grp <- rep(1:length(diff(i2)), diff(i2))
+d2
+}
 ```
 
 ```{r load prep data, echo=FALSE,message=FALSE,warning=FALSE}
 #load escapement data and remove 0's
-escdata<-fread("esc-WCVI-with-enhancement-rankings.csv")%>%
+escdata<-fread("~/R/PSF Hatchery Review/PSE Data/esc-WCVI-with-enhancement-rankings.csv")%>%
   select(-V1)
 
 escdata$escapement[escdata$escapement==0]<-NA
@@ -96,7 +95,6 @@ clust.dist.cor.z <- hclust(dist.cor.z)
 
 ggdendrogram(clust.dist.cor.z, rotate=TRUE)
 
-#insert cor analysis for each other metric
 
 #Correlation analysis by log escapement
 
@@ -116,6 +114,7 @@ clust.dist.cor.e <- hclust(dist.cor.e)
 
 ggdendrogram(clust.dist.cor.e, rotate=TRUE)
 
+
 # Correlation analysis by standardized escapement
 cor.data.s<-df%>%select(SYS_NM,Year,esc.stand)%>%pivot_wider(names_from="Year",values_from="esc.stand")%>%data.frame()
 
@@ -132,6 +131,7 @@ dist.cor.s<- dist(cor.s)
 clust.dist.cor.s <- hclust(dist.cor.s)
 
 ggdendrogram(clust.dist.cor.s, rotate=TRUE)
+
 
 # Correlation analysis by moving average
 cor.data.m<-df%>%select(SYS_NM,Year,m.ave)%>%pivot_wider(names_from="Year",values_from="m.ave")%>%data.frame()
@@ -150,6 +150,30 @@ clust.dist.cor.m <- hclust(dist.cor.m)
 
 ggdendrogram(clust.dist.cor.m, rotate=TRUE)
 
+```
+
+
+```{r correlations for side by side pre post,echo=FALSE,warning=FALSE,message=FALSE}
+#prep data for correlations
+
+cor.data.z<-df%>%select(SYS_NM,Year,z)%>%pivot_wider(names_from="Year",values_from="z")%>%data.frame()
+
+names(cor.data.z)
+
+cor.data.z.pre<-cor.data.z[,1:31]
+rownames(cor.data.z.pre)<-cor.data.z.pre$SYS_NM
+cor.data.z.pre<-cor.data.z.pre%>%select(-SYS_NM)
+cor.z.pre<-cor(t(cor.data.z.pre),use="pairwise.complete.obs")
+
+cor.data.z.post<-cor.data.z[,c(1,32:70)]
+rownames(cor.data.z.post)<-cor.data.z.post$SYS_NM
+cor.data.z.post<-cor.data.z.post%>%select(-SYS_NM)
+cor.z.post<-cor(t(cor.data.z.post),use="pairwise.complete.obs")
+
+#insert cor pre-post analysis for each other metric
+#esc.log
+#esc.stand
+#m.ave
 ```
 
 \newpage
@@ -225,16 +249,41 @@ ggplot(df,aes(y=SYS_NM,x=z,fill=prepost))+
 
 \newpage
 
-```{r coorrelation plots, echo=FALSE,warning=FALSE,message=FALSE,fig.align="center",fig.height=7,fig.width=6,fig.cap="Escapement to area streams by enhancement rank."}
-c1<-corrplot(cor.z,diag=FALSE,order="hclust",addrect=6,method="square",tl.col="black",tl.cex=.5)
+```{r correlation plots, echo=FALSE,warning=FALSE,message=FALSE,fig.align="center",fig.height=7,fig.width=6,fig.cap="Cross correlation plots to compare metrics."}
 
-c2<-corrplot(cor.z,diag=FALSE,order="hclust",addrect=6,method="square",tl.col="black",tl.cex=.5)
+#png("~/R/PSF Hatchery Review/analysis/spatial/outputs/corrplots.png",res=600,units="in",height=9,width=7)
+par(oma=c(2,2,2,2))
+par(mfrow=c(2,2))
+corrplot(cor.z,diag=FALSE,order="hclust",addrect=6,method="square",tl.col="black",tl.cex=.5)
+corrplot(cor.z,diag=FALSE,order="hclust",addrect=6,method="square",tl.col="black",tl.cex=.5)
+corrplot(cor.z,diag=FALSE,order="hclust",addrect=6,method="square",tl.col="black",tl.cex=.5)
+corrplot(cor.z,diag=FALSE,order="hclust",addrect=6,method="square",tl.col="black",tl.cex=.5)
 
-ggarrange(c1,c2,common.legend = TRUE,ncol=1)
+#dev.off()
+
+#ggarrange(c1,c2,common.legend = TRUE,ncol=1)
 
 
 ```
 
+```{r correlation plots pre post, echo=FALSE,warning=FALSE,message=FALSE,fig.align="center",fig.height=8,fig.width=6,fig.cap="Cross correlation plots to compare pre- and post-enhancement."}
+
+#png("~/R/PSF Hatchery Review/analysis/spatial/outputs/corrplots.png",res=600,units="in",height=9,width=7)
+
+par(mar=c(1,5,8,1))
+par(oma=c(1,1,1,1))
+par(mfrow=c(2,1))
+corrplot(cor.z.pre,diag=FALSE,order="hclust",addrect=6,method="square",mar=c(1,2,3,1),
+         tl.col="black",tl.cex=.3,title="Pre-Enhancement (1980)")
+corrplot(cor.z.post,diag=FALSE,order="hclust",addrect=6,method="square",mar=c(1,2,3,1),
+         tl.col="black",tl.cex=.3,title="Post-Enhancement (1980)")
+
+#dev.off()
+
+#ggarrange(c1,c2,common.legend = TRUE,ncol=1)
+
+
+```
 
 
 
