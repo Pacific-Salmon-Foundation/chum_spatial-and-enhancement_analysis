@@ -18,6 +18,7 @@ library(tidyverse)
 library(corrplot)
 library(ggpubr)
 library(zoo)
+library(ggdendro)
 
 options(scipen=10000)
 
@@ -26,23 +27,25 @@ options(scipen=10000)
 
 ```{r functions, echo=FALSE,message=FALSE,warning=FALSE}
 #function to extract data and group it
+
 getridofggplotlinesbetweenpoints<-function(data,colstokeep,yearcolumnname) {
-
-d2<-data%>%select(year=yearcolumnname,colstokeep)
-
-idx <- c(1, diff(d2$year))
-i2 <- c(1,which(idx != 1), nrow(d2)+1)
-d2$grp <- rep(1:length(diff(i2)), diff(i2))
-d2
+  d2<-data%>%select(year=yearcolumnname,colstokeep)
+  idx <- c(1, diff(d2$year))
+  i2 <- c(1,which(idx != 1), nrow(d2)+1)
+  d2$grp <- rep(1:length(diff(i2)), diff(i2))
+  d2
 }
 ```
 
 ```{r load prep data, echo=FALSE,message=FALSE,warning=FALSE}
 #load escapement data and remove 0's
-escdata<-fread("~/R/PSF Hatchery Review/PSE Data/esc-WCVI-with-enhancement-rankings.csv")%>%
+
+escdata<-fread("esc-WCVI-with-enhancement-rankings.csv")%>%
   select(-V1)
 
 escdata$escapement[escdata$escapement==0]<-NA
+
+streaminlet <- read_csv("CM A25 filtered stream list_with inlets.csv")
 
 ```
 
@@ -77,7 +80,7 @@ df<-esc.data%>%filter(SYS_NM%in%included.stream.list$SYS_NM)%>%
 ```{r correlations for all metrics,echo=FALSE,warning=FALSE,message=FALSE}
 #prep data for correlations
 
-#Correlation analysis by z-score
+# Correlation analysis by z-score
 
 cor.data.z<-df%>%select(SYS_NM,Year,z)%>%pivot_wider(names_from="Year",values_from="z")%>%data.frame()
 
@@ -86,6 +89,8 @@ rownames(cor.data.z)<-cor.data.z$SYS_NM
 cor.data.z<-cor.data.z%>%select(-SYS_NM)
 
 cor.z<-cor(t(cor.data.z),use="pairwise.complete.obs")
+
+# correlation plot and dendrogram by z-score
 
 corrplot(cor.z,type="upper",order="hclust",method="square",tl.col="black")
 
@@ -96,7 +101,7 @@ clust.dist.cor.z <- hclust(dist.cor.z)
 ggdendrogram(clust.dist.cor.z, rotate=TRUE)
 
 
-#Correlation analysis by log escapement
+# Correlation analysis by log escapement
 
 cor.data.e<-df%>%select(SYS_NM,Year,esc.log)%>%pivot_wider(names_from="Year",values_from="esc.log")%>%data.frame()
 
@@ -105,6 +110,8 @@ rownames(cor.data.e)<-cor.data.e$SYS_NM
 cor.data.e<-cor.data.e%>%select(-SYS_NM)
 
 cor.e<-cor(t(cor.data.e),use="pairwise.complete.obs")
+
+# correlation plot and dendrogram by log escapement
 
 corrplot(cor.e,type="upper",order="hclust",method="square",tl.col="black")
 
@@ -124,6 +131,8 @@ cor.data.s<-cor.data.s%>%select(-SYS_NM)
 
 cor.s<-cor(t(cor.data.s),use="pairwise.complete.obs")
 
+# correlation plot and dendrogram by standardized escapement
+
 corrplot(cor.s,type="upper",order="hclust",method="square",tl.col="black")
 
 dist.cor.s<- dist(cor.s)
@@ -141,6 +150,8 @@ rownames(cor.data.m)<-cor.data.m$SYS_NM
 cor.data.m<-cor.data.m%>%select(-SYS_NM)
 
 cor.m<-cor(t(cor.data.m),use="pairwise.complete.obs")
+
+# correlation plot and dendrogram moving average
 
 corrplot(cor.m,type="upper",order="hclust",method="square",tl.col="black")
 
