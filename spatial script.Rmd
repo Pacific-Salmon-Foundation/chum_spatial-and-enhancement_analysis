@@ -23,6 +23,7 @@ library(corrplot)
 library(ggpubr)
 library(zoo)
 library(ggdendro)
+library(dendextend)
 library(cowplot)
 
 options(scipen=10000)
@@ -199,8 +200,10 @@ zlabs <- as.data.frame(dendclust.z[["labels"]][["label"]])
 zlabs$order <- 1:length(zlabs[,1])
 colnames(zlabs) <- c("SYS_NM", "order")
 zlabs <- merge(streaminlet, zlabs, by = "SYS_NM")
+zlabs <- merge(inlets, zlabs, by = "inlet")
 zlabs <- zlabs %>%
   arrange(order)
+zlabcolours <- zlabs$colour
 inletlist <- as.factor(zlabs$inlet)
   
 dendclust.z[["labels"]][["inlet"]] <- inletlist
@@ -301,35 +304,42 @@ ylenm <- .95 * (max(dendclust.m[["segments"]][["y"]]))
 
 ```
 
-```{r correlation plots, echo=FALSE,warning=FALSE,message=FALSE,fig.align="center",fig.height=8.5,fig.width=7.5,fig.cap="Cross correlation plots to compare metrics."}
+```{r correlation plots, echo=FALSE,warning=FALSE,message=FALSE,fig.align="center",fig.height=9.5,fig.width=8.5,fig.cap="Cross correlation plots to compare metrics."}
 
 # Corplots to knit
 
-par(oma=c(1,1,1,1))
+par(oma=c(0,0,0,0))
 par(mfrow=c(2,2))
 
 corrplot(cor.z, diag = FALSE, order="hclust", method="square", tl.col="black",
-         addrect = 6, tl.cex = 0.5)
+         addrect = 6, tl.cex = 0.45, title = "Z-scores", mar=c(0,0,3,0))
 corrplot(cor.e, diag = FALSE, order="hclust", method="square", tl.col="black",
-         addrect = 6, tl.cex = 0.5)
+         addrect = 6, tl.cex = 0.45, title = "Log escapement", mar=c(0,0,3,0))
 corrplot(cor.s, diag = FALSE, order="hclust", method="square", tl.col="black",
-         addrect = 6, tl.cex = 0.5)
+         addrect = 6, tl.cex = 0.45, title = "Standardized escapement", mar=c(0,0,3,0))
 corrplot(cor.m, diag = FALSE, order="hclust", method="square", tl.col="black",
-         addrect = 6, tl.cex = 0.5)
+         addrect = 6, tl.cex = 0.45, title = "Moving average", mar=c(0,0,3,0))
 ```
 
+\newpage
 ## Dendrograms by metric
 
 ```{r dendrograms for all metrics,echo=FALSE,warning=FALSE,message=FALSE}
 # Dendrograms to knit
-par(mfrow=c(1,1))
+par(oma=c(0,0,0,0))
+par(mfrow=c(2,2))
 
-ggdendrogram(dendclust.z, rotate = TRUE) +
+ggdendrogram(dendclust.z, rotate = TRUE, size = 3) +
   labs(title = "Z-scores") +
   theme(axis.text.y = element_text(colour = dendclust.z[["labels"]][["inlet"]])) +
   annotate("text", x = xlenz, y = ylenz, colour = "red", label = "Nootka inlet") +
   annotate("text", x = xlenz-1, y = ylenz, colour = "black", label = "Esperanza inlet") +  
   annotate("text", x = xlenz-2, y = ylenz, colour = "99FF33", label = "Tahsis inlet")
+
+dendz <- as.dendrogram(clust.dist.cor.z)
+dendz %>% 
+  plot(main = "Z-scores", horiz = TRUE)
+
 ggdendrogram(dendclust.e, rotate = TRUE) +
   labs(title = "Log escapement") +
   theme(axis.text.y = element_text(colour = dendclust.e[["labels"]][["inlet"]])) +
