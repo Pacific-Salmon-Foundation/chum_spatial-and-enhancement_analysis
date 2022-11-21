@@ -43,7 +43,7 @@ getridofggplotlinesbetweenpoints<-function(data,colstokeep,yearcolumnname) {
 ```{r load prep data, echo=FALSE,message=FALSE,warning=FALSE}
 #load escapement data and remove 0's
 
-escdata<-fread("esc-WCVI-with-enhancement-rankings.csv")%>%
+escdata<-fread("all nuseds with enhancement rankings.csv")%>%
   select(-V1)
 
 escdata$escapement[escdata$escapement==0]<-NA
