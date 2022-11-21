@@ -21,7 +21,6 @@ library(zoo)
 library(ggdendro)
 library(cowplot)
 
-
 options(scipen=10000)
 
 ```
