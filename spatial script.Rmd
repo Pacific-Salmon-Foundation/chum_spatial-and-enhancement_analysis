@@ -1,5 +1,6 @@
 ---
 title: "Spatial Analysis Figures"
+subtitle: "Area 25 Chum Salmon"
 author: "Coastland"
 date: "22/10/2021"
 output:
@@ -11,7 +12,8 @@ editor_options:
 
 ```{r setup, echo=FALSE,message=FALSE,warning=FALSE}
 #load libraries
-knitr::opts_chunk$set(echo = TRUE)
+knitr::opts_chunk$set(echo = TRUE, fig.pos = "!h")
+
 
 library(data.table)
 library(tidyverse)
@@ -75,6 +77,82 @@ df<-esc.data%>%filter(SYS_NM%in%included.stream.list$SYS_NM)%>%
   
 ```
 
+\newpage
+
+```{r escapement bubble plot, fig.align="center",fig.height=8,fig.width=6,fig.cap="Escapement to area streams by enhancement rank.",echo=FALSE,warning=FALSE,message=FALSE}
+
+par(mfrow = c(1, 1))
+#bubbleplot of escapements for whole area
+ggplot(df,aes(x=Year,y=SYS_NM,color=Enhancement_Rank,size=escapement))+
+  geom_point(alpha=.5)+
+  scale_colour_manual(breaks=c("NONE","LOW","HIGH"),
+                      values=c("grey50","steelblue","darkred"))+
+  labs(y="Escapement",color="Enhancement",x="Year",size="Escapement")+
+  theme_bw()+
+  theme(legend.position="bottom")
+```
+
+\newpage
+
+```{r metric plots,fig.align="center",fig.height=8,fig.width=6,fig.cap="Various plots for escapement and transformations.",echo=FALSE,warning=FALSE,message=FALSE}
+#plot streams by enhancement
+
+p1<-ggplot(df,aes(x=Year,y=escapement,color=Enhancement_Rank,group=SYS_NM))+
+  geom_line()+
+  theme_bw()+
+  labs(y="Escapement",title="Raw Escapement")
+
+p2<-ggplot(df,aes(x=Year,y=esc.log,color=Enhancement_Rank,group=SYS_NM))+
+ geom_line()+
+  theme_bw()+
+  labs(y="log(Escapement)",title="Logged Escapement")
+
+p3<-ggplot(df,aes(x=Year,y=z,color=Enhancement_Rank,group=SYS_NM))+
+  geom_line()+
+  geom_hline(yintercept=0)+
+  theme_bw()+
+  labs(y="Z-scores (Escapement)",title="Z-scores Escapement")
+
+p4<-ggplot(df,aes(x=Year,y=esc.stand,color=Enhancement_Rank,group=SYS_NM))+
+  geom_line()+
+  theme_bw()+
+  labs(y="Standardized Escapement (pavg)",title="Escapement/Average (Pavg)")
+
+ggarrange(p1,p2,p3,p4,ncol=1,common.legend = TRUE)
+
+```
+
+\newpage
+
+```{r moving average and LOESS plots, echo=FALSE,warning=FALSE,message=FALSE,fig.align="center",fig.height=5,fig.width=6,fig.cap="Moving average and LOESS fits on logged escapement by enhancement ranking."}
+t1<-ggplot(df,aes(x=Year,y=m.ave,color=Enhancement_Rank,group=SYS_NM))+
+  geom_line()+
+  theme_bw()+
+  labs(y="Moving Average",title="Moving-Average")
+
+t2<-ggplot(df,aes(x=Year,y=z,color=Enhancement_Rank,group=SYS_NM))+
+  geom_smooth(method="loess",se=FALSE,span=.1,size=.7)+
+  geom_hline(yintercept=0)+
+  theme_bw()+
+  labs(y="Z-score",title="Loess fit on Z-scores")
+
+ggarrange(t1,t2,ncol=1,common.legend = TRUE)
+
+```
+
+\newpage
+
+```{r prepost boxplot,echo=FALSE,warning=FALSE,message=FALSE,fig.align="center",fig.height=7,fig.width=6,fig.cap="Z-scores pre- and post-enhancement."}
+ggplot(df,aes(y=SYS_NM,x=z,fill=prepost))+
+  geom_boxplot()+
+  geom_vline(xintercept=0)+
+  theme_bw()+
+  labs(y="System Name",x="Z-score")
+```
+
+\newpage
+
+\newpage
 
 ```{r correlations for all metrics,echo=FALSE,warning=FALSE,message=FALSE}
 #prep data for correlations
@@ -260,6 +338,25 @@ corrplot(cor.m, diag = FALSE, order="hclust", method="square", tl.col="black",
 
 ```
 
+
+```{r correlation plots, echo=FALSE,warning=FALSE,message=FALSE,fig.align="center",fig.height=7,fig.width=6,fig.cap="Cross correlation plots to compare metrics."}
+
+#png("~/R/PSF Hatchery Review/analysis/spatial/outputs/corrplots.png",res=600,units="in",height=9,width=7)
+par(oma=c(2,2,2,2))
+par(mfrow=c(2,2))
+corrplot(cor.z,diag=FALSE,order="hclust",addrect=6,method="square",tl.col="black",tl.cex=.5)
+corrplot(cor.z,diag=FALSE,order="hclust",addrect=6,method="square",tl.col="black",tl.cex=.5)
+corrplot(cor.z,diag=FALSE,order="hclust",addrect=6,method="square",tl.col="black",tl.cex=.5)
+corrplot(cor.z,diag=FALSE,order="hclust",addrect=6,method="square",tl.col="black",tl.cex=.5)
+
+#dev.off()
+
+#ggarrange(c1,c2,common.legend = TRUE,ncol=1)
+
+
+```
+
+\newpage
 
 ```{r correlations for side by side pre post,echo=FALSE,warning=FALSE,message=FALSE}
 #prep data for correlations
@@ -578,117 +675,6 @@ ggdendrogram(dendclust.m.post, rotate = TRUE) +
 
 ```
 
-\newpage
-
-```{r escapement bubble plot, fig.align="center",fig.height=8,fig.width=6,fig.cap="Escapement to area streams by enhancement rank.",echo=FALSE,warning=FALSE,message=FALSE}
-
-par(mfrow = c(1, 1))
-#bubbleplot of escapements for whole area
-ggplot(df,aes(x=Year,y=SYS_NM,color=Enhancement_Rank,size=escapement))+
-  geom_point(alpha=.5)+
-  scale_colour_manual(breaks=c("NONE","LOW","HIGH"),
-                      values=c("grey50","steelblue","darkred"))+
-  labs(y="Escapement",color="Enhancement",x="Year",size="Escapement")+
-  theme_bw()+
-  theme(legend.position="bottom")
-```
-
-\newpage
-
-```{r metric plots,fig.align="center",fig.height=8,fig.width=6,fig.cap="Various plots for escapement and transformations.",echo=FALSE,warning=FALSE,message=FALSE}
-#plot streams by enhancement
-
-p1<-ggplot(df,aes(x=Year,y=escapement,color=Enhancement_Rank,group=SYS_NM))+
-  geom_line()+
-  theme_bw()+
-  labs(y="Escapement",title="Raw Escapement")
-
-p2<-ggplot(df,aes(x=Year,y=esc.log,color=Enhancement_Rank,group=SYS_NM))+
- geom_line()+
-  theme_bw()+
-  labs(y="log(Escapement)",title="Logged Escapement")
-
-p3<-ggplot(df,aes(x=Year,y=z,color=Enhancement_Rank,group=SYS_NM))+
-  geom_line()+
-  geom_hline(yintercept=0)+
-  theme_bw()+
-  labs(y="Z-scores (Escapement)",title="Z-scores Escapement")
-
-p4<-ggplot(df,aes(x=Year,y=esc.stand,color=Enhancement_Rank,group=SYS_NM))+
-  geom_line()+
-  theme_bw()+
-  labs(y="Standardized Escapement (pavg)",title="Escapement/Average (Pavg)")
-
-ggarrange(p1,p2,p3,p4,ncol=1,common.legend = TRUE)
-
-```
-
-\newpage
-
-```{r moving average and LOESS plots, echo=FALSE,warning=FALSE,message=FALSE,fig.align="center",fig.height=5,fig.width=6,fig.cap="Moving average and LOESS fits on logged escapement by enhancement ranking."}
-t1<-ggplot(df,aes(x=Year,y=m.ave,color=Enhancement_Rank,group=SYS_NM))+
-  geom_line()+
-  theme_bw()+
-  labs(y="Moving Average",title="Moving-Average")
-
-t2<-ggplot(df,aes(x=Year,y=z,color=Enhancement_Rank,group=SYS_NM))+
-  geom_smooth(method="loess",se=FALSE,span=.1,size=.7)+
-  geom_hline(yintercept=0)+
-  theme_bw()+
-  labs(y="Z-score",title="Loess fit on Z-scores")
-
-ggarrange(t1,t2,ncol=1,common.legend = TRUE)
-
-```
-
-\newpage
-
-```{r prepost boxplot,echo=FALSE,warning=FALSE,message=FALSE,fig.align="center",fig.height=7,fig.width=6,fig.cap="Z-scores pre- and post-enhancement."}
-ggplot(df,aes(y=SYS_NM,x=z,fill=prepost))+
-  geom_boxplot()+
-  geom_vline(xintercept=0)+
-  theme_bw()+
-  labs(y="System Name",x="Z-score")
-```
-
-\newpage
-
-```{r correlation plots, echo=FALSE,warning=FALSE,message=FALSE,fig.align="center",fig.height=7,fig.width=6,fig.cap="Cross correlation plots to compare metrics."}
-
-#png("~/R/PSF Hatchery Review/analysis/spatial/outputs/corrplots.png",res=600,units="in",height=9,width=7)
-par(oma=c(2,2,2,2))
-par(mfrow=c(2,2))
-corrplot(cor.z,diag=FALSE,order="hclust",addrect=6,method="square",tl.col="black",tl.cex=.5)
-corrplot(cor.z,diag=FALSE,order="hclust",addrect=6,method="square",tl.col="black",tl.cex=.5)
-corrplot(cor.z,diag=FALSE,order="hclust",addrect=6,method="square",tl.col="black",tl.cex=.5)
-corrplot(cor.z,diag=FALSE,order="hclust",addrect=6,method="square",tl.col="black",tl.cex=.5)
-
-#dev.off()
-
-#ggarrange(c1,c2,common.legend = TRUE,ncol=1)
-
-
-```
-
-```{r correlation plots pre post, echo=FALSE,warning=FALSE,message=FALSE,fig.align="center",fig.height=8,fig.width=6,fig.cap="Cross correlation plots to compare pre- and post-enhancement."}
-
-#png("~/R/PSF Hatchery Review/analysis/spatial/outputs/corrplots.png",res=600,units="in",height=9,width=7)
-
-par(mar=c(1,5,8,1))
-par(oma=c(1,1,1,1))
-par(mfrow=c(2,1))
-corrplot(cor.z.pre,diag=FALSE,order="hclust",addrect=6,method="square",mar=c(1,2,3,1),
-         tl.col="black",tl.cex=.3,title="Pre-Enhancement (1980)")
-corrplot(cor.z.post,diag=FALSE,order="hclust",addrect=6,method="square",mar=c(1,2,3,1),
-         tl.col="black",tl.cex=.3,title="Post-Enhancement (1980)")
-
-#dev.off()
-
-#ggarrange(c1,c2,common.legend = TRUE,ncol=1)
-
-
-```
-
 
 
 ```{r, include=FALSE,eval=FALSE}
@@ -728,6 +714,27 @@ ggplot(a26.rel.prep,aes(x=RELEASE_YEAR,y=releases,color=RELEASE_STAGE_NAME,shape
   facet_wrap(~RELEASE_SITE_NAME,scale="free_y",ncol=1)+
   theme_bw()+
   theme(legend.position = "bottom")
+```
+
+
+
+```{r correlation plots pre post, echo=FALSE,warning=FALSE,message=FALSE,fig.align="center",fig.height=8,fig.width=6,fig.cap="Cross correlation plots to compare pre- and post-enhancement."}
+
+#png("~/R/PSF Hatchery Review/analysis/spatial/outputs/corrplots.png",res=600,units="in",height=9,width=7)
+
+par(mar=c(1,5,8,1))
+par(oma=c(1,1,1,1))
+par(mfrow=c(2,1))
+corrplot(cor.z.pre,diag=FALSE,order="hclust",addrect=6,method="square",mar=c(1,2,3,1),
+         tl.col="black",tl.cex=.3,title="Pre-Enhancement (1980)")
+corrplot(cor.z.post,diag=FALSE,order="hclust",addrect=6,method="square",mar=c(1,2,3,1),
+         tl.col="black",tl.cex=.3,title="Post-Enhancement (1980)")
+
+#dev.off()
+
+#ggarrange(c1,c2,common.legend = TRUE,ncol=1)
+
+
 ```
 
 
