@@ -2,7 +2,10 @@
 title: "Spatial Analysis Figures"
 subtitle: "Area 25 Chum Salmon"
 author: "Coastland"
-date: "22/10/2021"
+date: "`r Sys.Date()`"
+papersize: ledger
+geometry: margin = 1.75cm
+toc: TRUE
 output:
   pdf_document: default
   html_document: default
@@ -13,7 +16,6 @@ editor_options:
 ```{r setup, echo=FALSE,message=FALSE,warning=FALSE}
 #load libraries
 knitr::opts_chunk$set(echo = TRUE, fig.pos = "!h")
-
 
 library(data.table)
 library(tidyverse)
@@ -78,7 +80,8 @@ df<-esc.data%>%filter(SYS_NM%in%included.stream.list$SYS_NM)%>%
 ```
 
 \newpage
-
+# Summary statistics 
+## Bubbleplot of escapement by enhancement rank
 ```{r escapement bubble plot, fig.align="center",fig.height=8,fig.width=6,fig.cap="Escapement to area streams by enhancement rank.",echo=FALSE,warning=FALSE,message=FALSE}
 
 par(mfrow = c(1, 1))
@@ -90,10 +93,13 @@ ggplot(df,aes(x=Year,y=SYS_NM,color=Enhancement_Rank,size=escapement))+
   labs(y="Escapement",color="Enhancement",x="Year",size="Escapement")+
   theme_bw()+
   theme(legend.position="bottom")
+
 ```
 
 \newpage
 
+
+## Streams by enhancement
 ```{r metric plots,fig.align="center",fig.height=8,fig.width=6,fig.cap="Various plots for escapement and transformations.",echo=FALSE,warning=FALSE,message=FALSE}
 #plot streams by enhancement
 
@@ -123,7 +129,7 @@ ggarrange(p1,p2,p3,p4,ncol=1,common.legend = TRUE)
 ```
 
 \newpage
-
+## Moving average and LOESSS fit on enhancement ranking of log escapements
 ```{r moving average and LOESS plots, echo=FALSE,warning=FALSE,message=FALSE,fig.align="center",fig.height=5,fig.width=6,fig.cap="Moving average and LOESS fits on logged escapement by enhancement ranking."}
 t1<-ggplot(df,aes(x=Year,y=m.ave,color=Enhancement_Rank,group=SYS_NM))+
   geom_line()+
@@ -141,7 +147,7 @@ ggarrange(t1,t2,ncol=1,common.legend = TRUE)
 ```
 
 \newpage
-
+## Z-scores pre- and post-enhancement
 ```{r prepost boxplot,echo=FALSE,warning=FALSE,message=FALSE,fig.align="center",fig.height=7,fig.width=6,fig.cap="Z-scores pre- and post-enhancement."}
 ggplot(df,aes(y=SYS_NM,x=z,fill=prepost))+
   geom_boxplot()+
@@ -153,7 +159,8 @@ ggplot(df,aes(y=SYS_NM,x=z,fill=prepost))+
 \newpage
 
 \newpage
-
+# Correlation analyses
+## Correlation plots by metric
 ```{r correlations for all metrics,echo=FALSE,warning=FALSE,message=FALSE}
 #prep data for correlations
 
@@ -201,14 +208,7 @@ dendclust.z[["labels"]][["inlet"]] <- inletlist
 xlenz <- .95 * length(zlabs$SYS_NM)
 ylenz <- .95 * (max(dendclust.z[["segments"]][["y"]]))
 
-par(mfrow=c(1,1))
-
-ggdendrogram(dendclust.z, rotate = TRUE) +
-  labs(title = "Z-scores") +
-  theme(axis.text.y = element_text(colour = dendclust.z[["labels"]][["inlet"]])) +
-  annotate("text", x = xlenz, y = ylenz, colour = "red", label = "Nootka inlet") +
-  annotate("text", x = xlenz-1, y = ylenz, colour = "black", label = "Esperanza inlet") +  
-  annotate("text", x = xlenz-2, y = ylenz, colour = "99FF33", label = "Tahsis inlet") 
+ 
 
 # Correlation analysis by log escapement
 
@@ -239,12 +239,7 @@ dendclust.e[["labels"]][["inlet"]] <- inletlist
 xlene <- .95 * length(elabs$SYS_NM)
 ylene <- .95 * (max(dendclust.e[["segments"]][["y"]]))
 
-ggdendrogram(dendclust.e, rotate = TRUE) +
-  labs(title = "Log escapement") +
-  theme(axis.text.y = element_text(colour = dendclust.e[["labels"]][["inlet"]])) +
-  annotate("text", x = xlene, y = ylene, colour = "red", label = "Nootka inlet") +
-  annotate("text", x = xlene-1, y = ylene, colour = "black", label = "Esperanza inlet") +  
-  annotate("text", x = xlene-2, y = ylene, colour = "99FF33", label = "Tahsis inlet")
+
 
 
 
@@ -276,16 +271,6 @@ dendclust.s[["labels"]][["inlet"]] <- inletlist
 xlens <- .95 * length(slabs$SYS_NM)
 ylens <- .95 * (max(dendclust.s[["segments"]][["y"]]))
 
-ggdendrogram(dendclust.s, rotate = TRUE) +
-  labs(title = "Standardized escapement") +
-  theme(axis.text.y = element_text(colour = dendclust.s[["labels"]][["inlet"]])) +
-  annotate("text", x = xlens, y = ylens, colour = "red", label = "Nootka inlet") +
-  annotate("text", x = xlens-1, y = ylens, colour = "black", label = "Esperanza inlet") +  
-  annotate("text", x = xlens-2, y = ylens, colour = "99FF33", label = "Tahsis inlet")
-
-
-
-
 # Correlation analysis by moving average
 cor.data.m<-df%>%select(SYS_NM,Year,m.ave)%>%pivot_wider(names_from="Year",values_from="m.ave")%>%data.frame()
 
@@ -314,17 +299,15 @@ dendclust.m[["labels"]][["inlet"]] <- inletlist
 xlenm <- .95 * length(mlabs$SYS_NM)
 ylenm <- .95 * (max(dendclust.m[["segments"]][["y"]]))
 
-ggdendrogram(dendclust.m, rotate = TRUE) +
-  labs(title = "Moving average") +
-  theme(axis.text.y = element_text(colour = dendclust.m[["labels"]][["inlet"]])) +
-  annotate("text", x = xlenm, y = ylenm, colour = "red", label = "Nootka inlet") +
-  annotate("text", x = xlenm-1, y = ylenm, colour = "black", label = "Esperanza inlet") +  
-  annotate("text", x = xlenm-2, y = ylenm, colour = "99FF33", label = "Tahsis inlet")
+```
 
+```{r correlation plots, echo=FALSE,warning=FALSE,message=FALSE,fig.align="center",fig.height=8.5,fig.width=7.5,fig.cap="Cross correlation plots to compare metrics."}
 
 # Corplots to knit
-par(oma=c(2,2,2,2))
+
+par(oma=c(1,1,1,1))
 par(mfrow=c(2,2))
+
 corrplot(cor.z, diag = FALSE, order="hclust", method="square", tl.col="black",
          addrect = 6, tl.cex = 0.5)
 corrplot(cor.e, diag = FALSE, order="hclust", method="square", tl.col="black",
@@ -333,30 +316,44 @@ corrplot(cor.s, diag = FALSE, order="hclust", method="square", tl.col="black",
          addrect = 6, tl.cex = 0.5)
 corrplot(cor.m, diag = FALSE, order="hclust", method="square", tl.col="black",
          addrect = 6, tl.cex = 0.5)
-
-
-
 ```
 
+## Dendrograms by metric
 
-```{r correlation plots, echo=FALSE,warning=FALSE,message=FALSE,fig.align="center",fig.height=7,fig.width=6,fig.cap="Cross correlation plots to compare metrics."}
+```{r dendrograms for all metrics,echo=FALSE,warning=FALSE,message=FALSE}
+# Dendrograms to knit
+par(mfrow=c(1,1))
 
-#png("~/R/PSF Hatchery Review/analysis/spatial/outputs/corrplots.png",res=600,units="in",height=9,width=7)
-par(oma=c(2,2,2,2))
-par(mfrow=c(2,2))
-corrplot(cor.z,diag=FALSE,order="hclust",addrect=6,method="square",tl.col="black",tl.cex=.5)
-corrplot(cor.z,diag=FALSE,order="hclust",addrect=6,method="square",tl.col="black",tl.cex=.5)
-corrplot(cor.z,diag=FALSE,order="hclust",addrect=6,method="square",tl.col="black",tl.cex=.5)
-corrplot(cor.z,diag=FALSE,order="hclust",addrect=6,method="square",tl.col="black",tl.cex=.5)
+ggdendrogram(dendclust.z, rotate = TRUE) +
+  labs(title = "Z-scores") +
+  theme(axis.text.y = element_text(colour = dendclust.z[["labels"]][["inlet"]])) +
+  annotate("text", x = xlenz, y = ylenz, colour = "red", label = "Nootka inlet") +
+  annotate("text", x = xlenz-1, y = ylenz, colour = "black", label = "Esperanza inlet") +  
+  annotate("text", x = xlenz-2, y = ylenz, colour = "99FF33", label = "Tahsis inlet")
+ggdendrogram(dendclust.e, rotate = TRUE) +
+  labs(title = "Log escapement") +
+  theme(axis.text.y = element_text(colour = dendclust.e[["labels"]][["inlet"]])) +
+  annotate("text", x = xlene, y = ylene, colour = "red", label = "Nootka inlet") +
+  annotate("text", x = xlene-1, y = ylene, colour = "black", label = "Esperanza inlet") +  
+  annotate("text", x = xlene-2, y = ylene, colour = "99FF33", label = "Tahsis inlet")
 
-#dev.off()
+ggdendrogram(dendclust.s, rotate = TRUE) +
+  labs(title = "Standardized escapement") +
+  theme(axis.text.y = element_text(colour = dendclust.s[["labels"]][["inlet"]])) +
+  annotate("text", x = xlens, y = ylens, colour = "red", label = "Nootka inlet") +
+  annotate("text", x = xlens-1, y = ylens, colour = "black", label = "Esperanza inlet") +  
+  annotate("text", x = xlens-2, y = ylens, colour = "99FF33", label = "Tahsis inlet")
 
-#ggarrange(c1,c2,common.legend = TRUE,ncol=1)
-
-
+ggdendrogram(dendclust.m, rotate = TRUE) +
+  labs(title = "Moving average") +
+  theme(axis.text.y = element_text(colour = dendclust.m[["labels"]][["inlet"]])) +
+  annotate("text", x = xlenm, y = ylenm, colour = "red", label = "Nootka inlet") +
+  annotate("text", x = xlenm-1, y = ylenm, colour = "black", label = "Esperanza inlet") +  
+  annotate("text", x = xlenm-2, y = ylenm, colour = "99FF33", label = "Tahsis inlet")
 ```
 
 \newpage
+
 
 ```{r correlations for side by side pre post,echo=FALSE,warning=FALSE,message=FALSE}
 #prep data for correlations
