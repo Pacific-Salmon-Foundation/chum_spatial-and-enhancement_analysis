@@ -19,6 +19,7 @@ library(corrplot)
 library(ggpubr)
 library(zoo)
 library(ggdendro)
+library(cowplot)
 
 options(scipen=10000)
 
@@ -78,8 +79,6 @@ df<-esc.data%>%filter(SYS_NM%in%included.stream.list$SYS_NM)%>%
 ```{r correlations for all metrics,echo=FALSE,warning=FALSE,message=FALSE}
 #prep data for correlations
 
-# Needs: Arranged in knit, colors to stream inlet in dendrograms, tanglegrams(maybe?)
-
 # Merge stream inlet table into df
 
 streaminlet <- read_csv("CM A25 filtered stream list_with inlets.csv")
@@ -95,9 +94,6 @@ inlets$colour <- c("red", "blue", "darkgreen")
 colnames(inlets) <- c("inlet", "colour")
 
 
-
-
-
 # Correlation analysis by z-score
 
 cor.data.z<-df%>%select(SYS_NM,Year,z)%>%pivot_wider(names_from="Year",values_from="z")%>%data.frame()
@@ -107,8 +103,6 @@ rownames(cor.data.z)<-cor.data.z$SYS_NM
 cor.data.z<-cor.data.z%>%select(-SYS_NM)
 
 cor.z<-cor(t(cor.data.z),use="pairwise.complete.obs")
-
-corrplot(cor.z,type="upper",order="hclust",method="square",tl.col="black")
 
 # Dendrogram, factored by inlet, by z-score
 
@@ -126,14 +120,17 @@ inletlist <- as.factor(zlabs$inlet)
   
 dendclust.z[["labels"]][["inlet"]] <- inletlist
 
-xlenz <- .9 * length(zlabs$SYS_NM)
-ylenz <- .75 * (max(dendclust.z[["segments"]][["y"]]))
+xlenz <- .95 * length(zlabs$SYS_NM)
+ylenz <- .95 * (max(dendclust.z[["segments"]][["y"]]))
+
+par(mfrow=c(1,1))
 
 ggdendrogram(dendclust.z, rotate = TRUE) +
+  labs(title = "Z-scores") +
   theme(axis.text.y = element_text(colour = dendclust.z[["labels"]][["inlet"]])) +
   annotate("text", x = xlenz, y = ylenz, colour = "red", label = "Nootka inlet") +
   annotate("text", x = xlenz-1, y = ylenz, colour = "black", label = "Esperanza inlet") +  
-  annotate("text", x = xlenz-2, y = ylenz, colour = "green", label = "Tahsis inlet") 
+  annotate("text", x = xlenz-2, y = ylenz, colour = "99FF33", label = "Tahsis inlet") 
 
 # Correlation analysis by log escapement
 
@@ -144,8 +141,6 @@ rownames(cor.data.e)<-cor.data.e$SYS_NM
 cor.data.e<-cor.data.e%>%select(-SYS_NM)
 
 cor.e<-cor(t(cor.data.e),use="pairwise.complete.obs")
-
-corrplot(cor.e,type="upper",order="hclust",method="square",tl.col="black")
 
 # Dendrogram, factored by inlet, by log escapement
 
@@ -163,14 +158,15 @@ inletlist <- as.factor(elabs$inlet)
   
 dendclust.e[["labels"]][["inlet"]] <- inletlist
 
-xlene <- .9 * length(elabs$SYS_NM)
-ylene <- .75 * (max(dendclust.e[["segments"]][["y"]]))
+xlene <- .95 * length(elabs$SYS_NM)
+ylene <- .95 * (max(dendclust.e[["segments"]][["y"]]))
 
 ggdendrogram(dendclust.e, rotate = TRUE) +
+  labs(title = "Log escapement") +
   theme(axis.text.y = element_text(colour = dendclust.e[["labels"]][["inlet"]])) +
   annotate("text", x = xlene, y = ylene, colour = "red", label = "Nootka inlet") +
   annotate("text", x = xlene-1, y = ylene, colour = "black", label = "Esperanza inlet") +  
-  annotate("text", x = xlene-2, y = ylene, colour = "green", label = "Tahsis inlet")
+  annotate("text", x = xlene-2, y = ylene, colour = "99FF33", label = "Tahsis inlet")
 
 
 
@@ -182,8 +178,6 @@ rownames(cor.data.s)<-cor.data.s$SYS_NM
 cor.data.s<-cor.data.s%>%select(-SYS_NM)
 
 cor.s<-cor(t(cor.data.s),use="pairwise.complete.obs")
-
-corrplot(cor.s,type="upper",order="hclust",method="square",tl.col="black")
 
 # Dendrogram, factored by inlet, by standardized escapement
 
@@ -201,14 +195,15 @@ inletlist <- as.factor(slabs$inlet)
   
 dendclust.s[["labels"]][["inlet"]] <- inletlist
 
-xlens <- .9 * length(slabs$SYS_NM)
-ylens <- .75 * (max(dendclust.s[["segments"]][["y"]]))
+xlens <- .95 * length(slabs$SYS_NM)
+ylens <- .95 * (max(dendclust.s[["segments"]][["y"]]))
 
 ggdendrogram(dendclust.s, rotate = TRUE) +
+  labs(title = "Standardized escapement") +
   theme(axis.text.y = element_text(colour = dendclust.s[["labels"]][["inlet"]])) +
   annotate("text", x = xlens, y = ylens, colour = "red", label = "Nootka inlet") +
   annotate("text", x = xlens-1, y = ylens, colour = "black", label = "Esperanza inlet") +  
-  annotate("text", x = xlens-2, y = ylens, colour = "green", label = "Tahsis inlet")
+  annotate("text", x = xlens-2, y = ylens, colour = "99FF33", label = "Tahsis inlet")
 
 
 
@@ -221,8 +216,6 @@ rownames(cor.data.m)<-cor.data.m$SYS_NM
 cor.data.m<-cor.data.m%>%select(-SYS_NM)
 
 cor.m<-cor(t(cor.data.m),use="pairwise.complete.obs")
-
-corrplot(cor.m,type="upper",order="hclust",method="square",tl.col="black")
 
 # Dendrogram, factored by inlet, by moving average
 
@@ -240,14 +233,29 @@ inletlist <- as.factor(mlabs$inlet)
   
 dendclust.m[["labels"]][["inlet"]] <- inletlist
 
-xlenm <- .9 * length(mlabs$SYS_NM)
-ylenm <- .75 * (max(dendclust.m[["segments"]][["y"]]))
+xlenm <- .95 * length(mlabs$SYS_NM)
+ylenm <- .95 * (max(dendclust.m[["segments"]][["y"]]))
 
 ggdendrogram(dendclust.m, rotate = TRUE) +
+  labs(title = "Moving average") +
   theme(axis.text.y = element_text(colour = dendclust.m[["labels"]][["inlet"]])) +
   annotate("text", x = xlenm, y = ylenm, colour = "red", label = "Nootka inlet") +
   annotate("text", x = xlenm-1, y = ylenm, colour = "black", label = "Esperanza inlet") +  
-  annotate("text", x = xlenm-2, y = ylenm, colour = "green", label = "Tahsis inlet")
+  annotate("text", x = xlenm-2, y = ylenm, colour = "99FF33", label = "Tahsis inlet")
+
+
+# Corplots to knit
+par(oma=c(2,2,2,2))
+par(mfrow=c(2,2))
+corrplot(cor.z, diag = FALSE, order="hclust", method="square", tl.col="black",
+         addrect = 6, tl.cex = 0.5)
+corrplot(cor.e, diag = FALSE, order="hclust", method="square", tl.col="black",
+         addrect = 6, tl.cex = 0.5)
+corrplot(cor.s, diag = FALSE, order="hclust", method="square", tl.col="black",
+         addrect = 6, tl.cex = 0.5)
+corrplot(cor.m, diag = FALSE, order="hclust", method="square", tl.col="black",
+         addrect = 6, tl.cex = 0.5)
+
 
 
 ```
@@ -256,9 +264,8 @@ ggdendrogram(dendclust.m, rotate = TRUE) +
 ```{r correlations for side by side pre post,echo=FALSE,warning=FALSE,message=FALSE}
 #prep data for correlations
 
-cor.data.z<-df%>%select(SYS_NM,Year,z)%>%pivot_wider(names_from="Year",values_from="z")%>%data.frame()
-
-names(cor.data.z)
+cor.data.z<-df%>%select(SYS_NM,Year,z)%>%
+  pivot_wider(names_from="Year",values_from="z")%>%data.frame()
 
 cor.data.z.pre<-cor.data.z[,1:31]
 rownames(cor.data.z.pre)<-cor.data.z.pre$SYS_NM
@@ -270,15 +277,312 @@ rownames(cor.data.z.post)<-cor.data.z.post$SYS_NM
 cor.data.z.post<-cor.data.z.post%>%select(-SYS_NM)
 cor.z.post<-cor(t(cor.data.z.post),use="pairwise.complete.obs")
 
+
+par(mfrow=c(1,2))
+corrplot(cor.z.pre, diag = FALSE, order="hclust", method="square", tl.col="black",
+         addrect = 6, tl.cex = 0.5, title = "Z-scores (Pre 1980)", mar=c(0,0,1,0))
+corrplot(cor.z.post, diag = FALSE, order="hclust", method="square", tl.col="black",
+         addrect = 6, tl.cex = 0.5, title = "Z-score (Post 1980)", sub = "Z-scores", mar=c(0,0,1,0))
+
+# Dendrogram, factored by inlet, by z-score
+
+# Pre-1980
+dist.cor.z.pre<- dist(cor.z.pre)
+clust.dist.cor.z.pre <- hclust(dist.cor.z.pre)
+
+dendclust.z.pre <- dendro_data(clust.dist.cor.z.pre)
+zlabs.pre <- as.data.frame(dendclust.z.pre[["labels"]][["label"]])
+zlabs.pre$order <- 1:length(zlabs.pre[,1])
+colnames(zlabs.pre) <- c("SYS_NM", "order")
+zlabs.pre <- merge(streaminlet, zlabs.pre, by = "SYS_NM")
+zlabs.pre <- zlabs.pre %>%
+  arrange(order)
+inletlist.pre <- as.factor(zlabs.pre$inlet)
+  
+dendclust.z.pre[["labels"]][["inlet"]] <- inletlist.pre
+
+xlenz.pre <- .95 * length(zlabs.pre$SYS_NM)
+ylenz.pre <- .95 * (max(dendclust.z.pre[["segments"]][["y"]]))
+
+par(mfrow=c(1,1))
+
+ggdendrogram(dendclust.z.pre, rotate = TRUE) +
+  labs(title = "Z-scores (Pre 1980)") +
+  theme(axis.text.y = element_text(colour = dendclust.z.pre[["labels"]][["inlet"]])) +
+  annotate("text", x = xlenz.pre, y = ylenz.pre, colour = "red", label = "Nootka inlet") +
+  annotate("text", x = xlenz.pre-1, y = ylenz.pre, colour = "black", label = "Esperanza inlet") +  
+  annotate("text", x = xlenz.pre-2, y = ylenz.pre, colour = "99FF33", label = "Tahsis inlet") 
+
+# Post-1980
+dist.cor.z.post<- dist(cor.z.post)
+clust.dist.cor.z.post <- hclust(dist.cor.z.post)
+
+dendclust.z.post <- dendro_data(clust.dist.cor.z.post)
+zlabs.post <- as.data.frame(dendclust.z.post[["labels"]][["label"]])
+zlabs.post$order <- 1:length(zlabs.post[,1])
+colnames(zlabs.post) <- c("SYS_NM", "order")
+zlabs.post <- merge(streaminlet, zlabs.post, by = "SYS_NM")
+zlabs.post <- zlabs.post %>%
+  arrange(order)
+inletlist.post <- as.factor(zlabs.post$inlet)
+  
+dendclust.z.post[["labels"]][["inlet"]] <- inletlist.post
+
+xlenz.post <- .95 * length(zlabs.post$SYS_NM)
+ylenz.post <- .95 * (max(dendclust.z.post[["segments"]][["y"]]))
+
+par(mfrow=c(1,1))
+
+ggdendrogram(dendclust.z.post, rotate = TRUE) +
+  labs(title = "Z-scores (Post 1980)") +
+  theme(axis.text.y = element_text(colour = dendclust.z.post[["labels"]][["inlet"]])) +
+  annotate("text", x = xlenz.post, y = ylenz.post, colour = "red", label = "Nootka inlet") +
+  annotate("text", x = xlenz.post-1, y = ylenz.post, colour = "black", label = "Esperanza inlet") +  
+  annotate("text", x = xlenz.post-2, y = ylenz.post, colour = "99FF33", label = "Tahsis inlet")
+
+
+
 #insert cor pre-post analysis for each other metric
 #esc.log
+cor.data.e<-df%>%select(SYS_NM,Year,esc.log)%>%
+  pivot_wider(names_from="Year",values_from="esc.log")%>%data.frame()
+
+cor.data.e.pre<-cor.data.e[,1:31]
+rownames(cor.data.e.pre)<-cor.data.e.pre$SYS_NM
+cor.data.e.pre<-cor.data.e.pre%>%select(-SYS_NM)
+cor.e.pre<-cor(t(cor.data.e.pre),use="pairwise.complete.obs")
+
+cor.data.e.post<-cor.data.e[,c(1,32:70)]
+rownames(cor.data.e.post)<-cor.data.e.post$SYS_NM
+cor.data.e.post<-cor.data.e.post%>%select(-SYS_NM)
+cor.e.post<-cor(t(cor.data.e.post),use="pairwise.complete.obs")
+
+par(mfrow=c(1,2))
+corrplot(cor.e.pre, diag = FALSE, order="hclust", method="square", tl.col="black",
+         addrect = 6, tl.cex = 0.5, title = "Log escapement (Pre 1980)", mar=c(0,0,1,0))
+corrplot(cor.e.post, diag = FALSE, order="hclust", method="square", tl.col="black",
+         addrect = 6, tl.cex = 0.5, title = "Log escapement (Post 1980)", mar=c(0,0,1,0))
+
+# Dendrogram, factored by inlet, by log escapement
+
+# Pre-1980
+dist.cor.e.pre<- dist(cor.e.pre)
+clust.dist.cor.e.pre <- hclust(dist.cor.e.pre)
+
+dendclust.e.pre <- dendro_data(clust.dist.cor.e.pre)
+elabs.pre <- as.data.frame(dendclust.e.pre[["labels"]][["label"]])
+elabs.pre$order <- 1:length(elabs.pre[,1])
+colnames(elabs.pre) <- c("SYS_NM", "order")
+elabs.pre <- merge(streaminlet, elabs.pre, by = "SYS_NM")
+elabs.pre <- elabs.pre %>%
+  arrange(order)
+inletlist.pre <- as.factor(elabs.pre$inlet)
+  
+dendclust.e.pre[["labels"]][["inlet"]] <- inletlist.pre
+
+xlene.pre <- .95 * length(elabs.pre$SYS_NM)
+ylene.pre <- .95 * (max(dendclust.e.pre[["segments"]][["y"]]))
+
+par(mfrow=c(1,1))
+
+ggdendrogram(dendclust.e.pre, rotate = TRUE) +
+  labs(title = "Log escapement (Pre 1980)") +
+  theme(axis.text.y = element_text(colour = dendclust.e.pre[["labels"]][["inlet"]])) +
+  annotate("text", x = xlene.pre, y = ylene.pre, colour = "red", label = "Nootka inlet") +
+  annotate("text", x = xlene.pre-1, y = ylene.pre, colour = "black", label = "Esperanza inlet") +  
+  annotate("text", x = xlene.pre-2, y = ylene.pre, colour = "99FF33", label = "Tahsis inlet")
+
+# Post-1980
+dist.cor.e.post<- dist(cor.e.post)
+clust.dist.cor.e.post <- hclust(dist.cor.e.post)
+
+dendclust.e.post <- dendro_data(clust.dist.cor.e.post)
+elabs.post <- as.data.frame(dendclust.e.post[["labels"]][["label"]])
+elabs.post$order <- 1:length(elabs.post[,1])
+colnames(elabs.post) <- c("SYS_NM", "order")
+elabs.post <- merge(streaminlet, elabs.post, by = "SYS_NM")
+elabs.post <- elabs.post %>%
+  arrange(order)
+inletlist.post <- as.factor(elabs.post$inlet)
+  
+dendclust.e.post[["labels"]][["inlet"]] <- inletlist.post
+
+xlene.post <- .95 * length(elabs.post$SYS_NM)
+ylene.post <- .95 * (max(dendclust.e.post[["segments"]][["y"]]))
+
+par(mfrow=c(1,1))
+
+ggdendrogram(dendclust.e.post, rotate = TRUE) +
+  labs(title = "Log escapement (Post 1980)") +
+  theme(axis.text.y = element_text(colour = dendclust.e.post[["labels"]][["inlet"]])) +
+  annotate("text", x = xlene.post, y = ylene.post, colour = "red", label = "Nootka inlet") +
+  annotate("text", x = xlene.post-1, y = ylene.post, colour = "black", label = "Esperanza inlet") +  
+  annotate("text", x = xlene.post-2, y = ylene.post, colour = "99FF33", label = "Tahsis inlet")
+
+
 #esc.stand
+
+cor.data.s<-df%>%select(SYS_NM,Year,esc.stand)%>%
+  pivot_wider(names_from="Year",values_from="esc.stand")%>%data.frame()
+
+cor.data.s.pre<-cor.data.s[,1:31]
+rownames(cor.data.s.pre)<-cor.data.s.pre$SYS_NM
+cor.data.s.pre<-cor.data.s.pre%>%select(-SYS_NM)
+cor.s.pre<-cor(t(cor.data.s.pre),use="pairwise.complete.obs")
+
+cor.data.s.post<-cor.data.s[,c(1,32:70)]
+rownames(cor.data.s.post)<-cor.data.s.post$SYS_NM
+cor.data.s.post<-cor.data.s.post%>%select(-SYS_NM)
+cor.s.post<-cor(t(cor.data.s.post),use="pairwise.complete.obs")
+
+par(mfrow=c(1,2))
+corrplot(cor.s.pre, diag = FALSE, order="hclust", method="square", tl.col="black",
+         addrect = 6, tl.cex = 0.5, title = "Standardized escapement (Pre 1980)", mar=c(0,0,1,0))
+corrplot(cor.s.post, diag = FALSE, order="hclust", method="square", tl.col="black",
+         addrect = 6, tl.cex = 0.5, title = "Standardized escapement (Post 1980)", mar=c(0,0,1,0))
+
+# Dendrogram, factored by inlet, by standardized escapement
+
+# Pre-1980
+dist.cor.s.pre<- dist(cor.s.pre)
+clust.dist.cor.s.pre <- hclust(dist.cor.s.pre)
+
+dendclust.s.pre <- dendro_data(clust.dist.cor.s.pre)
+slabs.pre <- as.data.frame(dendclust.s.pre[["labels"]][["label"]])
+slabs.pre$order <- 1:length(slabs.pre[,1])
+colnames(slabs.pre) <- c("SYS_NM", "order")
+slabs.pre <- merge(streaminlet, slabs.pre, by = "SYS_NM")
+slabs.pre <- slabs.pre %>%
+  arrange(order)
+inletlist.pre <- as.factor(slabs.pre$inlet)
+  
+dendclust.s.pre[["labels"]][["inlet"]] <- inletlist.pre
+
+xlens.pre <- .95 * length(slabs.pre$SYS_NM)
+ylens.pre <- .95 * (max(dendclust.s.pre[["segments"]][["y"]]))
+
+par(mfrow=c(1,1))
+
+ggdendrogram(dendclust.s.pre, rotate = TRUE) +
+  labs(title = "Standardized escapement (Pre 1980)") +
+  theme(axis.text.y = element_text(colour = dendclust.s.pre[["labels"]][["inlet"]])) +
+  annotate("text", x = xlens.pre, y = ylens.pre, colour = "red", label = "Nootka inlet") +
+  annotate("text", x = xlens.pre-1, y = ylens.pre, colour = "black", label = "Esperanza inlet") +  
+  annotate("text", x = xlens.pre-2, y = ylens.pre, colour = "99FF33", label = "Tahsis inlet") 
+
+# Post-1980
+dist.cor.s.post<- dist(cor.s.post)
+clust.dist.cor.s.post <- hclust(dist.cor.s.post)
+
+dendclust.s.post <- dendro_data(clust.dist.cor.s.post)
+slabs.post <- as.data.frame(dendclust.s.post[["labels"]][["label"]])
+slabs.post$order <- 1:length(slabs.post[,1])
+colnames(slabs.post) <- c("SYS_NM", "order")
+slabs.post <- merge(streaminlet, slabs.post, by = "SYS_NM")
+slabs.post <- slabs.post %>%
+  arrange(order)
+inletlist.post <- as.factor(slabs.post$inlet)
+  
+dendclust.s.post[["labels"]][["inlet"]] <- inletlist.post
+
+xlens.post <- .95 * length(slabs.post$SYS_NM)
+ylens.post <- .95 * (max(dendclust.s.post[["segments"]][["y"]]))
+
+par(mfrow=c(1,1))
+
+ggdendrogram(dendclust.s.post, rotate = TRUE) +
+  labs(title = "Standardized escapement (Post 1980)") +
+  theme(axis.text.y = element_text(colour = dendclust.s.post[["labels"]][["inlet"]])) +
+  annotate("text", x = xlens.post, y = ylens.post, colour = "red", label = "Nootka inlet") +
+  annotate("text", x = xlens.post-1, y = ylens.post, colour = "black", label = "Esperanza inlet") +  
+  annotate("text", x = xlens.post-2, y = ylens.post, colour = "99FF33", label = "Tahsis inlet")
+
+
 #m.ave
+
+cor.data.m<-df%>%select(SYS_NM,Year,m.ave)%>%
+  pivot_wider(names_from="Year",values_from="m.ave")%>%data.frame()
+
+cor.data.m.pre<-cor.data.m[,1:31]
+rownames(cor.data.m.pre)<-cor.data.m.pre$SYS_NM
+cor.data.m.pre<-cor.data.m.pre%>%select(-SYS_NM)
+cor.m.pre<-cor(t(cor.data.m.pre),use="pairwise.complete.obs")
+
+cor.data.m.post<-cor.data.m[,c(1,32:70)]
+rownames(cor.data.m.post)<-cor.data.m.post$SYS_NM
+cor.data.m.post<-cor.data.m.post%>%select(-SYS_NM)
+cor.m.post<-cor(t(cor.data.m.post),use="pairwise.complete.obs")
+
+par(mfrow=c(1,2))
+corrplot(cor.m.pre, diag = FALSE, order="hclust", method="square", tl.col="black",
+         addrect = 6, tl.cex = 0.5, title = "Moving average (Pre 1980)", mar=c(0,0,1,0))
+corrplot(cor.m.post, diag = FALSE, order="hclust", method="square", tl.col="black",
+         addrect = 6, tl.cex = 0.5, title = "Moving average (Post 1980)", mar=c(0,0,1,0))
+
+# Dendrogram, factored by inlet, by m-score
+
+# Pre-1980
+dist.cor.m.pre<- dist(cor.m.pre)
+clust.dist.cor.m.pre <- hclust(dist.cor.m.pre)
+
+dendclust.m.pre <- dendro_data(clust.dist.cor.m.pre)
+mlabs.pre <- as.data.frame(dendclust.m.pre[["labels"]][["label"]])
+mlabs.pre$order <- 1:length(mlabs.pre[,1])
+colnames(mlabs.pre) <- c("SYS_NM", "order")
+mlabs.pre <- merge(streaminlet, mlabs.pre, by = "SYS_NM")
+mlabs.pre <- mlabs.pre %>%
+  arrange(order)
+inletlist.pre <- as.factor(mlabs.pre$inlet)
+  
+dendclust.m.pre[["labels"]][["inlet"]] <- inletlist.pre
+
+xlenm.pre <- .95 * length(mlabs.pre$SYS_NM)
+ylenm.pre <- .95 * (max(dendclust.m.pre[["segments"]][["y"]]))
+
+par(mfrow=c(1,1))
+
+ggdendrogram(dendclust.m.pre, rotate = TRUE) +
+  labs(title = "Moving average (Pre 1980)") +
+  theme(axis.text.y = element_text(colour = dendclust.m.pre[["labels"]][["inlet"]])) +
+  annotate("text", x = xlenm.pre, y = ylenm.pre, colour = "red", label = "Nootka inlet") +
+  annotate("text", x = xlenm.pre-1, y = ylenm.pre, colour = "black", label = "Esperanza inlet") +  
+  annotate("text", x = xlenm.pre-2, y = ylenm.pre, colour = "99FF33", label = "Tahsis inlet") 
+
+# Post-1980
+dist.cor.m.post<- dist(cor.m.post)
+clust.dist.cor.m.post <- hclust(dist.cor.m.post)
+
+dendclust.m.post <- dendro_data(clust.dist.cor.m.post)
+mlabs.post <- as.data.frame(dendclust.m.post[["labels"]][["label"]])
+mlabs.post$order <- 1:length(mlabs.post[,1])
+colnames(mlabs.post) <- c("SYS_NM", "order")
+mlabs.post <- merge(streaminlet, mlabs.post, by = "SYS_NM")
+mlabs.post <- mlabs.post %>%
+  arrange(order)
+inletlist.post <- as.factor(mlabs.post$inlet)
+  
+dendclust.m.post[["labels"]][["inlet"]] <- inletlist.post
+
+xlenm.post <- .95 * length(mlabs.post$SYS_NM)
+ylenm.post <- .95 * (max(dendclust.m.post[["segments"]][["y"]]))
+
+par(mfrow=c(1,1))
+
+ggdendrogram(dendclust.m.post, rotate = TRUE) +
+  labs(title = "Moving average (Post 1980)") +
+  theme(axis.text.y = element_text(colour = dendclust.m.post[["labels"]][["inlet"]])) +
+  annotate("text", x = xlenm.post, y = ylenm.post, colour = "red", label = "Nootka inlet") +
+  annotate("text", x = xlenm.post-1, y = ylenm.post, colour = "black", label = "Esperanza inlet") +  
+  annotate("text", x = xlenm.post-2, y = ylenm.post, colour = "99FF33", label = "Tahsis inlet")
+
+
 ```
 
 \newpage
 
 ```{r escapement bubble plot, fig.align="center",fig.height=8,fig.width=6,fig.cap="Escapement to area streams by enhancement rank.",echo=FALSE,warning=FALSE,message=FALSE}
+
+par(mfrow = c(1, 1))
 #bubbleplot of escapements for whole area
 ggplot(df,aes(x=Year,y=SYS_NM,color=Enhancement_Rank,size=escapement))+
   geom_point(alpha=.5)+
