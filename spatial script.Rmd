@@ -169,6 +169,10 @@ ggplot(df,aes(y=SYS_NM,x=z,fill=prepost))+
 
 streaminlet <- read_csv("CM A25 filtered stream list_with inlets.csv")
 
+
+streaminlet[21,4] <- "esperanza" # PLACEHOLDER FOR RANSOM RIVER INLET
+streaminlet[21,5] <- "esperanza" # PLACEHOLDER FOR RANSOM RIVER SUBINLET
+
 df <- df %>%
   inner_join(streaminlet, df, by = "SYS_NM")
 
@@ -204,7 +208,23 @@ zlabs <- merge(inlets, zlabs, by = "inlet")
 zlabs <- zlabs %>%
   arrange(order)
 zlabcolours <- zlabs$colour
-inletlist <- as.factor(zlabs$inlet)
+zlabnames <- zlabs$SYS_NM
+inletlist <- as.factor(zlabs$inlet) 
+  
+dendclust.z[["labels"]][["inlet"]] <- inletlist
+
+nameslookup <- as.data.frame(c("Tlupana", "Canton", "Conuma", "Leiner", "Deserted", "Sucwoa", 
+                 "Gold", "Mooyah", "Ransom", "Burman", "Kleeptee", "Espinosa",
+                 "L. Zeballos", "Hoiss", "Lord", "Zeballos", "Tahsis", "Tsowwin",
+                 "Hammond", "Marvinas", "Brodick", "Owossitsa", "Chum", 
+                 "Mamat", "Eliza", "Park"))
+colnames(nameslookup) <- "shortnames"
+nameslookup$SYS_NM <- zlabnames  
+nameslookup$erank <- c("red", "red", "red", "black", "yellow", "red",
+                       "black", "black", "black", "black", "black", "black",
+                       "black", "black", "black", "red", "black", "black",
+                       "black", "black", "black", "black", "black",
+                       "black", "black", "black")
   
 dendclust.z[["labels"]][["inlet"]] <- inletlist
 
@@ -233,17 +253,17 @@ elabs <- as.data.frame(dendclust.e[["labels"]][["label"]])
 elabs$order <- 1:length(elabs[,1])
 colnames(elabs) <- c("SYS_NM", "order")
 elabs <- merge(streaminlet, elabs, by = "SYS_NM")
+elabs <- merge(inlets, elabs, by = "inlet")
 elabs <- elabs %>%
   arrange(order)
+elabcolours <- elabs$colour
+elabnames <- elabs$SYS_NM
 inletlist <- as.factor(elabs$inlet)
   
 dendclust.e[["labels"]][["inlet"]] <- inletlist
 
 xlene <- .95 * length(elabs$SYS_NM)
 ylene <- .95 * (max(dendclust.e[["segments"]][["y"]]))
-
-
-
 
 
 # Correlation analysis by standardized escapement
@@ -265,8 +285,11 @@ slabs <- as.data.frame(dendclust.s[["labels"]][["label"]])
 slabs$order <- 1:length(slabs[,1])
 colnames(slabs) <- c("SYS_NM", "order")
 slabs <- merge(streaminlet, slabs, by = "SYS_NM")
+slabs <- merge(inlets, slabs, by = "inlet")
 slabs <- slabs %>%
   arrange(order)
+slabcolours <- slabs$colour
+slabnames <- slabs$SYS_NM
 inletlist <- as.factor(slabs$inlet)
   
 dendclust.s[["labels"]][["inlet"]] <- inletlist
@@ -293,8 +316,11 @@ mlabs <- as.data.frame(dendclust.m[["labels"]][["label"]])
 mlabs$order <- 1:length(mlabs[,1])
 colnames(mlabs) <- c("SYS_NM", "order")
 mlabs <- merge(streaminlet, mlabs, by = "SYS_NM")
+mlabs <- merge(inlets, mlabs, by = "inlet")
 mlabs <- mlabs %>%
   arrange(order)
+mlabcolours <- mlabs$colour
+mlabnames <- mlabs$SYS_NM
 inletlist <- as.factor(mlabs$inlet)
   
 dendclust.m[["labels"]][["inlet"]] <- inletlist
@@ -324,46 +350,147 @@ corrplot(cor.m, diag = FALSE, order="hclust", method="square", tl.col="black",
 \newpage
 ## Dendrograms by metric
 
-```{r dendrograms for all metrics,echo=FALSE,warning=FALSE,message=FALSE}
+```{r dendrograms for all metrics, echo = FALSE, warning = FALSE, message = FALSE, fig.align = "center", fig.height = 10.5, fig.width = 9.5, fig.cap = "Dendrograms by metric. Red labels are from Esperanza inlet, blue are from Nootka inlet, and green are from Tahsis inlet. Rivers and creek denoted with black circles have no enhancement rank, yellow have low, orange have medium, and red have high enhancement ranks."}
 # Dendrograms to knit
-par(oma=c(0,0,0,0))
+par(oma=c(2,2,2,2))
 par(mfrow=c(2,2))
 
-ggdendrogram(dendclust.z, rotate = TRUE, size = 3) +
-  labs(title = "Z-scores") +
-  theme(axis.text.y = element_text(colour = dendclust.z[["labels"]][["inlet"]])) +
-  annotate("text", x = xlenz, y = ylenz, colour = "red", label = "Nootka inlet") +
-  annotate("text", x = xlenz-1, y = ylenz, colour = "black", label = "Esperanza inlet") +  
-  annotate("text", x = xlenz-2, y = ylenz, colour = "99FF33", label = "Tahsis inlet")
+#ggdendrogram(dendclust.z, rotate = TRUE, size = 3) +
+#  labs(title = "Z-scores") +
+#  theme(axis.text.y = element_text(colour = dendclust.z[["labels"]][["inlet"]])) +
+#  annotate("text", x = xlenz, y = ylenz, colour = "red", label = "Nootka inlet") +
+#  annotate("text", x = xlenz-1, y = ylenz, colour = "black", label = "Esperanza inlet") +  
+#  annotate("text", x = xlenz-2, y = ylenz, colour = "99FF33", label = "Tahsis inlet")
+
+
 
 dendz <- as.dendrogram(clust.dist.cor.z)
-dendz %>% 
+dendz %>%
+  set("labels_colors", zlabcolours) %>%
+  set("labels_cex", 0.65) %>%
+  set("labels", nameslookup$shortnames) %>%
+  set("leaves_pch", 19) %>%
+  set("leaves_col", nameslookup$erank) %>%
   plot(main = "Z-scores", horiz = TRUE)
 
-ggdendrogram(dendclust.e, rotate = TRUE) +
-  labs(title = "Log escapement") +
-  theme(axis.text.y = element_text(colour = dendclust.e[["labels"]][["inlet"]])) +
-  annotate("text", x = xlene, y = ylene, colour = "red", label = "Nootka inlet") +
-  annotate("text", x = xlene-1, y = ylene, colour = "black", label = "Esperanza inlet") +  
-  annotate("text", x = xlene-2, y = ylene, colour = "99FF33", label = "Tahsis inlet")
+#ggdendrogram(dendclust.e, rotate = TRUE) +
+#  labs(title = "Log escapement") +
+#  theme(axis.text.y = element_text(colour = dendclust.e[["labels"]][["inlet"]])) +
+#  annotate("text", x = xlene, y = ylene, colour = "red", label = "Nootka inlet") +
+#  annotate("text", x = xlene-1, y = ylene, colour = "black", label = "Esperanza inlet") +  
+#  annotate("text", x = xlene-2, y = ylene, colour = "99FF33", label = "Tahsis inlet")
 
-ggdendrogram(dendclust.s, rotate = TRUE) +
-  labs(title = "Standardized escapement") +
-  theme(axis.text.y = element_text(colour = dendclust.s[["labels"]][["inlet"]])) +
-  annotate("text", x = xlens, y = ylens, colour = "red", label = "Nootka inlet") +
-  annotate("text", x = xlens-1, y = ylens, colour = "black", label = "Esperanza inlet") +  
-  annotate("text", x = xlens-2, y = ylens, colour = "99FF33", label = "Tahsis inlet")
+# Name lookup table was defined using z-scores, so all subsequent analyses have
+# this section.
+elabnames <- elabs$SYS_NM
+elabnames <- as.data.frame(elabnames)
+elabnames$order <- c(1:length(elabnames[,1]))
+colnames(elabnames) <- c("SYS_NM", "order")
+elabnames <- merge(elabnames, nameslookup, by = "SYS_NM")
+elabnames <- elabnames %>%
+  arrange(order)
+elabranks <- elabnames$erank
+elabnames <- elabnames$shortnames
+dende <- as.dendrogram(clust.dist.cor.e)
+dende %>%
+  set("labels_colors", elabcolours) %>%
+  set("labels_cex", 0.65) %>%
+  set("labels", elabnames) %>%
+  set("leaves_pch", 19) %>%
+  set("leaves_col", elabranks) %>%
+  plot(main = "Log escapement", horiz = TRUE)
 
-ggdendrogram(dendclust.m, rotate = TRUE) +
-  labs(title = "Moving average") +
-  theme(axis.text.y = element_text(colour = dendclust.m[["labels"]][["inlet"]])) +
-  annotate("text", x = xlenm, y = ylenm, colour = "red", label = "Nootka inlet") +
-  annotate("text", x = xlenm-1, y = ylenm, colour = "black", label = "Esperanza inlet") +  
-  annotate("text", x = xlenm-2, y = ylenm, colour = "99FF33", label = "Tahsis inlet")
+#ggdendrogram(dendclust.s, rotate = TRUE) +
+#  labs(title = "Standardized escapement") +
+#  theme(axis.text.y = element_text(colour = dendclust.s[["labels"]][["inlet"]])) +
+#  annotate("text", x = xlens, y = ylens, colour = "red", label = "Nootka inlet") +
+#  annotate("text", x = xlens-1, y = ylens, colour = "black", label = "Esperanza inlet") +  
+#  annotate("text", x = xlens-2, y = ylens, colour = "99FF33", label = "Tahsis inlet")
+
+slabnames <- slabs$SYS_NM
+slabnames <- as.data.frame(slabnames)
+slabnames$order <- c(1:length(slabnames[,1]))
+colnames(slabnames) <- c("SYS_NM", "order")
+slabnames <- merge(slabnames, nameslookup, by = "SYS_NM")
+slabnames <- slabnames %>%
+  arrange(order)
+slabranks <- slabnames$erank
+slabnames <- slabnames$shortnames
+dends <- as.dendrogram(clust.dist.cor.s)
+dends %>%
+  set("labels_colors", slabcolours) %>%
+  set("labels_cex", 0.65) %>%
+  set("labels", slabnames) %>%
+  set("leaves_pch", 19) %>%
+  set("leaves_col", slabranks) %>%
+  plot(main = "Standardized escapement", horiz = TRUE)
+
+
+
+#ggdendrogram(dendclust.m, rotate = TRUE) +
+#  labs(title = "Moving average") +
+#  theme(axis.text.y = element_text(colour = dendclust.m[["labels"]][["inlet"]])) +
+#  annotate("text", x = xlenm, y = ylenm, colour = "red", label = "Nootka inlet") +
+#  annotate("text", x = xlenm-1, y = ylenm, colour = "black", label = "Esperanza inlet") +  
+#  annotate("text", x = xlenm-2, y = ylenm, colour = "99FF33", label = "Tahsis inlet")
+
+
+mlabnames <- mlabs$SYS_NM
+mlabnames <- as.data.frame(mlabnames)
+mlabnames$order <- c(1:length(mlabnames[,1]))
+colnames(mlabnames) <- c("SYS_NM", "order")
+mlabnames <- merge(mlabnames, nameslookup, by = "SYS_NM")
+mlabnames <- mlabnames %>%
+  arrange(order)
+mlabranks <- mlabnames$erank
+mlabnames <- mlabnames$shortnames
+dendm <- as.dendrogram(clust.dist.cor.m)
+dendm %>%
+  set("labels_colors", mlabcolours) %>%
+  set("labels_cex", 0.65) %>%
+  set("labels", mlabnames) %>%
+  set("leaves_pch", 19) %>%
+  set("leaves_col", mlabranks) %>%
+  plot(main = "Moving average", horiz = TRUE)
+
 ```
 
 \newpage
 
+## Tanglegrams comparing effect of metric choice on cluster analysis
+
+```{r tanglegram z vs log, echo = FALSE, warning = FALSE, message = FALSE,  fig.align = "center", fig.height = 8, fig.width = 6, fig.cap = "Tanglegram comparing the use of z-score against the use of log escapements on cluster analysis outputs."}
+
+par(oma=c(2,2,2,2))
+par(mfrow=c(1,1))
+
+tangle1 <- dendlist(dendz%>%set("labels", nameslookup$shortnames), dende%>%set("labels", elabnames))
+tanglegram(tangle1, lab.cex = .8, margin_inner = 3, main_left = "Z-score",
+           main_right = "Log escapement", cex_main = 1, highlight_distinct_edges = FALSE,
+           lwd = 2, edge.lwd = 1)
+
+```
+\newpage
+```{r tanglegram z vs standardized esc, echo = FALSE, warning = FALSE, message = FALSE,  fig.align = "center", fig.height = 8, fig.width = 6, fig.cap = "Tanglegram comparing the use of z-score against the use of standardized escapements on cluster analysis outputs."}
+
+
+tangle2 <- dendlist(dendz%>%set("labels", nameslookup$shortnames), dends%>%set("labels", slabnames))
+tanglegram(tangle2, lab.cex = .8, margin_inner = 3, main_left = "Z-score",
+           main_right = "Standardized escapement", cex_main = 1, highlight_distinct_edges = FALSE,
+           lwd = 2, edge.lwd = 1)
+```
+\newpage
+```{r tanglegram a vs m.ave, echo = FALSE, warning = FALSE, message = FALSE,  fig.align = "center", fig.height = 8, fig.width = 6, fig.cap = "Tanglegram comparing the use of z-score against the use of moving average on cluster analysis outputs."}
+
+tangle3 <- dendlist(dendz%>%set("labels", nameslookup$shortnames), dendm%>%set("labels", mlabnames))
+tanglegram(tangle3, lab.cex = .8, margin_inner = 3, main_left = "Z-score",
+           main_right = "Moving average", cex_main = 1, highlight_distinct_edges = FALSE,
+           lwd = 2, edge.lwd = 1)
+
+
+```
+
+\newpage
 
 ```{r correlations for side by side pre post,echo=FALSE,warning=FALSE,message=FALSE}
 #prep data for correlations
