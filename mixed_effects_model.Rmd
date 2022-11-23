@@ -13,8 +13,9 @@ library(car) # Will mask select function in dplyr. Unload and restart to revert.
 library(MASS)
 library(tidyverse)
 library(lme4)
-library(plyr)
+library(plyr) # Ignore warning if working in this script only
 library(dplyr)
+library(broom.mixed)
 
 streaminlet <- read_csv("CM A25 filtered stream list_with inlets.csv")
 rpsdat <- readRDS("RPS.rds")
@@ -50,17 +51,14 @@ qqp(totrel$totreleases, "pois", lambda = poisson$estimate)
 
 modeldat <- join(streaminlet, rpsdat, by = "SYS_NM")
 
-colnames(totrel) <- c("Year", "totalreleases", "totrel.t")
+colnames(totrel) <- c("Year", "totreleases", "totrel.t")
 
 modeldat <- join(totrel, modeldat, by = "Year")
 
-modeldat$logreleases <- log(modeldat$totalreleases)
+modeldat$logreleases <- log(modeldat$totreleases)
 modeldat$logdistance <- log(modeldat$dist.t)
 
-#modeldat$Year <- as.factor(modeldat$Year)
-#modeldat$totalreleases <- as.factor(modeldat$totalreleases)
-#modeldat$logreleases <- as.factor(modeldat$logreleases)
-#modeldat$distancefromconuma <- as.factor(modeldat$distancefromconuma)
+modeldat$Year <- as.factor(modeldat$Year)
 modeldat$SYS_NM <- as.factor(modeldat$SYS_NM)
 
 ```
@@ -71,9 +69,40 @@ modeldat$SYS_NM <- as.factor(modeldat$SYS_NM)
 # Stream as random effect
 
 mod_stream_log <- lmer(rps ~ logdistance + logreleases + (1 | SYS_NM), 
-                   data = modeldat, REML = TRUE)
+                   data = modeldat, REML = FALSE,)
 
-summary(mod_stream_log)
+summary(mod_stream_log) 
+92.62 / (92.62 + 2989.33) # = 3.0 % of variance not explained by fixed effects is attributed to System
+
+fixef(mod_stream_log)
+confint(mod_stream_log)
+ranef(mod_stream_log)
+coef(mod_stream_log)
+coef.est <- tidy(mod_stream_log, conf.int = TRUE) %>%
+  filter(effect == "fixed")
+print(coef.est)
+
+ggplot(coef.est, aes(x = term, y = estimate,
+                     ymin = conf.low, ymax = conf.high)) +
+    geom_hline( yintercept = 0, color = 'red' ) +
+    geom_linerange() + geom_point() + coord_flip() + theme_minimal()
+
+
+png(file = "figures/modeldat.png", width = 2000, height = 3000, pointsize = 64)
+
+ggplot(data = modeldat, 
+       aes(x = logdistance, y = rps, group = SYS_NM)) +
+    geom_jitter(width = .5, height = 10) +
+    xlim(8, 12) +
+    #facet_grid(Year ~ . ) +
+    stat_smooth(method = "glm",
+                method.args = list(family = "gaussian"), 
+                se = FALSE,
+                alpha = 0.5) +
+    theme_minimal()
+dev.off()
+
+
 plot(mod_stream_log) # Residuals fit decently well except at extreme high outliers
 
 qqnorm(resid(mod_stream_log))
@@ -81,14 +110,18 @@ qqline(resid(mod_stream_log)) # Model performs well except at extreme high outli
 
 # Stream + Year as random effect
 
-mod_stream_log <- lmer(rps ~ logdistance + logreleases + (1 | SYS_NM) + (1 | Year), 
-                   data = modeldat, REML = TRUE)
+mod_stream_log2 <- lmer(rps ~ logdistance + logreleases + (1 | SYS_NM) + (1 | Year), 
+                   data = modeldat, REML = TRUE) # Set TRUE because effects are crossed, not nested
+summary(mod_stream_log2)
+79.52 / (79.52 + 2912.10) # = 2.7 % of variance not explained by fixed effects attributed to Year
+119.52 / (119.52 + 2912.10) # = 3.9 % of variance not explained by fixed effects attributed to System 
 
-summary(mod_stream_log)
-plot(mod_stream_log) # Residuals fit decently well except at extreme high outliers
+coef(mod_stream_log2)
 
-qqnorm(resid(mod_stream_log))
-qqline(resid(mod_stream_log)) # Model performs well except at extreme high outliers
+plot(mod_stream_log2) 
+
+qqnorm(resid(mod_stream_log2))
+qqline(resid(mod_stream_log2)) 
 
 
 ```
