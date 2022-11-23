@@ -832,6 +832,49 @@ tanglegram(tangle.m, lab.cex = .8, margin_inner = 3, main = "Moving average ", m
 
 \newpage
 
+```{r, Releases code from Andy needs reviewed and tested}
+rel<-fread("AllSEPReleases_2021-01-21 with otoliths.csv")
+
+allreleases <- rel %>%
+  select(SPECIES_NAME,STOCK_NAME,FACILITY_NAME,RELEASE_SITE_NAME,RELEASE_STAGE_NAME,TotalRelease,RELEASE_YEAR,REL_CU_NAME,REL_CU_INDEX) %>%
+  group_by(SPECIES_NAME,REL_CU_NAME,REL_CU_INDEX,STOCK_NAME,RELEASE_SITE_NAME,FACILITY_NAME,RELEASE_STAGE_NAME,RELEASE_YEAR)%>%
+  summarise(releases=sum(as.numeric(TotalRelease)),n=n()) %>% 
+  ungroup()
+
+swvi.chum <- allreleases %>% 
+  data.frame() %>% 
+  filter(SPECIES_NAME=="Chum"&REL_CU_NAME%in%"SOUTHWEST VANCOUVER ISLAND") %>%
+  mutate("site-stock"=paste0(RELEASE_SITE_NAME,":",STOCK_NAME))%>%
+  filter(!is.na(releases))%>%
+  arrange(`site-stock`,RELEASE_STAGE_NAME,RELEASE_YEAR)
+
+ggdata.rel<-swvi.chum
+idx <- c(1, diff(ggdata.rel$RELEASE_YEAR))
+i2 <- c(1,which(idx != 1), nrow(ggdata.rel)+1)
+ggdata.rel$grp <- rep(1:length(diff(i2)), diff(i2))
+
+ggdata.rel2<-ggdata.rel %>% 
+  filter(RELEASE_SITE_NAME%in%c("Canton Cr","Canton Est","Conuma Est","Conuma R Up","Conuma R",
+                          "Deserted R/NWVI","Moutcha Bay","Sucwoa R","Tlupana R","Zeballos R"))
+
+ggplot(ggdata.rel2,aes(x=RELEASE_YEAR,y=releases,color=RELEASE_STAGE_NAME,group=grp))+
+  geom_line()+geom_point()+
+  scale_color_brewer(palette="Set1")+
+  facet_wrap(~`site-stock`,ncol=3)+
+  theme_bw()+
+  labs(x="Release Year",y="Releases",color="Release Stage",title=paste0(species,": ",paste0(rel.cu.name,collapse=" ")))+
+  theme(legend.position = "bottom",
+        plot.title=element_text(size=8))
+
+totrel <- ggdata.rel2 %>% 
+  filter(`site-stock`!="Zeballos R:Zeballos R")%>%
+  filter(RELEASE_STAGE_NAME!="Eyed Egg")%>%
+  group_by(RELEASE_YEAR)%>%
+  summarise(totreleases=sum(releases))
+
+#write.csv(totrel,"~/R/PSF hatchery review/analysis/spatial/outputs/Area 25 chum releases totals.csv")
+```
+
 ```{r, include=FALSE,eval=FALSE}
 
 rel<-fread("~/R/PSF hatchery review/releases/AllSEPReleases_2020-04-21_Original.csv")
