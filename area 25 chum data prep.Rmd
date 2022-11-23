@@ -12,12 +12,6 @@ knitr::opts_chunk$set(echo = TRUE, fig.pos = "!h")
 
 library(data.table)
 library(tidyverse)
-library(corrplot)
-library(ggpubr)
-library(zoo)
-library(ggdendro)
-library(dendextend)
-library(cowplot)
 
 options(scipen=10000)
 
@@ -36,8 +30,11 @@ getridofggplotlinesbetweenpoints<-function(data,colstokeep,yearcolumnname) {
 }
 ```
 
-```{r, Releases code from Andy needs reviewed and tested}
+
+```{r releases for area 25}
 rel<-fread("AllSEPReleases_2021-01-21 with otoliths.csv")
+
+rel.cu.name="SOUTHWEST VANCOUVER ISLAND"
 
 allreleases <- rel %>%
   select(SPECIES_NAME, STOCK_NAME, FACILITY_NAME, RELEASE_SITE_NAME,
@@ -72,7 +69,10 @@ ggplot(ggdata.rel2,aes(x=RELEASE_YEAR,y=releases,color=RELEASE_STAGE_NAME,group=
   labs(x="Release Year",y="Releases",color="Release Stage",title=paste0(species,": ",paste0(rel.cu.name,collapse=" ")))+
   theme(legend.position = "bottom",
         plot.title=element_text(size=8))
+```
 
+
+```{r total releases for area 25}
 totrel <- ggdata.rel2 %>% 
   filter(`site-stock`!="Zeballos R:Zeballos R")%>%
   filter(RELEASE_STAGE_NAME!="Eyed Egg")%>%
@@ -81,3 +81,4 @@ totrel <- ggdata.rel2 %>%
 
 #write.csv(totrel,"~/R/PSF hatchery review/analysis/spatial/outputs/Area 25 chum releases totals.csv")
 ```
+
