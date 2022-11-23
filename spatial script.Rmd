@@ -836,8 +836,11 @@ tanglegram(tangle.m, lab.cex = .8, margin_inner = 3, main = "Moving average ", m
 rel<-fread("AllSEPReleases_2021-01-21 with otoliths.csv")
 
 allreleases <- rel %>%
-  select(SPECIES_NAME,STOCK_NAME,FACILITY_NAME,RELEASE_SITE_NAME,RELEASE_STAGE_NAME,TotalRelease,RELEASE_YEAR,REL_CU_NAME,REL_CU_INDEX) %>%
-  group_by(SPECIES_NAME,REL_CU_NAME,REL_CU_INDEX,STOCK_NAME,RELEASE_SITE_NAME,FACILITY_NAME,RELEASE_STAGE_NAME,RELEASE_YEAR)%>%
+  select(SPECIES_NAME, STOCK_NAME, FACILITY_NAME, RELEASE_SITE_NAME,
+         RELEASE_STAGE_NAME, TotalRelease, RELEASE_YEAR, REL_CU_NAME,
+         REL_CU_INDEX) %>%
+  group_by(SPECIES_NAME,REL_CU_NAME,REL_CU_INDEX,STOCK_NAME,RELEASE_SITE_NAME,
+           FACILITY_NAME,RELEASE_STAGE_NAME,RELEASE_YEAR) %>%
   summarise(releases=sum(as.numeric(TotalRelease)),n=n()) %>% 
   ungroup()
 
