@@ -8,6 +8,7 @@ geometry: margin = 1.75cm
 toc: TRUE
 output:
   pdf_document: default
+  pescdata.filt_document: default
   html_document: default
 editor_options:
   chunk_output_type: console
@@ -43,55 +44,14 @@ getridofggplotlinesbetweenpoints<-function(data,colstokeep,yearcolumnname) {
 }
 ```
 
-```{r load prep data, echo=FALSE,message=FALSE,warning=FALSE}
-#load escapement data and remove 0's
-
-escdata<-fread("all nuseds with enhancement rankings.csv")%>%
-  select(-V1)
-
-escdata$escapement[escdata$escapement==0]<-NA
-
-```
-
-```{r add analyses,echo=FALSE,warning=FALSE,message=FALSE}
-#filter species and area
-species="CM"
-area=25
-esc.data<-escdata%>%filter(SPP==species&Area==area)
-
-#apply filter - in this case need n counts out of all years
-n=(2018-1953)/2
-
-included.stream.list<-esc.data%>%
-  group_by(SYS_NM)%>%
-  summarise(notnas=sum(!is.na(escapement)))%>%
-  filter(notnas>n)
-
-#add escapement metrics and pre/post field
-df<-esc.data%>%filter(SYS_NM%in%included.stream.list$SYS_NM)%>%
-  group_by(SYS_NM)%>%
-  arrange(SYS_NM,Year)%>%
-  mutate(esc.log=log(escapement),
-         z=(esc.log-mean(esc.log,na.rm=TRUE))/sd(esc.log,na.rm=TRUE),
-         m.ave=rollapply(esc.log,4,mean,align='right',fill=NA),
-         esc.stand=esc.log/mean(esc.log,na.rm=TRUE),
-         prepost=case_when(Year<1980~"Pre",
-                           Year>=1980~"Post"))
-# Add filter by year
-fy=1980
-n.pre=(fy-1953)/2
-n.post=(2018-fy)/2
-included.stream.list<-esc.data%>%
-  mutate(prepost=case_when(Year<1980~"Pre",
-                           Year>=1980~"Post"))%>%
-  group_by(SYS_NM,prepost)%>%
-  summarise(notnas=sum(!is.na(escapement)))%>%
-  pivot_wider(names_from="prepost",values_from="notnas")%>%
-  filter(Post>n.post&Pre>n.pre)
-  
-```
-
 \newpage
+
+```{r load escapement data,echo=FALSE}
+
+escdata.raw<-fread("area 25 escapement data all.csv")
+escdata.filt<-fread("area 25 escapement data filtered.csv")%>%select(-V1)
+
+```
 
 # Summary statistics 
 
@@ -101,7 +61,7 @@ included.stream.list<-esc.data%>%
 
 par(mfrow = c(1, 1))
 #bubbleplot of escapements for whole area
-ggplot(df,aes(x=Year,y=SYS_NM,color=Enhancement_Rank,size=escapement))+
+ggplot(escdata.raw,aes(x=Year,y=SYS_NM,color=Enhancement_Rank,size=escapement))+
   geom_point(alpha=.5)+
   scale_colour_manual(breaks=c("NONE","LOW","HIGH"),
                       values=c("grey50","steelblue","darkred"))+
@@ -113,27 +73,31 @@ ggplot(df,aes(x=Year,y=SYS_NM,color=Enhancement_Rank,size=escapement))+
 
 \newpage
 
+```{r escapement filtered streams only, fig.align="center",fig.height=8,fig.width=7,fig.cap="Escapement to area streams by enhancement rank.",echo=FALSE,warning=FALSE,message=FALSE}
+
+ggplot(escdata.filt,aes(x=Year,y=escapement,color=Enhancement_Rank))+
+  geom_point()+geom_line()+theme_bw()+
+  facet_wrap(~SYS_NM,ncol=3,scale="free_y")+
+  labs(y="Escapement",color="Enhancement Level")+
+  theme(legend.position="bottom")
+
+```
+
+
+\newpage
+
 ## Releases by system
 
 ```{r, echo=FALSE,message=FALSE,warning=FALSE,fig.height=7,fig.width=7,fig.cap="Chum releases to Area 25 by release site and release stage."}
 
-rel<-fread("AllSEPReleases_2021-01-21 with otoliths.csv")
-
-allreleases <- rel %>% 
-  select(SPECIES_NAME,STOCK_NAME,FACILITY_NAME,RELEASE_SITE_NAME,RELEASE_STAGE_NAME,TotalRelease,RELEASE_YEAR,REL_CU_NAME) %>%
-  group_by(SPECIES_NAME,REL_CU_NAME,STOCK_NAME,RELEASE_SITE_NAME,FACILITY_NAME,RELEASE_STAGE_NAME,RELEASE_YEAR) %>%
-  summarise(releases=sum(as.numeric(TotalRelease)),n=n())
-
-swvi.chum <- allreleases %>% 
-  filter(SPECIES_NAME=="Chum"&REL_CU_NAME=="SOUTHWEST VANCOUVER ISLAND") %>%
-  mutate("site-stock"=paste0(RELEASE_SITE_NAME,":",STOCK_NAME)) %>%
-  filter(!is.na(releases)) %>%
-  arrange(`site-stock`,RELEASE_STAGE_NAME,RELEASE_YEAR)
+swvi.chum<-fread("swvi chum releases filtered.csv")
 
 ggdata.rel <- swvi.chum
+
 idx <- c(1, diff(ggdata.rel$RELEASE_YEAR))
 i2 <- c(1,which(idx != 1), nrow(ggdata.rel)+1)
 ggdata.rel$grp <- rep(1:length(diff(i2)), diff(i2))
+
 ggplot(ggdata.rel,aes(x=RELEASE_YEAR,y=releases,color=RELEASE_STAGE_NAME,group=grp))+
   geom_line()+
   geom_point(size = 0.7)+
@@ -143,11 +107,6 @@ ggplot(ggdata.rel,aes(x=RELEASE_YEAR,y=releases,color=RELEASE_STAGE_NAME,group=g
   labs(x="Release Year",y="Releases",color="Release Stage")+
   theme(legend.position = "bottom")
 
-#ggplot(swvi.chum,aes(x=RELEASE_YEAR,y=RELEASE_STAGE_NAME,color=RELEASE_STAGE_NAME,size=releases))+
-#  geom_point()+
-#  theme_bw()+
-#  facet_grid(`site-stock`~.,switch="y",scale="free_y")
-#ggsave("~/R/PSF Hatchery Review/analysis/spatial/outputs/junk.pdf",height=20,width=8,dpi=600)
 ```
 
 \newpage
@@ -157,28 +116,28 @@ ggplot(ggdata.rel,aes(x=RELEASE_YEAR,y=releases,color=RELEASE_STAGE_NAME,group=g
 ```{r metric plots,fig.align="center",fig.height=8,fig.width=6,fig.cap="Various plots for escapement and transformations.",echo=FALSE,warning=FALSE,message=FALSE}
 #plot streams by enhancement
 
-p1<-ggplot(df,aes(x=Year,y=escapement,color=Enhancement_Rank,group=SYS_NM))+
+p1<-ggplot(escdata.filt,aes(x=Year,y=escapement,color=Enhancement_Rank,group=SYS_NM))+
   geom_line()+
   theme_bw()+
-  labs(y="Escapement",title="Raw Escapement")
+  labs(y="Escapement",title="Raw Escapement",color="Enhancement Rank")
 
-p2<-ggplot(df,aes(x=Year,y=esc.log,color=Enhancement_Rank,group=SYS_NM))+
+p2<-ggplot(escdata.filt,aes(x=Year,y=esc.log,color=Enhancement_Rank,group=SYS_NM))+
  geom_line()+
   theme_bw()+
   labs(y="log(Escapement)",title="Logged Escapement")
 
-p3<-ggplot(df,aes(x=Year,y=z,color=Enhancement_Rank,group=SYS_NM))+
+p3<-ggplot(escdata.filt,aes(x=Year,y=z,color=Enhancement_Rank,group=SYS_NM))+
   geom_line()+
   geom_hline(yintercept=0)+
   theme_bw()+
   labs(y="Z-scores (Escapement)",title="Z-scores Escapement")
 
-p4<-ggplot(df,aes(x=Year,y=esc.stand,color=Enhancement_Rank,group=SYS_NM))+
+p4<-ggplot(escdata.filt,aes(x=Year,y=esc.stand,color=Enhancement_Rank,group=SYS_NM))+
   geom_line()+
   theme_bw()+
   labs(y="Standardized Escapement (pavg)",title="Escapement/Average (Pavg)")
 
-ggarrange(p1,p2,p3,p4,ncol=1,common.legend = TRUE)
+ggarrange(p1,p2,p3,p4,ncol=1,common.legend = TRUE,align='v',legend="bottom")
 
 ```
 
@@ -186,29 +145,61 @@ ggarrange(p1,p2,p3,p4,ncol=1,common.legend = TRUE)
 ## Moving average and LOESSS fit on enhancement ranking of log escapements
 ```{r moving average and LOESS plots, echo=FALSE,warning=FALSE,message=FALSE,fig.align="center",fig.height=5,fig.width=6,fig.cap="Moving average and LOESS fits on logged escapement by enhancement ranking."}
 
-t1<-ggplot(df,aes(x=Year,y=m.ave,color=Enhancement_Rank,group=SYS_NM))+
+t1<-ggplot(escdata.filt,aes(x=Year,y=m.ave,color=Enhancement_Rank,group=SYS_NM))+
   geom_line()+
   theme_bw()+
-  labs(y="Moving Average",title="Moving-Average")
+  labs(y="Moving Average",title="Moving-Average",color="Enhancement Rank")
 
-t2<-ggplot(df,aes(x=Year,y=z,color=Enhancement_Rank,group=SYS_NM))+
-  geom_smooth(method="loess",se=FALSE,span=.1,size=.7)+
+t2<-ggplot(escdata.filt,aes(x=Year,y=z,color=Enhancement_Rank,group=SYS_NM))+
+  geom_smooth(method="loess",se=FALSE,span=.1,linewidth=.7)+
   geom_hline(yintercept=0)+
   theme_bw()+
   labs(y="Z-score",title="Loess fit on Z-scores")
 
-ggarrange(t1,t2,ncol=1,common.legend = TRUE)
+ggarrange(t1,t2,ncol=1,common.legend = TRUE,legend = "bottom",align='v')
 
 ```
 
 \newpage
 ## Z-scores pre- and post-enhancement
 ```{r prepost boxplot,echo=FALSE,warning=FALSE,message=FALSE,fig.align="center",fig.height=7,fig.width=6,fig.cap="Z-scores pre- and post-enhancement."}
-ggplot(df,aes(y=SYS_NM,x=z,fill=prepost))+
+ggplot(escdata.filt,aes(y=SYS_NM,x=z,fill=prepost))+
   geom_boxplot()+
   geom_vline(xintercept=0)+
   theme_bw()+
   labs(y="System Name",x="Z-score")
+```
+
+
+```{r rps figure pre post with lm, echo=FALSE, warning=FALSE, message=FALSE ,fig.align="center", fig.height=7, fig.width=6 ,fig.cap="Log RPS by stream with linear regression fits pre- and post-first year of enhancement."}
+a25.rps<-fread("area 25 chum rps.csv")
+
+gga25.logrps<-a25.rps%>%select(Year,prepost,logrps,SYS_NM)%>%arrange(SYS_NM,prepost,Year)
+
+idx <- c(1, diff(gga25.logrps$Year))
+i2 <- c(1,which(idx != 1), nrow(gga25.logrps)+1)
+gga25.logrps$grp <- rep(1:length(diff(i2)), diff(i2))
+
+ggplot(gga25.logrps,aes(x=Year,y=logrps,color=prepost,group=grp))+
+  geom_line(alpha=.5)+geom_point(alpha=.5)+
+  scale_color_brewer(palette="Set1")+
+  geom_smooth(method='lm',se=TRUE)+
+  facet_wrap(~SYS_NM,ncol=3,scale="free_y")+
+  theme_bw()+
+  geom_hline(yintercept=0,linetype="dashed")+
+  labs(x="Brood Year",y="log(Recruits per spawner)",color="Period")+
+  theme(legend.position="bottom")
+```
+
+```{r rps figure boxplot,echo=FALSE,warning=FALSE,message=FALSE,fig.align="center",fig.height=7,fig.width=6,fig.cap="Log RPS by stream boxplot for pre- and post-start of enhancement period."}
+ggplot(gga25.logrps,aes(y=SYS_NM,x=logrps,fill=prepost))+
+  geom_boxplot(notch=F)+
+  scale_fill_brewer(palette="Set1")+
+  geom_vline(xintercept=0)+
+  theme_bw()+
+  labs(y="System Name",x="log(Recruits per spawner)",title="Area 25 Chum")+
+  theme(legend.position="bottom")
+
 ```
 
 \newpage
@@ -220,27 +211,31 @@ ggplot(df,aes(y=SYS_NM,x=z,fill=prepost))+
 ```{r correlations for all metrics,echo=FALSE,warning=FALSE,message=FALSE}
 #prep data for correlations
 
-# Merge stream inlet table into df
+# Merge stream inlet table into escdata.filt
 
-streaminlet <- read_csv("CM A25 filtered stream list_with inlets.csv")
+streaminlet <- fread("CM A25 filtered stream list_with inlets.csv")
 
-streaminlet[21,4] <- "esperanza" # PLACEHOLDER FOR RANSOM RIVER INLET
-streaminlet[21,5] <- "esperanza" # PLACEHOLDER FOR RANSOM RIVER SUBINLET
+escdata.filt<-merge(escdata.filt,streaminlet,by="SYS_NM")
 
-df <- df %>%
-  inner_join(streaminlet, df, by = "SYS_NM")
+#old way
+#escdata.filt <- escdata.filt %>%
+#  inner_join(streaminlet, escdata.filt, by = "SYS_NM")
 
-# Factor out inlet and create df of inlet colours
+# Factor out inlet and create escdata.filt of inlet colours
 
-df$inlet <- as.factor(df$inlet)
-inlets <- as.data.frame(levels(df$inlet))
+escdata.filt$inlet <- as.factor(escdata.filt$inlet)
+inlets <- as.data.frame(levels(escdata.filt$inlet))
 inlets$colour <- c("red", "blue", "darkgreen")
 colnames(inlets) <- c("inlet", "colour")
 
 
 # Correlation analysis by z-score
 
-cor.data.z<-df%>%select(SYS_NM,Year,z)%>%pivot_wider(names_from="Year",values_from="z")%>%data.frame()
+unique(escdata.filt$SYS_NM)
+
+cor.data.z<-escdata.filt%>%select(SYS_NM,Year,z)%>%
+  pivot_wider(names_from="Year",values_from="z")%>%
+  data.frame()
 
 rownames(cor.data.z)<-cor.data.z$SYS_NM
 
@@ -255,6 +250,7 @@ clust.dist.cor.z <- hclust(dist.cor.z)
 
 dendclust.z <- dendro_data(clust.dist.cor.z)
 zlabs <- as.data.frame(dendclust.z[["labels"]][["label"]])
+
 zlabs$order <- 1:length(zlabs[,1])
 colnames(zlabs) <- c("SYS_NM", "order")
 zlabs <- merge(streaminlet, zlabs, by = "SYS_NM")
@@ -268,17 +264,20 @@ inletlist <- as.factor(zlabs$inlet)
 dendclust.z[["labels"]][["inlet"]] <- inletlist
 
 nameslookup <- as.data.frame(c("Tlupana", "Canton", "Conuma", "Leiner", "Deserted", "Sucwoa", 
-                 "Gold", "Mooyah", "Ransom", "Burman", "Kleeptee", "Espinosa",
+                 "Mooyah", "Ransom", "Burman", "Kleeptee", "Espinosa",
                  "L. Zeballos", "Hoiss", "Lord", "Zeballos", "Tahsis", "Tsowwin",
                  "Hammond", "Marvinas", "Brodick", "Owossitsa", "Chum", 
-                 "Mamat", "Eliza", "Park"))
+                 "Mamat", "Park"))
+
 colnames(nameslookup) <- "shortnames"
+
 nameslookup$SYS_NM <- zlabnames  
+
 nameslookup$erank <- c("red", "red", "red", "black", "#3399FF", "red",
-                       "black", "black", "black", "black", "black", "black",
+                       "black", "black", "black", "black", "black",
                        "black", "black", "black", "red", "black", "black",
                        "black", "black", "black", "black", "black",
-                       "black", "black", "black")
+                       "black", "black")
   
 dendclust.z[["labels"]][["inlet"]] <- inletlist
 
@@ -289,7 +288,7 @@ ylenz <- .95 * (max(dendclust.z[["segments"]][["y"]]))
 
 # Correlation analysis by log escapement
 
-cor.data.e<-df%>%select(SYS_NM,Year,esc.log)%>%pivot_wider(names_from="Year",values_from="esc.log")%>%data.frame()
+cor.data.e<-escdata.filt%>%select(SYS_NM,Year,esc.log)%>%pivot_wider(names_from="Year",values_from="esc.log")%>%data.frame()
 
 rownames(cor.data.e)<-cor.data.e$SYS_NM
 
@@ -321,7 +320,7 @@ ylene <- .95 * (max(dendclust.e[["segments"]][["y"]]))
 
 
 # Correlation analysis by standardized escapement
-cor.data.s<-df%>%select(SYS_NM,Year,esc.stand)%>%pivot_wider(names_from="Year",values_from="esc.stand")%>%data.frame()
+cor.data.s<-escdata.filt%>%select(SYS_NM,Year,esc.stand)%>%pivot_wider(names_from="Year",values_from="esc.stand")%>%data.frame()
 
 rownames(cor.data.s)<-cor.data.s$SYS_NM
 
@@ -352,7 +351,7 @@ xlens <- .95 * length(slabs$SYS_NM)
 ylens <- .95 * (max(dendclust.s[["segments"]][["y"]]))
 
 # Correlation analysis by moving average
-cor.data.m<-df%>%select(SYS_NM,Year,m.ave)%>%pivot_wider(names_from="Year",values_from="m.ave")%>%data.frame()
+cor.data.m<-escdata.filt%>%select(SYS_NM,Year,m.ave)%>%pivot_wider(names_from="Year",values_from="m.ave")%>%data.frame()
 
 rownames(cor.data.m)<-cor.data.m$SYS_NM
 
@@ -569,7 +568,7 @@ tanglegram(tangle3, lab.cex = .8, margin_inner = 3, main_left = "Z-score",
 ```{r Corr plots for z-score, pre- and post-1980, echo=FALSE, warning=FALSE, message=FALSE, fig.align = "center", fig.height = 8, fig.width = 6, fig.cap = "Cross correlation plots of z-scores to compare pre- and post-enhancement."}
 #prep data for correlations
 
-cor.data.z <-df %>%
+cor.data.z <-escdata.filt %>%
   select(SYS_NM,Year,z) %>%
   pivot_wider(names_from="Year",values_from="z") %>%
   data.frame()
@@ -601,7 +600,7 @@ corrplot(cor.z.post, diag = FALSE, order="hclust", method="square", tl.col="blac
 
 # Log escapements 
 
-cor.data.e<-df%>%select(SYS_NM,Year,esc.log)%>%
+cor.data.e<-escdata.filt%>%select(SYS_NM,Year,esc.log)%>%
   pivot_wider(names_from="Year",values_from="esc.log")%>%data.frame()
 
 cor.data.e.pre<-cor.data.e[,1:31]
@@ -631,7 +630,7 @@ corrplot(cor.e.post, diag = FALSE, order="hclust", method="square", tl.col="blac
 
 # Standardized escapements
 
-cor.data.s<-df%>%select(SYS_NM,Year,esc.stand)%>%
+cor.data.s<-escdata.filt%>%select(SYS_NM,Year,esc.stand)%>%
   pivot_wider(names_from="Year",values_from="esc.stand")%>%data.frame()
 
 cor.data.s.pre<-cor.data.s[,1:31]
@@ -662,7 +661,7 @@ corrplot(cor.s.post, diag = FALSE, order="hclust", method="square", tl.col="blac
 
 # Moving average
 
-cor.data.m<-df%>%select(SYS_NM,Year,m.ave)%>%
+cor.data.m<-escdata.filt%>%select(SYS_NM,Year,m.ave)%>%
   pivot_wider(names_from="Year",values_from="m.ave")%>%data.frame()
 
 cor.data.m.pre<-cor.data.m[,1:31]
@@ -829,167 +828,3 @@ tanglegram(tangle.m, lab.cex = .8, margin_inner = 3, main = "Moving average ", m
 #dev.off()
 
 ```
-
-\newpage
-
-```{r, Releases code from Andy needs reviewed and tested}
-rel<-fread("AllSEPReleases_2021-01-21 with otoliths.csv")
-
-allreleases <- rel %>%
-  select(SPECIES_NAME, STOCK_NAME, FACILITY_NAME, RELEASE_SITE_NAME,
-         RELEASE_STAGE_NAME, TotalRelease, RELEASE_YEAR, REL_CU_NAME,
-         REL_CU_INDEX) %>%
-  group_by(SPECIES_NAME,REL_CU_NAME,REL_CU_INDEX,STOCK_NAME,RELEASE_SITE_NAME,
-           FACILITY_NAME,RELEASE_STAGE_NAME,RELEASE_YEAR) %>%
-  summarise(releases=sum(as.numeric(TotalRelease)),n=n()) %>% 
-  ungroup()
-
-swvi.chum <- allreleases %>% 
-  data.frame() %>% 
-  filter(SPECIES_NAME=="Chum"&REL_CU_NAME%in%"SOUTHWEST VANCOUVER ISLAND") %>%
-  mutate("site-stock"=paste0(RELEASE_SITE_NAME,":",STOCK_NAME))%>%
-  filter(!is.na(releases))%>%
-  arrange(`site-stock`,RELEASE_STAGE_NAME,RELEASE_YEAR)
-
-ggdata.rel<-swvi.chum
-idx <- c(1, diff(ggdata.rel$RELEASE_YEAR))
-i2 <- c(1,which(idx != 1), nrow(ggdata.rel)+1)
-ggdata.rel$grp <- rep(1:length(diff(i2)), diff(i2))
-
-ggdata.rel2<-ggdata.rel %>% 
-  filter(RELEASE_SITE_NAME%in%c("Canton Cr","Canton Est","Conuma Est","Conuma R Up","Conuma R",
-                          "Deserted R/NWVI","Moutcha Bay","Sucwoa R","Tlupana R","Zeballos R"))
-
-ggplot(ggdata.rel2,aes(x=RELEASE_YEAR,y=releases,color=RELEASE_STAGE_NAME,group=grp))+
-  geom_line()+geom_point()+
-  scale_color_brewer(palette="Set1")+
-  facet_wrap(~`site-stock`,ncol=3)+
-  theme_bw()+
-  labs(x="Release Year",y="Releases",color="Release Stage",title=paste0(species,": ",paste0(rel.cu.name,collapse=" ")))+
-  theme(legend.position = "bottom",
-        plot.title=element_text(size=8))
-
-totrel <- ggdata.rel2 %>% 
-  filter(`site-stock`!="Zeballos R:Zeballos R")%>%
-  filter(RELEASE_STAGE_NAME!="Eyed Egg")%>%
-  group_by(RELEASE_YEAR)%>%
-  summarise(totreleases=sum(releases))
-
-#write.csv(totrel,"~/R/PSF hatchery review/analysis/spatial/outputs/Area 25 chum releases totals.csv")
-```
-
-```{r, include=FALSE,eval=FALSE}
-
-rel<-fread("~/R/PSF hatchery review/releases/AllSEPReleases_2020-04-21_Original.csv")
-
-names(rel)
-str(rel)
-
-allreleases<-rel%>%select(SPECIES_NAME,STOCK_NAME,FACILITY_NAME,RELEASE_SITE_NAME,RELEASE_STAGE_NAME,TotalRelease,RELEASE_YEAR)%>%
-  group_by(SPECIES_NAME,STOCK_NAME,RELEASE_SITE_NAME,FACILITY_NAME,RELEASE_STAGE_NAME,RELEASE_YEAR)%>%
-  summarise(releases=sum(as.numeric(TotalRelease)),n=n())
-
-cd<-allreleases%>%filter(SPECIES_NAME=="Chum")
-
-getall<-unique(c(grep("Conuma",cd$RELEASE_SITE_NAME),
-          grep("Conuma",cd$STOCK_NAME),
-          grep("Canton",cd$RELEASE_SITE_NAME),
-          grep("Canton",cd$STOCK_NAME),
-          grep("Sucwoa",cd$RELEASE_SITE_NAME),
-          grep("Sucwoa",cd$STOCK_NAME),
-          grep("Tlupana",cd$RELEASE_SITE_NAME),
-          grep("Tlupana",cd$STOCK_NAME),
-          grep("Zeballos",cd$RELEASE_SITE_NAME),
-          grep("Zeballos",cd$STOCK_NAME)))
-          
-a26.rel.prep<-cd[getall,]
-
-ggplot(a26.rel.prep,aes(x=RELEASE_YEAR,y=releases,color=RELEASE_STAGE_NAME))+
-  geom_point()+geom_line()+
-  facet_grid(RELEASE_SITE_NAME~STOCK_NAME)+
-  theme_bw()+
-  theme(legend.position = "bottom")
-
-ggplot(a26.rel.prep,aes(x=RELEASE_YEAR,y=releases,color=RELEASE_STAGE_NAME,shape=STOCK_NAME))+
-  geom_point()+geom_line()+
-  facet_wrap(~RELEASE_SITE_NAME,scale="free_y",ncol=1)+
-  theme_bw()+
-  theme(legend.position = "bottom")
-```
-
-
-```{r,include=FALSE,eval=FALSE}
-cd%>%filter(RELEASE_SITE_NAME)
-
-atup<-cd%>%filter(RELEASE_SITE_NAME=="Atnarko R Up"&SPECIES_NAME=="Chinook")
-atlow<-cd%>%filter(RELEASE_SITE_NAME=="Atnarko R Low"&SPECIES_NAME=="Chinook")
-#nimp<-cd%>%filter(RELEASE_SITE_NAME=="Nimpkish R"&SPECIES_NAME=="Chinook")
-kitimat<-cd%>%filter(RELEASE_SITE_NAME=="Kitimat R"&SPECIES_NAME=="Chinook")
-
-nimpCN<-cd%>%filter(RELEASE_SITE_NAME=="Nimpkish R"&SPECIES_NAME=="Chinook")
-nimpall<-cd%>%filter(RELEASE_SITE_NAME=="Nimpkish R")
-atn<-rbind(atup,atlow)
-
-ggdata<-kitimat
-
-idx <- c(1, diff(ggdata$RELEASE_YEAR))
-i2 <- c(1,which(idx != 1), nrow(ggdata)+1)
-#adds a grouping column for ggplot to use
-ggdata$grp <- rep(1:length(diff(i2)), diff(i2))
-
-
-ggplot(ggdata,aes(x=RELEASE_YEAR,y=releases,color=RELEASE_STAGE_NAME,shape=RELEASE_SITE_NAME,group=grp))+
-  geom_line()+
-  geom_point()+
-  #facet_wrap(~STOCK_NAME+SPECIES_NAME,ncol=2,scales="free_y")+
-  facet_wrap(~STOCK_NAME,ncol=1,scales="free_y")+
-  #facet_grid(STOCK_NAME~SPECIES_NAME,scales="free_y")+
-  labs(y="Releases",x="Release Year",color="Release Stage",shape="Release Site Name")+
-  theme_bw()+
-  theme(legend.position="bottom",legend.box = "vertical")
-
-ggsave("Nimpkish CN only releases facet grid.png",dpi=600,height=10,width=8)
-```
-
-```{r old code,include=FALSE,eval=FALSE}
-#included systems
-dfwide<-df%>%select(SYS_NM,Enhancement_Rank,Year,escapement)%>%
-  pivot_wider(names_from="Year",values_from="escapement")
-
-#count number of observations in last 10 years
-dfwide$n10<-apply(dfwide[,3:70],1,function(x) x=sum(!is.na(x[61:71])))
-
-#run a filter to exclude any stream with less than 3 counts in last 10 years
-esc.incl1<-subset(dfwide,n10>3)
-
-##standardized escapements
-esc.s<-esc.incl1
-
-esc.s$u.esc<-apply(esc.s[3:71],1,function(x) mean(x,na.rm=TRUE))
-
-esc.s[3:71]<-esc.s[3:71]/esc.s$u.esc
-
-#setup for cross correlation
-esc.cm<-esc.s%>%select(-n10,-u.esc,-Enhancement_Rank)%>%data.frame()
-
-rownames(esc.cm)<-esc.cm$SYS_NM
-
-cm<-cor(t(esc.cm[,-1]),use="complete.obs")
-
-corrplot(cm,type="upper",order="hclust",method="square",tl.col="black")
-
-#logged escapements
-names(esc.incl1)
-
-esc.log<-esc.incl1
-esc.log[,3:71] <-log(esc.log[3:71],2)
-
-esc.log2<-esc.log%>%select(-n10,-Enhancement_Rank)%>%data.frame()
-
-rownames(esc.log2)<-esc.log2$SYS_NM
-
-
-df%>%group_by(SYS_NM)%>%filter(Year>2008)%>%summarise(x=sum(!is.na(escapement)))
-
-```
-

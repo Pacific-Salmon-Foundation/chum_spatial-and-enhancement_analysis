@@ -31,6 +31,77 @@ getridofggplotlinesbetweenpoints<-function(data,colstokeep,yearcolumnname) {
 ```
 
 
+
+```{r load prep data, echo=FALSE,message=FALSE,warning=FALSE}
+#load escapement data and remove 0's
+
+escdata<-fread("all nuseds with enhancement rankings.csv")%>%
+  select(-V1)
+
+escdata$escapement[escdata$escapement==0]<-NA
+
+species="CM"
+area=25
+
+a25.escdata<-escdata%>%filter(SPP=="CM"&Area==25)
+
+#write.csv(a25.escdata,"area 25 escapement data all.csv")
+
+# Add filter by year
+fy=1980
+n.pre=(fy-1953)/2
+n.post=(2018-fy)/2
+
+included.stream.list<-esc.data%>%
+  mutate(prepost=case_when(Year<1980~"Pre",
+                           Year>=1980~"Post"))%>%
+  group_by(SYS_NM,prepost)%>%
+  summarise(notnas=sum(!is.na(escapement)))%>%
+  pivot_wider(names_from="prepost",values_from="notnas")%>%
+  filter(Post>n.post&Pre>n.pre)
+
+#add escapement metrics and pre/post field
+a25.escdata.filtered<-esc.data%>%filter(SYS_NM%in%included.stream.list$SYS_NM)%>%
+  group_by(SYS_NM)%>%
+  arrange(SYS_NM,Year)%>%
+  mutate(esc.log=log(escapement),
+         z=(esc.log-mean(esc.log,na.rm=TRUE))/sd(esc.log,na.rm=TRUE),
+         m.ave=rollapply(esc.log,4,mean,align='right',fill=NA),
+         esc.stand=esc.log/mean(esc.log,na.rm=TRUE),
+         prepost=case_when(Year<1980~"Pre",
+                           Year>=1980~"Post"))
+
+write.csv(a25.escdata.filtered,"area 25 escapement data filtered.csv")
+
+ggplot(escdata.filt,aes(x=Year,y=escapement,color=Enhancement_Rank))+
+  geom_point()+geom_line()+theme_bw()+
+  facet_wrap(~SYS_NM,ncol=3,scale="free_y")+
+  labs(y="Escapement",color="Enhancement Level")+
+  theme(legend.position="bottom")
+
+ggsave("a25 chum escapement filtered streams.png",dpi=600,height=8,width=7)
+
+```
+
+
+```{r junk test}
+
+streaminlet <- read_csv("CM A25 filtered stream list_with inlets.csv")
+
+esc.byinlet<-merge(streaminlet,escdata.filt,by="SYS_NM")
+
+escdata.filt.u<-escdata.filt%>%group_by(Enhancement_Rank)
+
+ggplot(esc.byinlet,aes(x=Year,y=z,color=subinlet))+
+    geom_point()+
+    geom_smooth()
+           
+           
+```
+
+
+
+
 ```{r releases for area 25}
 rel<-fread("AllSEPReleases_2021-01-21 with otoliths.csv")
 
@@ -61,6 +132,13 @@ ggdata.rel2<-ggdata.rel %>%
   filter(RELEASE_SITE_NAME%in%c("Canton Cr","Canton Est","Conuma Est","Conuma R Up","Conuma R",
                           "Deserted R/NWVI","Moutcha Bay","Sucwoa R","Tlupana R","Zeballos R"))
 
+
+write.csv(ggdata.rel2,"swvi chum releases filtered.csv")
+
+```
+
+
+```{r releases for area 25}
 ggplot(ggdata.rel2,aes(x=RELEASE_YEAR,y=releases,color=RELEASE_STAGE_NAME,group=grp))+
   geom_line()+geom_point()+
   scale_color_brewer(palette="Set1")+
@@ -69,6 +147,8 @@ ggplot(ggdata.rel2,aes(x=RELEASE_YEAR,y=releases,color=RELEASE_STAGE_NAME,group=
   labs(x="Release Year",y="Releases",color="Release Stage",title=paste0(species,": ",paste0(rel.cu.name,collapse=" ")))+
   theme(legend.position = "bottom",
         plot.title=element_text(size=8))
+
+ggsave("figures/swvi chum releases for area 25.png",dpi=600,height=8,width=7)
 ```
 
 
@@ -82,3 +162,71 @@ totrel <- ggdata.rel2 %>%
 #write.csv(totrel,"~/R/PSF hatchery review/analysis/spatial/outputs/Area 25 chum releases totals.csv")
 ```
 
+``` {r prep rps data}
+a25.escdata<-fread("area 25 escapement data filtered.csv")%>%select(-V1)
+
+age<-fread("SCVI_age_2019-04-13.txt")%>%select(-V1)
+
+swvi.ageers<-age%>%filter(CU_Name=="Southwest & West  Vancouver Island")%>%
+  select(Year=BroodYear,Total.ER,p3=Age3,p4=Age4,p5=Age5)
+
+a25.rps<-merge(a25.escdata,swvi.ageers,by="Year")%>%
+  mutate(TR=escapement/(1-Total.ER))%>%
+  mutate(age3=TR*p3,age4=TR*p4,age5=TR*p5)%>%
+  mutate(r3=shift(age3,n=-3,type="lag"),r4=shift(age4,n=-4,type="lag"),
+         r5=shift(age5,n=-5,type="lag"))%>%
+  rowwise()%>%
+  mutate(recruits=sum(c_across(r3:r5),na.rm=TRUE))%>%
+  mutate(rps=recruits/escapement,
+         rps=replace(rps,rps==0,NA),
+         logrps=log(rps))
+
+write.csv(a25.rps,"area 25 chum rps.csv")
+
+```
+
+
+```{r}
+#total return plot
+ggplot(a25.rps,aes(x=Year,y=TR))+
+  geom_line()+geom_point()+
+  facet_wrap(~SYS_NM,ncol=3,scale="free_y")
+
+#rps plots
+ggplot(a25.rps,aes(x=Year,y=rps))+
+  geom_line()+geom_point()+
+  geom_smooth(method='lm',se=TRUE)+
+  facet_wrap(~SYS_NM,ncol=3,scale="free_y")+
+  theme_bw()+
+  geom_hline(yintercept=1)
+
+#log rps plots
+gga25.logrps<-a25.rps%>%select(Year,prepost,logrps,SYS_NM)%>%arrange(SYS_NM,prepost,Year)
+
+idx <- c(1, diff(gga25.logrps$Year))
+i2 <- c(1,which(idx != 1), nrow(gga25.logrps)+1)
+gga25.logrps$grp <- rep(1:length(diff(i2)), diff(i2))
+
+ggplot(gga25.logrps,aes(x=Year,y=logrps,color=prepost,group=grp))+
+  geom_line(alpha=.5)+geom_point(alpha=.5)+
+  scale_color_brewer(palette="Set1")+
+  geom_smooth(method='lm',se=TRUE)+
+  facet_wrap(~SYS_NM,ncol=3,scale="free_y")+
+  theme_bw()+
+  geom_hline(yintercept=0,linetype="dashed")+
+  labs(x="Brood Year",y="log(Recruits per spawner)",color="Period")+
+  theme(legend.position="bottom")
+
+ggsave("figures/A25 chum log rps pre vs post.png",dpi=600,height=8,width=7)
+
+ggplot(gga25.logrps,aes(y=SYS_NM,x=logrps,fill=prepost))+
+  geom_boxplot(notch=F)+
+  scale_fill_brewer(palette="Set1")+
+  geom_vline(xintercept=0)+
+  theme_bw()+
+  labs(y="System Name",x="log(Recruits per spawner)",title="Area 25 Chum")+
+  theme(legend.position="bottom")
+
+ggsave("figures/A25 chum log rps pre vs post boxplot.png",dpi=600,height=8,width=7)
+
+```
