@@ -164,7 +164,7 @@ tanglegram(tangle.rps, lab.cex = .8, margin_inner = 3, main = "Recruits per spaw
 
 # Compare with z-scores
 
-png(file = "figures/tanglegram_z_rps.png", width = 2000, height = 3000, pointsize = 36)
+#png(file = "figures/tanglegram_z_rps.png", width = 2000, height = 3000, pointsize = 36)
 
 rownames(cor.data.rps)<-cor.data.rps$SYS_NM
 cor.data.rps<-cor.data.rps%>%select(-SYS_NM)
@@ -199,5 +199,5 @@ tanglegram(tangle_z_rps, lab.cex = .8, margin_inner = 3, main_left = "Recruits p
            main_right = "Z-score", cex_main = 1, highlight_distinct_edges = FALSE,
            lwd = 2, edge.lwd = 1)
 
-dev.off()
+#dev.off()
 ```
