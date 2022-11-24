@@ -872,7 +872,9 @@ summary(lrps_dist)
 summary(lrps_dist_rels)
 summary(lrps_rels)
 
-AIC(rps_dist, rps_rels, rps_dist_rel,lrps_dist, lrps_rels, lrps_dist_rels)%>%arrange(AIC) #rps_dist model selected by AIC and arranged top to bottom
+AICtable<-AIC(rps_dist, rps_rels, rps_dist_rel,lrps_dist, lrps_rels, lrps_dist_rels)%>%arrange(AIC) #rps_dist model selected by AIC and arranged top to bottom
+
+print(AICtable)
 
 summ(lrps_dist_rels)
 
