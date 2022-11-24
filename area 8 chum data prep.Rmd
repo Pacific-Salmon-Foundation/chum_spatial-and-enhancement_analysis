@@ -151,15 +151,13 @@ ggplot(releases,aes(x=RELEASE_YEAR,y=releases,color=RELEASE_STAGE_NAME,group=grp
 
 ggsave("figures/releases chum area 8 by CU.png",dpi=600,height=8,width=7)
 
-
-
+write.csv(releases,"releases area 8 chum all.csv")
 
 gg.releases<-releases %>% 
   filter(RELEASE_SITE_NAME%in%c("Canton Cr","Canton Est","Conuma Est","Conuma R Up","Conuma R",
                           "Deserted R/NWVI","Moutcha Bay","Sucwoa R","Tlupana R","Zeballos R"))
 
 
-write.csv(ggdata.rel2,"swvi chum releases filtered.csv")
 
 ```
 
