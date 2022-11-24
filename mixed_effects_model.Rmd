@@ -23,6 +23,46 @@ totrel <- readRDS("totrel.rds")
 
 ```
 
+```{r, Create dataframe for analysis}
+
+modeldat <- join(streaminlet, rpsdat, by = "SYS_NM")
+
+colnames(totrel) <- c("Year", "totreleases", "totrel.t")
+
+modeldat <- join(totrel, modeldat, by = "Year")
+
+modeldat$logreleases <- log(modeldat$totreleases)
+modeldat$logdistance <- log(modeldat$dist.t)
+
+modeldat$Year <- as.factor(modeldat$Year)
+modeldat$SYS_NM <- as.factor(modeldat$SYS_NM)
+
+```
+
+```{r, Fitting and plotting LMs}
+
+rps_dist <- lm(rps ~ distancefromconuma, data = modeldat)
+rps_rels <- lm(rps ~ totreleases, data = modeldat)
+rps_dist_rels <- lm(rps ~ distancefromconuma + totreleases, data = modeldat)
+
+AIC(rps_dist, rps_rels, rps_dist_rels) #rps_dist model selected by AIC
+
+coef(rps_dist) # Average RPS for dataset is 3.6. For every one unit of distance
+               # moved away from Conuma, that value goes up by .0001. P = 0.0282 
+               # Decent results, poor R^2. Poor model fit at high values
+               # If I'm interpreting that right, it would suggest that RPS becomes
+               # more independent as you move away from Conuma? 
+summary(rps_dist)
+
+par(mfrow = c(2, 2))
+plot(rps_dist)
+plot(rps_rels)
+plot(rps_dist_rels)
+
+```
+
+
+DEPRECATING CODE BELOW - MODEL DOESN'T NEED RANDOM EFFECTS; (G?)LM WILL DO
 
 ```{r Identify distributions of predictor variables, echo = FALSE, include = FALSE, message = FALSE}
 
@@ -44,22 +84,6 @@ qqp(totrel$totreleases, "lnorm")
 pois <- fitdistr(totrel$totreleases, "Poisson")
 qqp(totrel$totreleases, "pois", lambda = poisson$estimate)
 
-
-```
-
-```{r, Create dataframe for analysis}
-
-modeldat <- join(streaminlet, rpsdat, by = "SYS_NM")
-
-colnames(totrel) <- c("Year", "totreleases", "totrel.t")
-
-modeldat <- join(totrel, modeldat, by = "Year")
-
-modeldat$logreleases <- log(modeldat$totreleases)
-modeldat$logdistance <- log(modeldat$dist.t)
-
-modeldat$Year <- as.factor(modeldat$Year)
-modeldat$SYS_NM <- as.factor(modeldat$SYS_NM)
 
 ```
 
@@ -86,9 +110,6 @@ ggplot(coef.est, aes(x = term, y = estimate,
                      ymin = conf.low, ymax = conf.high)) +
     geom_hline( yintercept = 0, color = 'red' ) +
     geom_linerange() + geom_point() + coord_flip() + theme_minimal()
-
-
-png(file = "figures/modeldat.png", width = 2000, height = 3000, pointsize = 64)
 
 ggplot(data = modeldat, 
        aes(x = logdistance, y = rps, group = SYS_NM)) +
