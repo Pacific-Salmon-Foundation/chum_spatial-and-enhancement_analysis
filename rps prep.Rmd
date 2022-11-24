@@ -114,13 +114,22 @@ rownames(cor.data.rps.post)<-cor.data.rps.post$SYS_NM
 cor.data.rps.post<-cor.data.rps.post%>%select(-SYS_NM)
 cor.rps.post<-cor(t(cor.data.rps.post),use="pairwise.complete.obs")
 
+#png(file = "figures/corrplots_rps_1980.png", width = 2000, height = 3000, pointsize = 48)
+
 par(mfrow=c(2,1))
 corrplot(cor.rps.pre, diag = FALSE, order="hclust", method="square", tl.col="black",
          addrect = 6, tl.cex = 0.5, title = "Recruits per spawner (Pre-1980)", cex.main = .7, mar=c(0,0,1,0))
 corrplot(cor.rps.post, diag = FALSE, order="hclust", method="square", tl.col="black",
          addrect = 6, tl.cex = 0.5, title = "Recruits per spawner (Post-1980)", sub = "Z-scores", cex.main = .7, mar=c(0,0,1,0))
 
+#dev.off()
+
 # Tanglegrams
+
+#png(file = "figures/tanglegram_rps1980.png", width = 2000, height = 3000, pointsize = 36)
+
+par(oma=c(2,2,2,2))
+par(mfrow=c(1,1))
 
 # Pre-1980
 dist.cor.rps.pre <- dist(cor.rps.pre)
@@ -147,14 +156,15 @@ cor.data.rps <-df2 %>%
   pivot_wider(names_from="Year",values_from="rps") %>%
   data.frame()
 
-
-
 tangle.rps <- dendlist(dendrps.pre, dendrps.post)
 tanglegram(tangle.rps, lab.cex = .8, margin_inner = 3, main = "Recruits per spawner", main_left = "Pre-1980",
            main_right = "Post-1980", cex_main = 1, highlight_distinct_edges = FALSE,
            lwd = 2, edge.lwd = 1)
+#dev.off()
 
 # Compare with z-scores
+
+png(file = "figures/tanglegram_z_rps.png", width = 2000, height = 3000, pointsize = 36)
 
 rownames(cor.data.rps)<-cor.data.rps$SYS_NM
 cor.data.rps<-cor.data.rps%>%select(-SYS_NM)
@@ -189,5 +199,5 @@ tanglegram(tangle_z_rps, lab.cex = .8, margin_inner = 3, main_left = "Recruits p
            main_right = "Z-score", cex_main = 1, highlight_distinct_edges = FALSE,
            lwd = 2, edge.lwd = 1)
 
-
+dev.off()
 ```
