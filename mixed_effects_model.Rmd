@@ -33,6 +33,7 @@ colnames(totrel) <- c("Year", "totreleases", "totrel.t")
 
 modeldat <- join(totrel, modeldat, by = "Year")
 
+modeldat$dist.t <- modeldat$distancefromconuma + 1
 modeldat$logreleases <- log(modeldat$totreleases)
 modeldat$logdistance <- log(modeldat$dist.t)
 
@@ -104,8 +105,27 @@ plot_coefs(rps_dist)
 
 ```{r trying a glm}
 glm1<-glm(logrps~year+SYS_NM,data=modeldat)
+glm2 <- glm(logrps ~ year + SYS_NM + distancefromconumakm, data = modeldat)
+summary(glm2)
 
 summ(glm1)
+summ(glm2)
+
+ggplot(modeldat, aes(distancefromconumakm, logrps)) +
+  geom_jitter(width = 1, height = 1) + 
+  geom_smooth(method = "lm")
+
+slopes <- coef(glm2)
+slopes <- slopes[3:26]
+slopes <- as.data.frame(slopes)
+intercept <- as.data.frame(rep(glm2$coefficients[1], 24))
+ablines <- as.data.frame(c(intercept, slopes))
+
+# Plot isn't right but I need to look at it fresh later to figure out what's wrong
+ggplot(modeldat, aes(distancefromconumakm, rps)) +
+  geom_point() +
+  geom_abline(intercept = ablines$rep.glm2.coefficients.1...24., slope = ablines$slopes) +
+  ylim(-10, 30)
 
 # cant remember how to interpret this...lots of significant effects though.
 
@@ -141,7 +161,7 @@ qqp(totrel$totreleases, "pois", lambda = poisson$estimate)
 
 # Stream as random effect
 
-mod_stream_log <- lmer(rps ~ logdistance + logreleases + (1 | SYS_NM), 
+mod_stream_log <- lmer(rps ~ logdistance + logreleases + (1 | SYS_NM) + (1 | year), 
                    data = modeldat, REML = FALSE,)
 
 summary(mod_stream_log) 
