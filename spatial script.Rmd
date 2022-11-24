@@ -828,3 +828,67 @@ tanglegram(tangle.m, lab.cex = .8, margin_inner = 3, main = "Moving average ", m
 #dev.off()
 
 ```
+
+\newpage
+
+```{r, Fitting and plotting LMs}
+
+rps_dist <- lm(rps ~ distancefromconuma, data = modeldat)
+rps_rels <- lm(rps ~ totreleases, data = modeldat)
+rps_dist_rels <- lm(rps ~ distancefromconuma + totreleases, data = modeldat)
+
+
+coef(rps_dist) # Average RPS for dataset is 3.6. For every one unit of distance
+               # moved away from Conuma, that value goes up by .0001. P = 0.0282 
+               # Decent results, poor R^2. Poor model fit at high values
+               # If I'm interpreting that right, it would suggest that RPS becomes
+               # more independent as you move away from Conuma? 
+
+
+AIC(rps_dist, rps_rels, rps_dist_rels) #rps_dist model selected by AIC
+
+
+par(mfrow = c(2, 2))
+plot(rps_dist)
+plot(rps_rels)
+plot(rps_dist_rels)
+
+
+
+```
+
+#using log rps
+```{r, Fitting and plotting LMs}
+
+#adding in year as numeric and converting distance to km so effects are scaled better
+modeldat$year<-as.numeric(as.character(modeldat$Year))
+modeldat$distancefromconumakm<-modeldat$distancefromconuma/1000
+
+lrps_dist <- lm(logrps ~ distancefromconumakm + year, data = modeldat)
+lrps_rels <- lm(logrps ~ totreleases + year, data = modeldat)
+lrps_dist_rels <- lm(logrps ~ distancefromconumakm + totreleases + year, data = modeldat)
+
+summary(lrps_dist)
+summary(lrps_dist_rels)
+summary(lrps_rels)
+
+AIC(rps_dist, rps_rels, rps_dist_rel,lrps_dist, lrps_rels, lrps_dist_rels)%>%arrange(AIC) #rps_dist model selected by AIC and arranged top to bottom
+
+summ(lrps_dist_rels)
+
+#png("figures/effects from log rps lm.png",res=600,height=6,width=6,units='in')
+plot_summs(lrps_dist,lrps_dist_rels,lrps_rels,inner_ci_level = .9,
+           model.names=c("logrps~dist+year","logrps~dist+rel+year","logrps~rel+year")) 
+#dev.off()
+#so this is cool. I used log rps and distance + year (gotta be a year effect included to include temporal trends), and get a stronger distance effect +0.02 log RPS units per km of distance. Thats an exponential relationship between distance and RPS? I think it would work out to a change in RPS of 1.09 (100^2) over 100 km for example? Super interesting effect if RPS increases with distance from the enhancement, combine that with the lower RPS in the 4 enhanced systems and maybe thats evidence of an effect? However R2 is still really low so assuming thats still going to mean that it doesnt really explain much of the variation. 
+
+100^.02
+
+exp(.06)-exp(.04)
+exp(.04)-exp(.02)
+
+plot_coefs(rps_dist)
+
+
+```
+
