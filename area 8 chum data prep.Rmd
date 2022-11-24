@@ -1,6 +1,8 @@
 ---
 title: "Area 8 Chum Data Prep"
 output: html_notebook
+editor_options: 
+  chunk_output_type: console
 ---
 
 
@@ -38,10 +40,7 @@ escdata<-fread("all nuseds with enhancement rankings.csv")%>%
 
 escdata$escapement[escdata$escapement==0]<-NA
 
-species="CM"
-area=25
-
-a25.escdata<-escdata%>%filter(SPP=="CM"&Area==25)
+escdata<-escdata%>%filter(SPP=="CM"&Area==8)
 
 #write.csv(a25.escdata,"area 25 escapement data all.csv")
 
@@ -100,12 +99,10 @@ ggplot(esc.byinlet,aes(x=Year,y=z,color=subinlet))+
 
 
 
-```{r releases for area 25}
-rel<-fread("AllSEPReleases_2021-01-21 with otoliths.csv")
+```{r releases for area 8}
+releases.raw<-fread("AllSEPReleases_2021-01-21 with otoliths revised.csv")
 
-rel.cu.name="SOUTHWEST VANCOUVER ISLAND"
-
-allreleases <- rel %>%
+allreleases <- releases.raw %>%
   select(SPECIES_NAME, STOCK_NAME, FACILITY_NAME, RELEASE_SITE_NAME,
          RELEASE_STAGE_NAME, TotalRelease, RELEASE_YEAR, REL_CU_NAME,
          REL_CU_INDEX) %>%
@@ -114,19 +111,50 @@ allreleases <- rel %>%
   summarise(releases=sum(as.numeric(TotalRelease)),n=n()) %>% 
   ungroup()
 
-swvi.chum <- allreleases %>% 
+allcunames<-allreleases%>%filter(SPECIES_NAME==species)%>%distinct(REL_CU_NAME)
+allreleasesites<-allreleases%>%filter(SPECIES_NAME==species&REL_CU_NAME=="")%>%distinct(RELEASE_SITE_NAME,STOCK_NAME)
+
+species="Chum"
+rel.cu.name=c("BELLA COOLA RIVER-LATE","BELLA COOLA-DEAN RIVERS","SPILLER-FITZ HUGH-BURKE")
+
+releases <- allreleases %>% 
   data.frame() %>% 
-  filter(SPECIES_NAME=="Chum"&REL_CU_NAME%in%rel.cu.name) %>%
+  filter(SPECIES_NAME==species&REL_CU_NAME%in%rel.cu.name)%>%
   mutate("site-stock"=paste0(RELEASE_SITE_NAME,":",STOCK_NAME))%>%
   filter(!is.na(releases))%>%
   arrange(`site-stock`,RELEASE_STAGE_NAME,RELEASE_YEAR)
 
-ggdata.rel<-swvi.chum
-idx <- c(1, diff(ggdata.rel$RELEASE_YEAR))
-i2 <- c(1,which(idx != 1), nrow(ggdata.rel)+1)
-ggdata.rel$grp <- rep(1:length(diff(i2)), diff(i2))
+extra.releasesites<-c("Bella Coola Est","Bella Coola R Low","Bentinck Arm N","Hagensborg Sl","Nooklikonnick Cr")
 
-ggdata.rel2<-ggdata.rel %>% 
+extras<-allreleases%>%data.frame()%>%
+  filter(REL_CU_NAME==""&RELEASE_SITE_NAME%in%extra.releasesites)%>%
+  mutate("site-stock"=paste0(RELEASE_SITE_NAME,":",STOCK_NAME))%>%
+  filter(!is.na(releases))%>%
+  arrange(`site-stock`,RELEASE_STAGE_NAME,RELEASE_YEAR)
+
+releases<-rbind(releases,extras)
+
+idx <- c(1, diff(releases$RELEASE_YEAR))
+i2 <- c(1,which(idx != 1), nrow(releases)+1)
+releases$grp <- rep(1:length(diff(i2)), diff(i2))
+
+#plot all releases in area to determine which systems specifically to included
+ggplot(releases,aes(x=RELEASE_YEAR,y=releases,color=RELEASE_STAGE_NAME,group=grp))+
+  geom_line()+geom_point()+
+  scale_color_brewer(palette="Set1")+
+  facet_wrap(~`site-stock`,ncol=4)+
+  theme_bw()+
+  labs(x="Release Year",y="Releases",color="Release Stage",
+       title=paste0(species,": ",paste0(rel.cu.name,collapse=" ")))+
+  theme(legend.position = "bottom",
+        plot.title=element_text(size=8))
+
+ggsave("figures/releases chum area 8 by CU.png",dpi=600,height=8,width=7)
+
+
+
+
+gg.releases<-releases %>% 
   filter(RELEASE_SITE_NAME%in%c("Canton Cr","Canton Est","Conuma Est","Conuma R Up","Conuma R",
                           "Deserted R/NWVI","Moutcha Bay","Sucwoa R","Tlupana R","Zeballos R"))
 
@@ -136,13 +164,14 @@ write.csv(ggdata.rel2,"swvi chum releases filtered.csv")
 ```
 
 
-```{r releases for area 25}
-ggplot(ggdata.rel2,aes(x=RELEASE_YEAR,y=releases,color=RELEASE_STAGE_NAME,group=grp))+
+```{r plot releases for area 8}
+ggplot(gg.releases,aes(x=RELEASE_YEAR,y=releases,color=RELEASE_STAGE_NAME,group=grp))+
   geom_line()+geom_point()+
   scale_color_brewer(palette="Set1")+
   facet_wrap(~`site-stock`,ncol=3)+
   theme_bw()+
-  labs(x="Release Year",y="Releases",color="Release Stage",title=paste0(species,": ",paste0(rel.cu.name,collapse=" ")))+
+  labs(x="Release Year",y="Releases",color="Release Stage",
+       title=paste0(species,": ",paste0(rel.cu.name,collapse=" ")))+
   theme(legend.position = "bottom",
         plot.title=element_text(size=8))
 
