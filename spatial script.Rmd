@@ -279,6 +279,7 @@ nameslookup$erank <- c("red", "red", "red", "black", "#3399FF", "red",
                        "black", "black", "black", "red", "black", "black",
                        "black", "black", "black", "black", "black",
                        "black", "black", "black")
+saveRDS(nameslookup, "nameslookup.rds")
   
 dendclust.z[["labels"]][["inlet"]] <- inletlist
 
@@ -424,6 +425,24 @@ par(mfrow=c(2,2))
 #  annotate("text", x = xlenz-2, y = ylenz, colour = "99FF33", label = "Tahsis inlet")
 
 
+zlabnames <- zlabs$SYS_NM
+zlabnames <- as.data.frame(zlabnames)
+zlabnames$order <- c(1:length(zlabnames[,1]))
+colnames(zlabnames) <- c("SYS_NM", "order")
+zlabnames <- merge(zlabnames, nameslookup, by = "SYS_NM")
+zlabnames <- zlabnames %>%
+  arrange(order)
+zlabranks <- zlabnames$zrank
+zlabnames <- zlabnames$shortnames
+dendz <- as.dendrogram(clust.dist.cor.z)
+dendz %>%
+  set("labels_colors", zlabcolours) %>%
+  set("labels_cex", 0.65) %>%
+  set("labels", zlabnames) %>%
+  set("leaves_pch", 19) %>%
+  set("leaves_col", zlabranks) %>%
+  plot(main = "Z-scores", horiz = TRUE)
+
 dendz <- as.dendrogram(clust.dist.cor.z)
 dendz %>%
   set("labels_colors", zlabcolours) %>%
@@ -432,6 +451,8 @@ dendz %>%
   set("leaves_pch", 19) %>%
   set("leaves_col", nameslookup$erank) %>%
   plot(main = "Z-scores", horiz = TRUE)
+
+
 
 
 #ggdendrogram(dendclust.e, rotate = TRUE) +
