@@ -1,0 +1,197 @@
+---
+title: "mixed_effects_model"
+output: html_document
+date: '2022-11-23'
+editor_options: 
+  chunk_output_type: console
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+
+library(car) # Will mask select function in dplyr. Unload and restart to revert.
+library(MASS)
+library(tidyverse)
+library(lme4)
+library(plyr) # Ignore warning if working in this script only
+library(dplyr)
+library(broom.mixed)
+library(jtools)
+library(ggstance)
+
+streaminlet <- read_csv("CM A25 filtered stream list_with inlets.csv")
+rpsdat <- readRDS("RPS.rds")
+totrel <- readRDS("totrel.rds")
+
+```
+
+```{r, Create dataframe for analysis}
+
+modeldat <- join(streaminlet, rpsdat, by = "SYS_NM")
+
+colnames(totrel) <- c("Year", "totreleases", "totrel.t")
+
+modeldat <- join(totrel, modeldat, by = "Year")
+
+modeldat$logreleases <- log(modeldat$totreleases)
+modeldat$logdistance <- log(modeldat$dist.t)
+
+modeldat$Year <- as.factor(modeldat$Year)
+modeldat$SYS_NM <- as.factor(modeldat$SYS_NM)
+
+```
+
+```{r, Fitting and plotting LMs}
+
+rps_dist <- lm(rps ~ distancefromconuma, data = modeldat)
+rps_rels <- lm(rps ~ totreleases, data = modeldat)
+rps_dist_rels <- lm(rps ~ distancefromconuma + totreleases, data = modeldat)
+
+
+coef(rps_dist) # Average RPS for dataset is 3.6. For every one unit of distance
+               # moved away from Conuma, that value goes up by .0001. P = 0.0282 
+               # Decent results, poor R^2. Poor model fit at high values
+               # If I'm interpreting that right, it would suggest that RPS becomes
+               # more independent as you move away from Conuma? 
+
+
+AIC(rps_dist, rps_rels, rps_dist_rels) #rps_dist model selected by AIC
+
+
+par(mfrow = c(2, 2))
+plot(rps_dist)
+plot(rps_rels)
+plot(rps_dist_rels)
+
+
+
+```
+
+#using log rps
+```{r, Fitting and plotting LMs}
+
+#adding in year as numeric and converting distance to km so effects are scaled better
+modeldat$year<-as.numeric(as.character(modeldat$Year))
+modeldat$distancefromconumakm<-modeldat$distancefromconuma/1000
+
+lrps_dist <- lm(logrps ~ distancefromconumakm + year, data = modeldat)
+lrps_rels <- lm(logrps ~ totreleases + year, data = modeldat)
+lrps_dist_rels <- lm(logrps ~ distancefromconumakm + totreleases + year, data = modeldat)
+
+summary(lrps_dist)
+summary(lrps_dist_rels)
+summary(lrps_rels)
+
+AIC(lrps_dist, lrps_rels, lrps_dist_rels)%>%arrange(AIC) #rps_dist model selected by AIC and arranged top to bottom
+
+summ(lrps_dist_rels)
+
+#png("figures/effects from log rps lm.png",res=600,height=6,width=6,units='in')
+plot_summs(lrps_dist,lrps_dist_rels,lrps_rels,inner_ci_level = .9,
+           model.names=c("logrps~dist+year","logrps~dist+rel+year","logrps~rel+year")) 
+#dev.off()
+#so this is cool. I used log rps and distance + year (gotta be a year effect included to include temporal trends), and get a stronger distance effect +0.02 log RPS units per km of distance. Thats an exponential relationship between distance and RPS? I think it would work out to a change in RPS of 1.09 (100^2) over 100 km for example? Super interesting effect if RPS increases with distance from the enhancement, combine that with the lower RPS in the 4 enhanced systems and maybe thats evidence of an effect? However R2 is still really low so assuming thats still going to mean that it doesnt really explain much of the variation. 
+
+100^.02
+
+exp(.06)-exp(.04)
+exp(.04)-exp(.02)
+
+plot_coefs(rps_dist)
+
+
+```
+
+```{r trying a glm}
+glm1<-glm(logrps~year+SYS_NM,data=modeldat)
+
+summ(glm1)
+
+# cant remember how to interpret this...lots of significant effects though.
+
+```
+
+DEPRECATING CODE BELOW - MODEL DOESN'T NEED RANDOM EFFECTS; (G?)LM WILL DO
+
+```{r Identify distributions of predictor variables, echo = FALSE, include = FALSE, message = FALSE}
+
+# Distance from conuma
+
+streaminlet$dist.t <- streaminlet$distancefromconuma + 1 
+qqp(streaminlet$distancefromconuma, "norm")  # Normal distribution is best fit
+qqp(streaminlet$distancefromconuma, "lnorm")
+nbinom <- fitdistr(streaminlet$dist.t, "Negative Binomial")
+qqp(streaminlet$dist.t, "nbinom", size = nbinom$estimate[[1]], 
+    mu = nbinom$estimate[[2]])
+poisson <- fitdistr(streaminlet$dist.t, "Poisson")
+qqp(streaminlet$dist.t, "pois", lambda = poisson$estimate)
+
+# Total releases from conuma
+
+qqp(totrel$totreleases, "norm")  # Normal distribution is best fit
+qqp(totrel$totreleases, "lnorm")
+pois <- fitdistr(totrel$totreleases, "Poisson")
+qqp(totrel$totreleases, "pois", lambda = poisson$estimate)
+
+
+```
+
+```{r, Model}
+
+
+# Stream as random effect
+
+mod_stream_log <- lmer(rps ~ logdistance + logreleases + (1 | SYS_NM), 
+                   data = modeldat, REML = FALSE,)
+
+summary(mod_stream_log) 
+92.62 / (92.62 + 2989.33) # = 3.0 % of variance not explained by fixed effects is attributed to System
+
+fixef(mod_stream_log)
+confint(mod_stream_log)
+ranef(mod_stream_log)
+coef(mod_stream_log)
+coef.est <- tidy(mod_stream_log, conf.int = TRUE) %>%
+  filter(effect == "fixed")
+print(coef.est)
+
+ggplot(coef.est, aes(x = term, y = estimate,
+                     ymin = conf.low, ymax = conf.high)) +
+    geom_hline( yintercept = 0, color = 'red' ) +
+    geom_linerange() + geom_point() + coord_flip() + theme_minimal()
+
+ggplot(data = modeldat, 
+       aes(x = logdistance, y = rps, group = SYS_NM)) +
+    geom_jitter(width = .5, height = 10) +
+    xlim(8, 12) +
+    #facet_grid(Year ~ . ) +
+    stat_smooth(method = "glm",
+                method.args = list(family = "gaussian"), 
+                se = FALSE,
+                alpha = 0.5) +
+    theme_minimal()
+dev.off()
+
+
+plot(mod_stream_log) # Residuals fit decently well except at extreme high outliers
+
+qqnorm(resid(mod_stream_log))
+qqline(resid(mod_stream_log)) # Model performs well except at extreme high outliers
+
+# Stream + Year as random effect
+
+mod_stream_log2 <- lmer(rps ~ logdistance + logreleases + (1 | SYS_NM) + (1 | Year), 
+                   data = modeldat, REML = TRUE) # Set TRUE because effects are crossed, not nested
+summary(mod_stream_log2)
+79.52 / (79.52 + 2912.10) # = 2.7 % of variance not explained by fixed effects attributed to Year
+119.52 / (119.52 + 2912.10) # = 3.9 % of variance not explained by fixed effects attributed to System 
+
+coef(mod_stream_log2)
+
+plot(mod_stream_log2) 
+
+qqnorm(resid(mod_stream_log2))
+qqline(resid(mod_stream_log2)) 
+
+
+```
