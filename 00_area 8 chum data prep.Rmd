@@ -68,7 +68,7 @@ a25.escdata.filtered<-esc.data%>%filter(SYS_NM%in%included.stream.list$SYS_NM)%>
          prepost=case_when(Year<1980~"Pre",
                            Year>=1980~"Post"))
 
-write.csv(a25.escdata.filtered,"area 25 escapement data filtered.csv")
+write.csv(a25.escdata.filtered,"data/area 25 escapement data filtered.csv")
 
 ggplot(escdata.filt,aes(x=Year,y=escapement,color=Enhancement_Rank))+
   geom_point()+geom_line()+theme_bw()+
@@ -145,45 +145,30 @@ ggplot(releases,aes(x=RELEASE_YEAR,y=releases,color=RELEASE_STAGE_NAME,group=grp
   facet_wrap(~`site-stock`,ncol=4)+
   theme_bw()+
   labs(x="Release Year",y="Releases",color="Release Stage",
-       title=paste0(species,": ",paste0(rel.cu.name,collapse=" ")))+
+       title=paste0(species,": ",paste0(rel.cu.name,collapse=" ")),subtitle="Release site:Origin stock")+
   theme(legend.position = "bottom",
-        plot.title=element_text(size=8))
+        plot.title=element_text(size=8),strip.text=element_text(size=8))
 
-ggsave("figures/releases chum area 8 by CU.png",dpi=600,height=8,width=7)
+#ggsave("figures/releases chum area 8 by CU.png",dpi=600,height=8,width=7)
 
-write.csv(releases,"data/releases area 8 chum all.csv")
-
-gg.releases<-releases %>% 
-  filter(RELEASE_SITE_NAME%in%c("Canton Cr","Canton Est","Conuma Est","Conuma R Up","Conuma R",
-                          "Deserted R/NWVI","Moutcha Bay","Sucwoa R","Tlupana R","Zeballos R"))
-
-
+#write.csv(releases,"data/releases area 8 chum all.csv")
 
 ```
 
 
-```{r plot releases for area 8}
-ggplot(gg.releases,aes(x=RELEASE_YEAR,y=releases,color=RELEASE_STAGE_NAME,group=grp))+
-  geom_line()+geom_point()+
-  scale_color_brewer(palette="Set1")+
-  facet_wrap(~`site-stock`,ncol=3)+
-  theme_bw()+
-  labs(x="Release Year",y="Releases",color="Release Stage",
-       title=paste0(species,": ",paste0(rel.cu.name,collapse=" ")))+
-  theme(legend.position = "bottom",
-        plot.title=element_text(size=8))
-
-ggsave("figures/swvi chum releases for area 25.png",dpi=600,height=8,width=7)
-```
+```{r total releases for area 8 terminal not including mcloughlin bay}
 
 
-```{r total releases for area 25}
-totrel <- ggdata.rel2 %>% 
-  filter(`site-stock`!="Zeballos R:Zeballos R")%>%
-  filter(RELEASE_STAGE_NAME!="Eyed Egg")%>%
+releasesfortotals<-releases %>% 
+  filter(RELEASE_SITE_NAME%in%c("Fish Cr+Airport Ch","Saloompt R","Snootli Cr","Thorsen Cr/CCST"))
+
+totrel <- releasesfortotals %>% 
   group_by(RELEASE_YEAR)%>%
   summarise(totreleases=sum(releases))
 
+write.csv(totrel,"data/releases area 8 chum total terminal releases.csv")
+
+totrel
 #write.csv(totrel,"~/R/PSF hatchery review/analysis/spatial/outputs/Area 25 chum releases totals.csv")
 ```
 
