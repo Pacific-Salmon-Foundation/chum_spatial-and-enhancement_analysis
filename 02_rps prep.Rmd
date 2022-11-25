@@ -11,9 +11,9 @@ library(tidyverse)
 library(data.table)
 library(dplyr)
 library(corrplot)
-nameslookup <- readRDS("nameslookup.rds")
+nameslookup <- readRDS("RDS/nameslookup.rds")
 
-escdata <- read_csv("all nuseds with enhancement rankings.csv")%>%
+escdata <- read_csv("data/all nuseds with enhancement rankings.csv")%>%
   select(-V1)
 
 escdata$escapement[escdata$escapement==0]<-NA
@@ -51,7 +51,7 @@ df<-esc.data%>%filter(SYS_NM%in%included.stream.list$SYS_NM)%>%
          prepost=case_when(Year<1980~"Pre",
                            Year>=1980~"Post"))
 
-age<-read.delim("SCVI_age_2019-04-13.txt")
+age<-read.delim("data/SCVI_age_2019-04-13.txt")
 
 swvi.ageers<-age%>%filter(CU_Name=="Southwest & West  Vancouver Island")%>%
   select(Year=BroodYear,Total.ER,p3=Age3,p4=Age4,p5=Age5)
@@ -67,7 +67,7 @@ df2<-merge(df,swvi.ageers,by="Year")%>%
          rps=replace(rps,rps==0,NA),
          logrps=log(rps))
 
-saveRDS(df2, file = "RPS.rds") 
+saveRDS(df2, file = "RDS/RPS.rds") 
 
 #total return plot
 ggplot(df2, aes(x=Year,y=TR)) +

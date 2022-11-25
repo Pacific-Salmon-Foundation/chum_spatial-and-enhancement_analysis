@@ -48,8 +48,8 @@ getridofggplotlinesbetweenpoints<-function(data,colstokeep,yearcolumnname) {
 
 ```{r load escapement data,echo=FALSE}
 
-escdata.raw<-fread("area 25 escapement data all.csv")
-escdata.filt<-fread("area 25 escapement data filtered.csv")%>%select(-V1)
+escdata.raw<-fread("data/area 25 escapement data all.csv")
+escdata.filt<-fread("data/area 25 escapement data filtered.csv")%>%select(-V1)
 
 ```
 
@@ -90,7 +90,7 @@ ggplot(escdata.filt,aes(x=Year,y=escapement,color=Enhancement_Rank))+
 
 ```{r, echo=FALSE,message=FALSE,warning=FALSE,fig.height=7,fig.width=7,fig.cap="Chum releases to Area 25 by release site and release stage."}
 
-swvi.chum<-fread("swvi chum releases filtered.csv")
+swvi.chum<-fread("data/swvi chum releases filtered.csv")
 
 ggdata.rel <- swvi.chum
 
@@ -172,7 +172,7 @@ ggplot(escdata.filt,aes(y=SYS_NM,x=z,fill=prepost))+
 
 
 ```{r rps figure pre post with lm, echo=FALSE, warning=FALSE, message=FALSE ,fig.align="center", fig.height=7, fig.width=6 ,fig.cap="Log RPS by stream with linear regression fits pre- and post-first year of enhancement."}
-a25.rps<-fread("area 25 chum rps.csv")
+a25.rps<-fread("data/area 25 chum rps.csv")
 
 gga25.logrps<-a25.rps%>%select(Year,prepost,logrps,SYS_NM)%>%arrange(SYS_NM,prepost,Year)
 
@@ -213,7 +213,7 @@ ggplot(gga25.logrps,aes(y=SYS_NM,x=logrps,fill=prepost))+
 
 # Merge stream inlet table into escdata.filt
 
-streaminlet <- fread("CM A25 filtered stream list_with inlets.csv")
+streaminlet <- fread("data/CM A25 filtered stream list_with inlets.csv")
 
 escdata.filt<-merge(escdata.filt,streaminlet,by="SYS_NM")
 

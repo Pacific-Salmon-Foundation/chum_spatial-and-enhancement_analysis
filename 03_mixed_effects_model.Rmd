@@ -19,9 +19,9 @@ library(broom.mixed)
 library(jtools)
 library(ggstance)
 
-streaminlet <- read_csv("CM A25 filtered stream list_with inlets.csv")
-rpsdat <- readRDS("RPS.rds")
-totrel <- readRDS("totrel.rds")
+streaminlet <- read_csv("data/CM A25 filtered stream list_with inlets.csv")
+rpsdat <- readRDS("RDS/RPS.rds")
+totrel <- readRDS("RDS/totrel.rds")
 
 ```
 

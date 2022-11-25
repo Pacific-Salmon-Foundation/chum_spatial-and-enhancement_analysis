@@ -35,7 +35,7 @@ getridofggplotlinesbetweenpoints<-function(data,colstokeep,yearcolumnname) {
 ```{r load prep data, echo=FALSE,message=FALSE,warning=FALSE}
 #load escapement data and remove 0's
 
-escdata<-fread("all nuseds with enhancement rankings.csv")%>%
+escdata<-fread("data/all nuseds with enhancement rankings.csv")%>%
   select(-V1)
 
 escdata$escapement[escdata$escapement==0]<-NA
@@ -76,14 +76,14 @@ ggplot(escdata.filt,aes(x=Year,y=escapement,color=Enhancement_Rank))+
   labs(y="Escapement",color="Enhancement Level")+
   theme(legend.position="bottom")
 
-ggsave("a25 chum escapement filtered streams.png",dpi=600,height=8,width=7)
+ggsave("figures/a25 chum escapement filtered streams.png",dpi=600,height=8,width=7)
 
 ```
 
 
 ```{r junk test}
 
-streaminlet <- read_csv("CM A25 filtered stream list_with inlets.csv")
+streaminlet <- read_csv("data/CM A25 filtered stream list_with inlets.csv")
 
 esc.byinlet<-merge(streaminlet,escdata.filt,by="SYS_NM")
 
@@ -100,7 +100,7 @@ ggplot(esc.byinlet,aes(x=Year,y=z,color=subinlet))+
 
 
 ```{r releases for area 8}
-releases.raw<-fread("AllSEPReleases_2021-01-21 with otoliths revised.csv")
+releases.raw<-fread("data/AllSEPReleases_2021-01-21 with otoliths revised.csv")
 
 allreleases <- releases.raw %>%
   select(SPECIES_NAME, STOCK_NAME, FACILITY_NAME, RELEASE_SITE_NAME,
@@ -151,7 +151,7 @@ ggplot(releases,aes(x=RELEASE_YEAR,y=releases,color=RELEASE_STAGE_NAME,group=grp
 
 ggsave("figures/releases chum area 8 by CU.png",dpi=600,height=8,width=7)
 
-write.csv(releases,"releases area 8 chum all.csv")
+write.csv(releases,"data/releases area 8 chum all.csv")
 
 gg.releases<-releases %>% 
   filter(RELEASE_SITE_NAME%in%c("Canton Cr","Canton Est","Conuma Est","Conuma R Up","Conuma R",
@@ -188,9 +188,9 @@ totrel <- ggdata.rel2 %>%
 ```
 
 ``` {r prep rps data}
-a25.escdata<-fread("area 25 escapement data filtered.csv")%>%select(-V1)
+a25.escdata<-fread("data/area 25 escapement data filtered.csv")%>%select(-V1)
 
-age<-fread("SCVI_age_2019-04-13.txt")%>%select(-V1)
+age<-fread("data/SCVI_age_2019-04-13.txt")%>%select(-V1)
 
 swvi.ageers<-age%>%filter(CU_Name=="Southwest & West  Vancouver Island")%>%
   select(Year=BroodYear,Total.ER,p3=Age3,p4=Age4,p5=Age5)
@@ -206,7 +206,7 @@ a25.rps<-merge(a25.escdata,swvi.ageers,by="Year")%>%
          rps=replace(rps,rps==0,NA),
          logrps=log(rps))
 
-write.csv(a25.rps,"area 25 chum rps.csv")
+write.csv(a25.rps,"data/area 25 chum rps.csv")
 
 ```
 
