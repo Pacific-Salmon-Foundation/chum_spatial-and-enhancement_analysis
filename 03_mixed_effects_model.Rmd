@@ -20,7 +20,7 @@ library(jtools)
 library(ggstance)
 
 streaminlet <- read_csv("data/CM A25 filtered stream list_with inlets.csv")
-rpsdat <- readRDS("RDS/RPS.rds")
+rpsdat <- read_csv("data/area 25 chum rps.csv")
 totrel <- readRDS("RDS/totrel.rds")
 
 ```
@@ -82,7 +82,7 @@ summary(lrps_dist)
 summary(lrps_dist_rels)
 summary(lrps_rels)
 
-AIC(lrps_dist, lrps_rels, lrps_dist_rels)%>%arrange(AIC) #rps_dist model selected by AIC and arranged top to bottom
+AICtable<-AIC(lrps_dist, lrps_rels, lrps_dist_rels)%>%arrange(AIC) #rps_dist model selected by AIC and arranged top to bottom
 
 summ(lrps_dist_rels)
 

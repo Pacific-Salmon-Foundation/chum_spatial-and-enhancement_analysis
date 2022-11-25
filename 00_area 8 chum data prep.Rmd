@@ -11,7 +11,7 @@ editor_options:
 knitr::opts_chunk$set(echo = TRUE, fig.pos = "!h")
 
 library(data.table)
-library(tidyverse)
+library(dplyr)
 library(zoo)
 
 options(scipen=10000)
@@ -198,76 +198,86 @@ ggplot(totrel,aes(x=RELEASE_YEAR,y=totreleases,color=group))+
   theme_bw()+
   labs(x="Release Year",y="Total Releases",title="Area 8 Chum total terminal releases (excludes Mcloughlin Bay)")
 
-ggsave("figures/releases chum area 8 total terminal.png",dpi=600,height=6,width=6)
+#ggsave("figures/releases chum area 8 total terminal.png",dpi=600,height=6,width=6)
 
 #write.csv(totrel,"~/R/PSF hatchery review/analysis/spatial/outputs/Area 25 chum releases totals.csv")
 ```
 
 ``` {r prep rps data}
-escdata<-fread("data/area 8 chum escapement data filtered with metrics.csv")%>%select(-V1)
+escdata<-fread("data/area 8 chum escapement data filtered with metrics.csv")
 
 age<-fread("data/age and ERs NC CC PSE.csv")
 
-ageERs<-age%>%filter(SpeciesId=="CM",CU_Name=="Bella Coola-Dean Rivers, BELLA COOLA RIVER-LATE")%>%
-  select(Year=BroodYear,`Total ER`,p3=Age3,p4=Age4,p5=Age5)
+ageERs<-age%>%filter(SpeciesId=="CM",CU_Name=="Bella Coola-Dean Rivers, BELLA COOLA RIVER-LATE")%>%select(Year=BroodYear,`Total ER`,p3=Age3,p4=Age4,p5=Age5)
 
-a25.rps<-merge(a25.escdata,swvi.ageers,by="Year")%>%
-  mutate(TR=escapement/(1-Total.ER))%>%
+rps<-merge(escdata,ageERs,by="Year")%>%
+  mutate(TR=escapement/(1-`Total ER`))%>%
   mutate(age3=TR*p3,age4=TR*p4,age5=TR*p5)%>%
-  mutate(r3=shift(age3,n=-3,type="lag"),r4=shift(age4,n=-4,type="lag"),
-         r5=shift(age5,n=-5,type="lag"))%>%
+  arrange(SYS_NM,Year)%>%
+  mutate(r3=shift(age3,n=3,type="lag"),r4=shift(age4,n=4,type="lag"),
+         r5=shift(age5,n=5,type="lag"))%>%
   rowwise()%>%
   mutate(recruits=sum(c_across(r3:r5),na.rm=TRUE))%>%
   mutate(rps=recruits/escapement,
          rps=replace(rps,rps==0,NA),
          logrps=log(rps))
 
-write.csv(a25.rps,"data/area 25 chum rps.csv")
+write.csv(rps,"data/area 8 chum with rps raw.csv")
 
+```
+
+```{r}
+
+rps.clean<-rps%>%mutate(rps=replace(rps,rps>0,NA))
+
+rps.clean
 ```
 
 
 ```{r}
 #total return plot
-ggplot(a25.rps,aes(x=Year,y=TR))+
+ggplot(rps,aes(x=Year,y=TR))+
   geom_line()+geom_point()+
   facet_wrap(~SYS_NM,ncol=3,scale="free_y")
 
 #rps plots
-ggplot(a25.rps,aes(x=Year,y=rps))+
+ggplot(rps,aes(x=Year,y=rps))+
   geom_line()+geom_point()+
   geom_smooth(method='lm',se=TRUE)+
   facet_wrap(~SYS_NM,ncol=3,scale="free_y")+
   theme_bw()+
   geom_hline(yintercept=1)
 
+ggsave("figures/releases chum area 8 total terminal.png",dpi=600,height=6,width=6)
+
 #log rps plots
-gga25.logrps<-a25.rps%>%select(Year,prepost,logrps,SYS_NM)%>%arrange(SYS_NM,prepost,Year)
+logrps<-rps%>%select(Year,prepost,logrps,SYS_NM)%>%arrange(SYS_NM,prepost,Year)
 
-idx <- c(1, diff(gga25.logrps$Year))
-i2 <- c(1,which(idx != 1), nrow(gga25.logrps)+1)
-gga25.logrps$grp <- rep(1:length(diff(i2)), diff(i2))
+idx <- c(1, diff(logrps$Year))
+i2 <- c(1,which(idx != 1), nrow(logrps)+1)
+logrps$grp <- rep(1:length(diff(i2)), diff(i2))
 
-ggplot(gga25.logrps,aes(x=Year,y=logrps,color=prepost,group=grp))+
+ggplot(logrps,aes(x=Year,y=logrps,color=prepost,group=grp))+
   geom_line(alpha=.5)+geom_point(alpha=.5)+
   scale_color_brewer(palette="Set1")+
   geom_smooth(method='lm',se=TRUE)+
   facet_wrap(~SYS_NM,ncol=3,scale="free_y")+
   theme_bw()+
+  geom_vline(xintercept=fy,color="seagreen")+
   geom_hline(yintercept=0,linetype="dashed")+
-  labs(x="Brood Year",y="log(Recruits per spawner)",color="Period")+
+  labs(x="Brood Year",y="log(Recruits per spawner)",color="Period",title="Area 8 Chum")+
   theme(legend.position="bottom")
 
-ggsave("figures/A25 chum log rps pre vs post.png",dpi=600,height=8,width=7)
+ggsave("figures/area 8 chum log rps pre vs post.png",dpi=600,height=8,width=7)
 
-ggplot(gga25.logrps,aes(y=SYS_NM,x=logrps,fill=prepost))+
+ggplot(logrps,aes(y=SYS_NM,x=logrps,fill=prepost))+
   geom_boxplot(notch=F)+
   scale_fill_brewer(palette="Set1")+
   geom_vline(xintercept=0)+
   theme_bw()+
-  labs(y="System Name",x="log(Recruits per spawner)",title="Area 25 Chum")+
+  labs(y="System Name",x="log(Recruits per spawner)",title="Area 8 Chum")+
   theme(legend.position="bottom")
 
-ggsave("figures/A25 chum log rps pre vs post boxplot.png",dpi=600,height=8,width=7)
+ggsave("figures/area 8 chum log rps pre vs post boxplot.png",dpi=600,height=8,width=7)
 
 ```
