@@ -173,6 +173,7 @@ swvi.ageers<-age%>%filter(CU_Name=="Southwest & West  Vancouver Island")%>%
 a25.rps<-merge(a25.escdata,swvi.ageers,by="Year")%>%
   mutate(TR=escapement/(1-Total.ER))%>%
   mutate(age3=TR*p3,age4=TR*p4,age5=TR*p5)%>%
+  arrange(SYS_NM,Year)%>%
   mutate(r3=shift(age3,n=-3,type="lag"),r4=shift(age4,n=-4,type="lag"),
          r5=shift(age5,n=-5,type="lag"))%>%
   rowwise()%>%
