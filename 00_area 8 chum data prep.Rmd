@@ -13,7 +13,7 @@ knitr::opts_chunk$set(echo = TRUE, fig.pos = "!h")
 library(data.table)
 library(dplyr)
 library(zoo)
-
+library(ggplot2)
 options(scipen=10000)
 
 ```
@@ -214,25 +214,24 @@ rps<-merge(escdata,ageERs,by="Year")%>%
   mutate(TR=escapement/(1-`Total ER`))%>%
   mutate(age3=TR*p3,age4=TR*p4,age5=TR*p5)%>%
   arrange(SYS_NM,Year)%>%
-  mutate(r3=shift(age3,n=3,type="lag"),r4=shift(age4,n=4,type="lag"),
-         r5=shift(age5,n=5,type="lag"))%>%
+  mutate(r3=shift(age3,n=-3,type="lag"),r4=shift(age4,n=-4,type="lag"),
+         r5=shift(age5,n=-5,type="lag"))%>%
   rowwise()%>%
-  mutate(recruits=sum(c_across(r3:r5),na.rm=TRUE))%>%
+  mutate(recruits=sum(dplyr::c_across(r3:r5),na.rm=TRUE))%>%
   mutate(rps=recruits/escapement,
          rps=replace(rps,rps==0,NA),
          logrps=log(rps))
 
-write.csv(rps,"data/area 8 chum with rps raw.csv")
+
+rps.clean<-rps%>%select(Year,SYS_NM,prepost,escapement,r3,r4,r5,recruits,rps,logrps)%>%
+  mutate(rps=replace(rps,rps>100,NA))%>%
+  mutate(exclude=ifelse(is.na(r3)|is.na(r4)|is.na(r5)|rps>50,"Y","N"))%>%
+  mutate(rpsclean=case_when(exclude=="N"~rps),
+         logrpsclean=case_when(exclude=="N"~logrps))
+
+write.csv(rps,"data/area 8 chum with rps raw and clean.csv")
 
 ```
-
-```{r}
-
-rps.clean<-rps%>%mutate(rps=replace(rps,rps>0,NA))
-
-rps.clean
-```
-
 
 ```{r}
 #total return plot
@@ -251,13 +250,15 @@ ggplot(rps,aes(x=Year,y=rps))+
 ggsave("figures/releases chum area 8 total terminal.png",dpi=600,height=6,width=6)
 
 #log rps plots
-logrps<-rps%>%select(Year,prepost,logrps,SYS_NM)%>%arrange(SYS_NM,prepost,Year)
+names(rps.clean)
+
+logrps<-rps.clean%>%select(Year,prepost,logrpsclean,SYS_NM)%>%arrange(SYS_NM,prepost,Year)
 
 idx <- c(1, diff(logrps$Year))
 i2 <- c(1,which(idx != 1), nrow(logrps)+1)
 logrps$grp <- rep(1:length(diff(i2)), diff(i2))
 
-ggplot(logrps,aes(x=Year,y=logrps,color=prepost,group=grp))+
+ggplot(logrps,aes(x=Year,y=logrpsclean,color=prepost,group=grp))+
   geom_line(alpha=.5)+geom_point(alpha=.5)+
   scale_color_brewer(palette="Set1")+
   geom_smooth(method='lm',se=TRUE)+

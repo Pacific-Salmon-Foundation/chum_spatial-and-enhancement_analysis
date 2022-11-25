@@ -163,14 +163,14 @@ totrel <- ggdata.rel2 %>%
 ```
 
 ``` {r prep rps data}
-a25.escdata<-fread("data/area 25 escapement data filtered.csv")%>%select(-V1)
+escdata<-fread("data/area 25 escapement data filtered.csv")%>%select(-V1)
 
 age<-fread("data/SCVI_age_2019-04-13.txt")%>%select(-V1)
 
-swvi.ageers<-age%>%filter(CU_Name=="Southwest & West  Vancouver Island")%>%
+ageERs<-age%>%filter(CU_Name=="Southwest & West  Vancouver Island")%>%
   select(Year=BroodYear,Total.ER,p3=Age3,p4=Age4,p5=Age5)
 
-a25.rps<-merge(a25.escdata,swvi.ageers,by="Year")%>%
+rps<-merge(escdata,ageERs,by="Year")%>%
   mutate(TR=escapement/(1-Total.ER))%>%
   mutate(age3=TR*p3,age4=TR*p4,age5=TR*p5)%>%
   arrange(SYS_NM,Year)%>%
@@ -182,7 +182,15 @@ a25.rps<-merge(a25.escdata,swvi.ageers,by="Year")%>%
          rps=replace(rps,rps==0,NA),
          logrps=log(rps))
 
-write.csv(a25.rps,"data/area 25 chum rps.csv")
+
+rps.clean<-rps%>%select(Year,SYS_NM,prepost,escapement,r3,r4,r5,recruits,rps,logrps)%>%
+  mutate(rps=replace(rps,rps>100,NA))%>%
+  mutate(exclude=ifelse(is.na(r3)|is.na(r4)|is.na(r5)|rps>50,"Y","N"))%>%
+  mutate(rpsclean=case_when(exclude=="N"~rps),
+         logrpsclean=case_when(exclude=="N"~logrps))
+
+write.csv(rps.clean,"data/area 25 chum rps raw and clean.csv")
+
 
 ```
 

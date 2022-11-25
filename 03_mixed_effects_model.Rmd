@@ -20,7 +20,7 @@ library(jtools)
 library(ggstance)
 
 streaminlet <- read_csv("data/CM A25 filtered stream list_with inlets.csv")
-rpsdat <- read_csv("data/area 25 chum rps.csv")
+rpsdat <- read_csv("data/area 25 chum rps raw and clean.csv")
 totrel <- readRDS("RDS/totrel.rds")
 
 ```
@@ -34,6 +34,7 @@ colnames(totrel) <- c("Year", "totreleases", "totrel.t")
 modeldat <- join(totrel, modeldat, by = "Year")
 
 modeldat$logreleases <- log(modeldat$totreleases)
+
 modeldat$logdistance <- log(modeldat$dist.t)
 
 modeldat$Year <- as.factor(modeldat$Year)
@@ -73,16 +74,21 @@ plot(rps_dist_rels)
 #adding in year as numeric and converting distance to km so effects are scaled better
 modeldat$year<-as.numeric(as.character(modeldat$Year))
 modeldat$distancefromconumakm<-modeldat$distancefromconuma/1000
+modeldat$distancefromconumakm[modeldat$distancefromconumakm==0]<-0.0001
 
-lrps_dist <- lm(logrps ~ distancefromconumakm + year, data = modeldat)
-lrps_rels <- lm(logrps ~ totreleases + year, data = modeldat)
-lrps_dist_rels <- lm(logrps ~ distancefromconumakm + totreleases + year, data = modeldat)
+lrps_dist <- lm(logrpsclean ~ log(distancefromconumakm) + year, data = modeldat)
+lrps_rels <- lm(logrpsclean ~ totreleases + year, data = modeldat)
+lrps_dist_rels <- lm(logrpsclean ~ distancefromconumakm + totreleases + year, data = modeldat)
 
 summary(lrps_dist)
 summary(lrps_dist_rels)
 summary(lrps_rels)
 
-AICtable<-AIC(lrps_dist, lrps_rels, lrps_dist_rels)%>%arrange(AIC) #rps_dist model selected by AIC and arranged top to bottom
+AICtable<-AIC(lrps_dist, lrps_rels, lrps_dist_rels)%>%
+  mutate(Model=c("lrps_dist","lrps_rels","lrps_dist_rels"))%>%
+  arrange(AIC)
+
+AICtable
 
 summ(lrps_dist_rels)
 
@@ -90,6 +96,7 @@ summ(lrps_dist_rels)
 plot_summs(lrps_dist,lrps_dist_rels,lrps_rels,inner_ci_level = .9,
            model.names=c("logrps~dist+year","logrps~dist+rel+year","logrps~rel+year")) 
 #dev.off()
+
 #so this is cool. I used log rps and distance + year (gotta be a year effect included to include temporal trends), and get a stronger distance effect +0.02 log RPS units per km of distance. Thats an exponential relationship between distance and RPS? I think it would work out to a change in RPS of 1.09 (100^2) over 100 km for example? Super interesting effect if RPS increases with distance from the enhancement, combine that with the lower RPS in the 4 enhanced systems and maybe thats evidence of an effect? However R2 is still really low so assuming thats still going to mean that it doesnt really explain much of the variation. 
 
 100^.02
