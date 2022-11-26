@@ -104,10 +104,14 @@ summary(j)
 summary(c)
 summ(c)
 
-effect_plot(c, pred = Year, interval = TRUE, plot.points = TRUE, jitter = .25,
+EPC_RPS_YEAR <- effect_plot(c, pred = Year, interval = TRUE, plot.points = TRUE, jitter = .25,
             x.label = "Year", y.label = "Log recruits per spawner")
-effect_plot(c, pred = totreleases, interval = TRUE, plot.points = TRUE, 
+write_rds(EPC_RPS_YEAR, 'RDS/EPC_RPS_YEAR.rds')
+
+EPC_RPS_TOTREL <- effect_plot(c, pred = totreleases, interval = TRUE, plot.points = TRUE, 
             jitter = .25, x.label = "Total releases", y.label = "Log recruits per spawner")
+write_rds(EPC_RPS_TOTREL, 'RDS/EPC_RPS_TOTREL.rds')
+
 
 AIC(a, b, c, d, e, f, g, h, i, j)
 
@@ -132,12 +136,16 @@ summary(fdist)
 
 AIC(adist, bdist, cdist, ddist, edist, fdist)
 
-effect_plot(fdist, pred = corcoef, interval = TRUE, plot.points = TRUE, jitter = .25,
+EP_ESC_COR <- effect_plot(fdist, pred = corcoef, interval = TRUE, plot.points = TRUE, jitter = .25,
             x.label = "Correlation coefficient", y.label = "Log escapement")
-effect_plot(fdist, pred = distancefromconuma, interval = TRUE, plot.points = TRUE, jitter = 0,
+EP_ESC_DIST <- effect_plot(fdist, pred = distancefromconuma, interval = TRUE, plot.points = TRUE, jitter = 0,
             x.label = "Distance from enhanced system", y.label = "Log escapement")
-effect_plot(fdist, pred = totreleases, interval = TRUE, plot.points = TRUE, jitter = 0,
+EP_ESC_TOTREL <- effect_plot(fdist, pred = totreleases, interval = TRUE, plot.points = TRUE, jitter = 0,
             x.label = "Total releases", y.label = "Log escapement")
+
+saveRDS(EP_ESC_COR, "RDS/EP_ESC_COR.rds")
+saveRDS(EP_ESC_DIST, "RDS/EP_ESC_COR.rds")
+saveRDS(EP_ESC_TOTREL, "RDS/EP_ESC_COR.rds")
 
 ```
 
