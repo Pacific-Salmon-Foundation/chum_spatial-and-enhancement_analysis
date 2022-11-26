@@ -18,6 +18,7 @@ library(dplyr)
 library(broom.mixed)
 library(jtools)
 library(ggstance)
+library(multcomp)
 
 streaminlet <- read_csv("data/CM A25 filtered stream list_with inlets.csv")
 rpsdat <- read_csv("data/area 25 chum rps raw and clean.csv")
@@ -29,16 +30,71 @@ totrel <- readRDS("RDS/totrel.rds")
 
 modeldat <- join(streaminlet, rpsdat, by = "SYS_NM")
 
-colnames(totrel) <- c("Year", "totreleases", "totrel.t")
+colnames(totrel) <- c("Year", "totreleases")
 
 modeldat <- join(totrel, modeldat, by = "Year")
 
 modeldat$logreleases <- log(modeldat$totreleases)
-
+modeldat$dist.t <- modeldat$distancefromconuma + 1
 modeldat$logdistance <- log(modeldat$dist.t)
-
-modeldat$Year <- as.factor(modeldat$Year)
 modeldat$SYS_NM <- as.factor(modeldat$SYS_NM)
+modeldat$inlet <- as.factor(modeldat$inlet)
+modeldat$subinlet <- as.factor(modeldat$subinlet)
+
+corcoefs <- as.data.frame(cor.z.post["CONUMA RIVER",])
+cornames <- as.vector(rownames(cor.z.post))
+corcoefs <- cbind(cornames, corcoefs)
+colnames(corcoefs) <- c("SYS_NM", "corcoef")
+modeldat <- join(corcoefs, modeldat, by = "SYS_NM")
+
+#modeldat <- modeldat %>%
+#  drop_na()
+
+par(mfrow=c(1,1))
+ggplot(modeldat, aes(distancefromconuma, rpsclean)) + 
+  geom_jitter(width = 1200, height = 4) + 
+  geom_smooth()
+
+par(mfrow=c(1,1))
+ggplot(modeldat, aes(distancefromconuma, escapement)) + 
+  geom_jitter(width = 700, height = 4) + 
+  geom_smooth()
+
+a <- glm(logrpsclean ~ distancefromconuma,
+        data = modeldat)
+summary(a)
+b <- glm(logrpsclean ~ distancefromconuma + totreleases + Year,
+        data = modeldat)
+summary(b)
+c <- glm(logrpsclean ~ totreleases + Year,   # Best Model by AIC
+        data = modeldat)
+summary(c)
+d <- glm(logrpsclean ~ totreleases + as.factor(Year),
+        data = modeldat)
+summary(d)
+e <- glm(logrpsclean ~ totreleases + as.factor(Year) + Year, 
+        data = modeldat)
+summary(e)
+f <- glm(logrpsclean ~ totreleases + Year + SYS_NM,
+        data = modeldat)
+summary(f)
+g <- glm(logrpsclean ~ totreleases + Year + inlet,
+        data = modeldat)
+summary(g)
+h <- glm(logrpsclean ~ corcoef + Year,
+        data = modeldat)
+summary(h)
+i <- glm(logrpsclean ~ corcoef + Year + SYS_NM,
+        data = modeldat)
+summary(i)
+j <- glm(logrpsclean ~ corcoef + Year + totreleases,
+        data = modeldat)
+summary(j)
+
+effect_plot(c, pred = Year, interval = TRUE, plot.points = TRUE, jitter = .25)
+effect_plot(c, pred = totreleases, interval = TRUE, plot.points = TRUE, jitter = .25)
+
+AIC(a, b, c, d, e, f, g, h, i, j)
 
 ```
 
@@ -54,7 +110,8 @@ coef(rps_dist) # Average RPS for dataset is 3.6. For every one unit of distance
                # Decent results, poor R^2. Poor model fit at high values
                # If I'm interpreting that right, it would suggest that RPS becomes
                # more independent as you move away from Conuma? 
-
+coef(rps_rels)
+coef(rps_dist_rels)
 
 AIC(rps_dist, rps_rels, rps_dist_rels) #rps_dist model selected by AIC
 
@@ -148,7 +205,7 @@ qqp(totrel$totreleases, "pois", lambda = poisson$estimate)
 
 # Stream as random effect
 
-mod_stream_log <- lmer(rps ~ logdistance + logreleases + (1 | SYS_NM), 
+mod_stream_log <- lmer(rps ~ logdistance + logreleases + Enhancement_Rank + (1 | SYS_NM), 
                    data = modeldat, REML = FALSE,)
 
 summary(mod_stream_log) 
