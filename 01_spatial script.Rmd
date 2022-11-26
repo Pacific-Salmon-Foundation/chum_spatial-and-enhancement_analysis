@@ -112,7 +112,7 @@ ggplot(ggdata.rel,aes(x=RELEASE_YEAR,y=releases,color=RELEASE_STAGE_NAME,group=g
 \newpage
 
 ## Hatchery releases to area
-```{r releases for area 25}
+```{r releases for area 25, fig.align="center", fig.height=6, fig.width=8, fig.cap="Total hatchery chum salmon releases in Area 25",echo=FALSE,warning=FALSE,message=FALSE}
 
 releases.raw <- read_csv("data/Area 25 chum releases totals.csv")
 
@@ -158,7 +158,9 @@ ggarrange(p1,p2,p3,p4,ncol=1,common.legend = TRUE,align='v',legend="bottom")
 ```
 
 \newpage
+
 ## Moving average and LOESSS fit on enhancement ranking of log escapements
+
 ```{r moving average and LOESS plots, echo=FALSE,warning=FALSE,message=FALSE,fig.align="center",fig.height=5,fig.width=6,fig.cap="Moving average and LOESS fits on logged escapement by enhancement ranking."}
 
 t1<-ggplot(escdata.filt,aes(x=Year,y=m.ave,color=Enhancement_Rank,group=SYS_NM))+
@@ -177,7 +179,9 @@ ggarrange(t1,t2,ncol=1,common.legend = TRUE,legend = "bottom",align='v')
 ```
 
 \newpage
+
 ## Z-scores pre- and post-enhancement
+
 ```{r prepost boxplot,echo=FALSE,warning=FALSE,message=FALSE,fig.align="center",fig.height=7,fig.width=6,fig.cap="Z-scores pre- and post-enhancement."}
 ggplot(escdata.filt,aes(y=SYS_NM,x=z,fill=prepost))+
   geom_boxplot()+
@@ -186,8 +190,12 @@ ggplot(escdata.filt,aes(y=SYS_NM,x=z,fill=prepost))+
   labs(y="System Name",x="Z-score")
 ```
 
+\newpage
+
+## Log RPS by stream
 
 ```{r rps figure pre post with lm, echo=FALSE, warning=FALSE, message=FALSE ,fig.align="center", fig.height=7, fig.width=6 ,fig.cap="Log RPS by stream with linear regression fits pre- and post-first year of enhancement."}
+
 a25.rps<-fread("data/area 25 chum rps.csv")
 
 gga25.logrps<-a25.rps%>%select(Year,prepost,logrps,SYS_NM)%>%arrange(SYS_NM,prepost,Year)
@@ -207,7 +215,12 @@ ggplot(gga25.logrps,aes(x=Year,y=logrps,color=prepost,group=grp))+
   theme(legend.position="bottom")
 ```
 
+\newpage
+
+## Log RPS by stream boxplot
+
 ```{r rps figure boxplot,echo=FALSE,warning=FALSE,message=FALSE,fig.align="center",fig.height=7,fig.width=6,fig.cap="Log RPS by stream boxplot for pre- and post-start of enhancement period."}
+
 ggplot(gga25.logrps,aes(y=SYS_NM,x=logrps,fill=prepost))+
   geom_boxplot(notch=F)+
   scale_fill_brewer(palette="Set1")+
@@ -218,13 +231,8 @@ ggplot(gga25.logrps,aes(y=SYS_NM,x=logrps,fill=prepost))+
 
 ```
 
-\newpage
+```{r correlations for all metrics, echo = FALSE, warning = FALSE, message = FALSE}
 
-# Correlation analyses
-
-## Correlation plots by metric
-
-```{r correlations for all metrics,echo=FALSE,warning=FALSE,message=FALSE}
 #prep data for correlations
 
 # Merge stream inlet table into escdata.filt
@@ -246,8 +254,6 @@ colnames(inlets) <- c("inlet", "colour")
 
 
 # Correlation analysis by z-score
-
-unique(escdata.filt$SYS_NM)
 
 cor.data.z<-escdata.filt%>%select(SYS_NM,Year,z)%>%
   pivot_wider(names_from="Year",values_from="z")%>%
@@ -399,6 +405,12 @@ ylenm <- .95 * (max(dendclust.m[["segments"]][["y"]]))
 
 ```
 
+\newpage
+
+# Correlation analyses
+
+## Correlation plots by metric
+
 ```{r correlation plots, echo=FALSE,warning=FALSE,message=FALSE,fig.align="center",fig.height=9.5,fig.width=8.5,fig.cap="Cross correlation plots to compare metrics."}
 
 # Corplots to knit
@@ -421,6 +433,7 @@ corrplot(cor.m, diag = FALSE, order="hclust", method="square", tl.col="black",
 ```
 
 \newpage
+
 ## Dendrograms by metric
 
 ```{r dendrograms for all metrics, echo = FALSE, warning = FALSE, message = FALSE, fig.align = "center", fig.height = 10.5, fig.width = 9.5, fig.cap = "Dendrograms by metric. Red labels are from Esperanza inlet, blue are from Nootka inlet, and green are from Tahsis inlet. Rivers and creeks denoted with black circles have no enhancement rank, blue have low, orange have medium, and red have high enhancement ranks."}
