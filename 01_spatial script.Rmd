@@ -17,6 +17,7 @@ editor_options:
 ```{r setup, echo=FALSE,message=FALSE,warning=FALSE}
 #load libraries
 knitr::opts_chunk$set(echo = TRUE, fig.pos = "!h")
+options(knitr.table.format ='pdf' ) 
 
 library(data.table)
 library(tidyverse)
@@ -26,6 +27,7 @@ library(zoo)
 library(ggdendro)
 library(dendextend)
 library(kableExtra)
+library(tinytex)
 
 options(scipen=10000)
 
@@ -113,7 +115,8 @@ ggplot(ggdata.rel,aes(x=RELEASE_YEAR,y=releases,color=RELEASE_STAGE_NAME,group=g
 
 ## Table of A25 streams by inlet and distance from Conuma enhancement
 
-```{r, Kable of distances by inlet}
+
+```{r, Kable of distances by inlet, echo = FALSE, warning = FALSE, message = FALSE, fig.align="center", fig.height = 7, fig.width = 7}
 
 streaminlet <- fread("data/CM A25 filtered stream list_with inlets.csv")
 
@@ -125,14 +128,16 @@ streaminlet$Subinlet <- str_to_sentence(streaminlet$Subinlet)
 
 streaminlet %>%
   kbl(align = colaligns, format.args = list(big.mark = ",")) %>%
-  kable_classic(full_width = F, html_font = "Courier New")
+  kable_paper(full_width = F, html_font = "Courier New") %>%
+  kable_styling(latex_options = "HOLD_position")# %>%
+ # as_image(file = "kable.png", width = 11)
 
 ```
 
 \newpage
 
 ## Hatchery releases to area
-```{r releases for area 25, fig.align="center", fig.height=6, fig.width=8, fig.cap="Total hatchery chum salmon releases in Area 25",echo=FALSE,warning=FALSE,message=FALSE}
+```{r releases for area 25, fig.align="center", fig.height=5, fig.width=8, fig.cap="Total hatchery chum salmon releases in Area 25",echo=FALSE,warning=FALSE,message=FALSE}
 
 releases.raw <- read_csv("data/Area 25 chum releases totals.csv")
 
