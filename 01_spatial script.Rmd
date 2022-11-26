@@ -129,8 +129,7 @@ streaminlet$Subinlet <- str_to_sentence(streaminlet$Subinlet)
 streaminlet %>%
   kbl(align = colaligns, format.args = list(big.mark = ",")) %>%
   kable_paper(full_width = F, html_font = "Courier New") %>%
-  kable_styling(latex_options = "HOLD_position")# %>%
- # as_image(file = "kable.png", width = 11)
+  kable_styling(latex_options = "HOLD_position")
 
 ```
 
@@ -880,5 +879,71 @@ tanglegram(tangle.m, lab.cex = .8, margin_inner = 3, main = "Moving average ", m
            lwd = 2, edge.lwd = 1)
 
 #dev.off()
+
+```
+
+\newpage
+
+# Statistical models
+
+## Table of Recruits per spawner candidate models
+
+```{r, Table of RPS candidate models, echo = FALSE, message = FALSE, warning = FALSE}
+
+```
+
+## Effects plot of log RPS by year
+
+```{r, Effects plot log rps by year, echo = FALSE, message = FALSE, warning = FALSE, fig.align = "center", fig.height = 5, fig.width = 8, fig.cap = "Effects plots of Recruits per spawner by year"}
+
+par(mfrow=c(1,1))
+
+EPC_RPS_YEAR <- readRDS("RDS/EPC_RPS_YEAR.rds")
+plot(EPC_RPS_YEAR)
+
+```
+
+\newpage
+
+## Effects plot of log RPS by total releases
+
+```{r, Effects plots log rps by totrel, echo = FALSE, message = FALSE, warning = FALSE, fig.align = "center", fig.height = 5, fig.width = 8, fig.cap = "Effects plots of Recruits per spawner by total releases"}
+
+par(mfrow=c(1,1))
+
+EPC_RPS_TOTREL <- readRDS("RDS/EPC_RPS_TOTREL.rds")
+plot(EPC_RPS_TOTREL)
+```
+
+\newpage
+
+## Effects plot of escapement by correlation coefficient
+
+```{r, Effects plots escapement x corcoef, echo = FALSE, message = FALSE, warning = FALSE, fig.align = "center", fig.height = 5, fig.width = 8, fig.cap = "Effects plots of Escapement by correlation coefficient"}
+
+EP_ESC_COR <- readRDS("RDS/EP_ESC_COR.rds")
+plot(EP_ESC_COR)
+
+```
+
+\newpage
+
+## Effects plot of escapement by distance from enhancement
+
+```{r, Effects plots escapement x dist, echo = FALSE, message = FALSE, warning = FALSE, fig.align = "center", fig.height = 5, fig.width = 8, fig.cap = "Effects plots of Escapement by distance from enhancement"}
+
+EP_ESC_DIST <- readRDS("RDS/EP_ESC_DIST.rds")
+plot(EP_ESC_DIST)
+
+```
+
+\newpage
+
+## Effects plot of escapement by total hatchery releases
+
+```{r, Effects plots escapement esc x totrel, echo = FALSE, message = FALSE, warning = FALSE, fig.align = "center", fig.height = 5, fig.width = 8, fig.cap = "Effects plots of Escapement by correlation coefficient"}
+
+EP_ESC_TOTREL <- readRDS("RDS/EP_ESC_TOTREL.rds")
+plot(EP_ESC_TOTREL)
 
 ```
