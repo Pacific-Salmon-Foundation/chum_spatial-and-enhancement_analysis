@@ -52,7 +52,9 @@ modeldat <- join(corcoefs, modeldat, by = "SYS_NM")
 
 #modeldat <- modeldat %>%
 #  drop_na()
+```
 
+```{r, exploratory plots}
 par(mfrow=c(1,1))
 ggplot(modeldat, aes(distancefromconuma, rpsclean)) + 
   geom_jitter(width = 1200, height = 4) + 
@@ -62,6 +64,11 @@ par(mfrow=c(1,1))
 ggplot(modeldat, aes(distancefromconuma, escapement)) + 
   geom_jitter(width = 700, height = 4) + 
   geom_smooth()
+
+```
+
+
+```{r, model fitting}
 
 a <- glm(logrpsclean ~ distancefromconuma,
         data = modeldat)
@@ -133,6 +140,12 @@ effect_plot(fdist, pred = totreleases, interval = TRUE, plot.points = TRUE, jitt
             x.label = "Total releases", y.label = "Log escapement")
 
 ```
+
+
+
+
+DEPRECATING SCRIPTS BELOW
+
 
 ```{r, Fitting and plotting LMs}
 
