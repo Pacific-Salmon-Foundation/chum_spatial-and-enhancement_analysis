@@ -144,8 +144,8 @@ EP_ESC_TOTREL <- effect_plot(fdist, pred = totreleases, interval = TRUE, plot.po
             x.label = "Total releases", y.label = "Log escapement")
 
 saveRDS(EP_ESC_COR, "RDS/EP_ESC_COR.rds")
-saveRDS(EP_ESC_DIST, "RDS/EP_ESC_COR.rds")
-saveRDS(EP_ESC_TOTREL, "RDS/EP_ESC_COR.rds")
+saveRDS(EP_ESC_DIST, "RDS/EP_ESC_DIST.rds")
+saveRDS(EP_ESC_TOTREL, "RDS/EP_ESC_TOTREL.rds")
 
 ```
 
