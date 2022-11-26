@@ -70,8 +70,8 @@ ggplot(modeldat, aes(distancefromconuma, escapement)) +
 
 ```{r, model fitting}
 
-a <- glm(logrpsclean ~ distancefromconuma,
-        data = modeldat)
+a <- glm(logrpsclean ~ distancefromconuma + Year,
+         data = modeldat)
 summary(a)
 b <- glm(logrpsclean ~ distancefromconuma + totreleases + Year,
         data = modeldat)
@@ -115,17 +115,17 @@ write_rds(EPC_RPS_TOTREL, 'RDS/EPC_RPS_TOTREL.rds')
 
 AIC(a, b, c, d, e, f, g, h, i, j)
 
-adist <- lm(log(escapement) ~ distancefromconuma + Year, 
+adist <- glm(log(escapement) ~ distancefromconuma + Year, 
              data = modeldat)
-bdist <- lm(log(escapement) ~ distancefromconuma + totreleases + Year,
+bdist <- glm(log(escapement) ~ distancefromconuma + totreleases + Year,
              data = modeldat)
-cdist <- lm(log(escapement) ~ corcoef + totreleases + Year,
+cdist <- glm(log(escapement) ~ corcoef + totreleases + Year,
              data = modeldat)
-ddist <- lm(log(escapement) ~ corcoef + totreleases + Year + subinlet,
+ddist <- glm(log(escapement) ~ corcoef + totreleases + Year + inlet,
              data = modeldat)
-edist <- lm(log(escapement) ~ corcoef + totreleases + Year + subinlet,
+edist <- glm(log(escapement) ~ corcoef + totreleases + Year + subinlet,
              data = modeldat)
-fdist <- lm(log(escapement) ~ corcoef + distancefromconuma + totreleases + Year + subinlet,
+fdist <- glm(log(escapement) ~ corcoef + distancefromconuma + totreleases + Year + subinlet,
              data = modeldat)
 summary(adist)
 summary(bdist)
