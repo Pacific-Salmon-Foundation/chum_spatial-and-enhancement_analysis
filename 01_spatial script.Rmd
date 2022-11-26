@@ -25,7 +25,7 @@ library(ggpubr)
 library(zoo)
 library(ggdendro)
 library(dendextend)
-library(cowplot)
+library(kableExtra)
 
 options(scipen=10000)
 
@@ -106,6 +106,26 @@ ggplot(ggdata.rel,aes(x=RELEASE_YEAR,y=releases,color=RELEASE_STAGE_NAME,group=g
   theme_bw()+
   labs(x="Release Year",y="Releases",color="Release Stage")+
   theme(legend.position = "bottom")
+
+```
+
+\newpage
+
+## Table of A25 streams by inlet and distance from Conuma enhancement
+
+```{r, Kable of distances by inlet}
+
+streaminlet <- fread("data/CM A25 filtered stream list_with inlets.csv")
+
+colnames(streaminlet) <- c("System name", "NOTNAS", "Inlet", "Subinlet", "Dist. from enhancement")
+colaligns <- c("l", "c", "l", "l", "r")
+streaminlet$`System name` <- str_to_title(streaminlet$`System name`)
+streaminlet$Inlet <- str_to_sentence(streaminlet$Inlet)
+streaminlet$Subinlet <- str_to_sentence(streaminlet$Subinlet)
+
+streaminlet %>%
+  kbl(align = colaligns, format.args = list(big.mark = ",")) %>%
+  kable_classic(full_width = F, html_font = "Courier New")
 
 ```
 
