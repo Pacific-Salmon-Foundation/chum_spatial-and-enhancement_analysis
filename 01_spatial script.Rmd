@@ -111,6 +111,70 @@ ggplot(ggdata.rel,aes(x=RELEASE_YEAR,y=releases,color=RELEASE_STAGE_NAME,group=g
 
 \newpage
 
+## Hatchery releases to area
+```{r releases for area 25}
+
+releases.raw <- read_csv("data/Area 25 chum releases totals.csv")
+
+ggplot(releases.raw, aes(x = RELEASE_YEAR, y = totreleases/1000000)) + 
+  geom_point() +
+  geom_line() + 
+  geom_smooth() + 
+  xlab("Year") + 
+  ylab("Total A25 chum salmon releases (millions)")
+
+```
+
+
+```{r total releases for area 8 terminal not including mcloughlin bay}
+
+#total releases for BC and MB
+releases.BCMB<-releases %>% 
+  filter(RELEASE_SITE_NAME%in%c("Fish Cr+Airport Ch","Saloompt R","Snootli Cr","Thorsen Cr/CCST","McLoughlin Bay"))
+
+totalrel.BCMB <- releases.BCMB %>% 
+  group_by(RELEASE_YEAR)%>%
+  summarise(totreleases=sum(releases))%>%
+  mutate(group="BC/MB")
+
+#total releases for just MB
+releases.MB<-releases %>% 
+  filter(RELEASE_SITE_NAME%in%c("McLoughlin Bay"))
+
+totalrel.MB <- releases.MB %>% 
+  group_by(RELEASE_YEAR)%>%
+  summarise(totreleases=sum(releases))%>%
+  mutate(group="MB")
+
+#total releases for just BC
+releases.BC<-releases %>% 
+  filter(RELEASE_SITE_NAME%in%c("Fish Cr+Airport Ch","Saloompt R","Snootli Cr","Thorsen Cr/CCST"))
+
+totalrel.BC <- releases.BC %>% 
+  group_by(RELEASE_YEAR)%>%
+  summarise(totreleases=sum(releases))%>%
+  mutate(group="BC")
+
+totrel<-rbind(totalrel.BC,totalrel.BCMB,totalrel.MB)
+
+totrelwide<-totrel%>%pivot_wider(names_from="group",values_from="totreleases")
+
+write.csv(totrelwide,"data/releases area 8 chum total terminal releases by group.csv")
+```
+
+
+```{r plot total releases}
+ggplot(totrel,aes(x=RELEASE_YEAR,y=totreleases,color=group))+
+  geom_point()+geom_line()+
+  theme_bw()+
+  labs(x="Release Year",y="Total Releases",title="Area 8 Chum total terminal releases (excludes Mcloughlin Bay)")
+
+#ggsave("figures/releases chum area 8 total terminal.png",dpi=600,height=6,width=6)
+
+#write.csv(totrel,"~/R/PSF hatchery review/analysis/spatial/outputs/Area 25 chum releases totals.csv")
+```
+
+
 ## Escapement by enhancement rank per system
 
 ```{r metric plots,fig.align="center",fig.height=8,fig.width=6,fig.cap="Various plots for escapement and transformations.",echo=FALSE,warning=FALSE,message=FALSE}
