@@ -113,7 +113,9 @@ EPC_RPS_TOTREL <- effect_plot(c, pred = totreleases, interval = TRUE, plot.point
 write_rds(EPC_RPS_TOTREL, 'RDS/EPC_RPS_TOTREL.rds')
 
 
-AIC(a, b, c, d, e, f, g, h, i, j)
+rpsaic <- AIC(a, b, c, d, e, f, g, h, i, j)
+saveRDS(rpsaic, "RDS/rpsaic.rds")
+
 
 adist <- glm(log(escapement) ~ distancefromconuma + Year, 
              data = modeldat)
@@ -134,7 +136,8 @@ summary(ddist)
 summary(edist)
 summary(fdist)
 
-AIC(adist, bdist, cdist, ddist, edist, fdist)
+escaic <- AIC(adist, bdist, cdist, ddist, edist, fdist)
+saveRDS(escaic, "RDS/escaic.rds")
 
 EP_ESC_COR <- effect_plot(fdist, pred = corcoef, interval = TRUE, plot.points = TRUE, jitter = .25,
             x.label = "Correlation coefficient", y.label = "Log escapement")
