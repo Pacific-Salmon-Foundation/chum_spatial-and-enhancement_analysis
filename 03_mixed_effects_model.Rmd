@@ -19,6 +19,9 @@ library(broom.mixed)
 library(jtools)
 library(ggstance)
 library(multcomp)
+library(huxtable)
+library(officer)
+library(flextable)
 
 streaminlet <- read_csv("data/CM A25 filtered stream list_with inlets.csv")
 rpsdat <- read_csv("data/area 25 chum rps raw and clean.csv")
@@ -78,7 +81,7 @@ summary(e)
 f <- glm(logrpsclean ~ totreleases + Year + SYS_NM,
         data = modeldat)
 summary(f)
-g <- glm(logrpsclean ~ totreleases + Year + inlet,
+g <- glm(logrpsclean ~ totreleases + Year + subinlet,
         data = modeldat)
 summary(g)
 h <- glm(logrpsclean ~ corcoef + Year,
@@ -91,10 +94,43 @@ j <- glm(logrpsclean ~ corcoef + Year + totreleases,
         data = modeldat)
 summary(j)
 
-effect_plot(c, pred = Year, interval = TRUE, plot.points = TRUE, jitter = .25)
-effect_plot(c, pred = totreleases, interval = TRUE, plot.points = TRUE, jitter = .25)
+summary(c)
+summ(c)
+
+effect_plot(c, pred = Year, interval = TRUE, plot.points = TRUE, jitter = .25,
+            x.label = "Year", y.label = "Log recruits per spawner")
+effect_plot(c, pred = totreleases, interval = TRUE, plot.points = TRUE, 
+            jitter = .25, x.label = "Total releases", y.label = "Log recruits per spawner")
 
 AIC(a, b, c, d, e, f, g, h, i, j)
+
+adist <- lm(log(escapement) ~ distancefromconuma + Year, 
+             data = modeldat)
+bdist <- lm(log(escapement) ~ distancefromconuma + totreleases + Year,
+             data = modeldat)
+cdist <- lm(log(escapement) ~ corcoef + totreleases + Year,
+             data = modeldat)
+ddist <- lm(log(escapement) ~ corcoef + totreleases + Year + subinlet,
+             data = modeldat)
+edist <- lm(log(escapement) ~ corcoef + totreleases + Year + subinlet,
+             data = modeldat)
+fdist <- lm(log(escapement) ~ corcoef + distancefromconuma + totreleases + Year + subinlet,
+             data = modeldat)
+summary(adist)
+summary(bdist)
+summary(cdist)
+summary(ddist)
+summary(edist)
+summary(fdist)
+
+AIC(adist, bdist, cdist, ddist, edist, fdist)
+
+effect_plot(fdist, pred = corcoef, interval = TRUE, plot.points = TRUE, jitter = .25,
+            x.label = "Correlation coefficient", y.label = "Log escapement")
+effect_plot(fdist, pred = distancefromconuma, interval = TRUE, plot.points = TRUE, jitter = 0,
+            x.label = "Distance from enhanced system", y.label = "Log escapement")
+effect_plot(fdist, pred = totreleases, interval = TRUE, plot.points = TRUE, jitter = 0,
+            x.label = "Total releases", y.label = "Log escapement")
 
 ```
 
@@ -114,7 +150,6 @@ coef(rps_rels)
 coef(rps_dist_rels)
 
 AIC(rps_dist, rps_rels, rps_dist_rels) #rps_dist model selected by AIC
-
 
 par(mfrow = c(2, 2))
 plot(rps_dist)
