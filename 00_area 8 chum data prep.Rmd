@@ -46,6 +46,8 @@ escdata.raw<-escdata%>%filter(SPP=="CM"&Area==8)
 
 write.csv(escdata,"data/area 8 chum escapement data all.csv")
 
+saveRDS(escdata, "RDS/a08cm_escdata.rds")
+
 #bubbleplot of escapements for whole area
 ggplot(escdata.raw,aes(x=Year,y=SYS_NM,color=Enhancement_Rank,size=escapement))+
   geom_point(alpha=.5)+
@@ -86,6 +88,8 @@ escdata.filtered<-escdata.raw%>%filter(SYS_NM%in%included.stream.list$SYS_NM)%>%
          esc.stand=esc.log/mean(esc.log,na.rm=TRUE),
          prepost=case_when(Year<1980~"Pre",
                            Year>=1980~"Post"))
+
+saveRDS(escdata.filtered, "RDS/a08cm_escdata_filtered.rds")
 
 write.csv(escdata.filtered,"data/area 8 chum escapement data filtered with metrics.csv")
 
@@ -225,12 +229,13 @@ rps<-merge(escdata,ageERs,by="Year")%>%
          rps=replace(rps,rps==0,NA),
          logrps=log(rps))
 
-
 rps.clean<-rps%>%select(Year,SYS_NM,prepost,escapement,r3,r4,r5,recruits,rps,logrps)%>%
   mutate(rps=replace(rps,rps>100,NA))%>%
   mutate(exclude=ifelse(is.na(r3)|is.na(r4)|is.na(r5)|rps>50,"Y","N"))%>%
   mutate(rpsclean=case_when(exclude=="N"~rps),
          logrpsclean=case_when(exclude=="N"~logrps))
+
+saveRDS(rps.clean, "RDS/a08cm_rpsclean.rds")
 
 write.csv(rps,"data/area 8 chum with rps raw and clean.csv")
 
