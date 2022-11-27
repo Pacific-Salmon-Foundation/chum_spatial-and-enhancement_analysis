@@ -238,12 +238,12 @@ write.csv(rps,"data/area 8 chum with rps raw and clean.csv")
 
 ```{r}
 #total return plot
-ggplot(rps,aes(x=Year,y=TR))+
+ggplot(rps.clean,aes(x=Year,y=escapement))+
   geom_line()+geom_point()+
   facet_wrap(~SYS_NM,ncol=3,scale="free_y")
 
 #rps plots
-ggplot(rps,aes(x=Year,y=rps))+
+ggplot(rps.clean,aes(x=Year,y=rps))+
   geom_line()+geom_point()+
   geom_smooth(method='lm',se=TRUE)+
   facet_wrap(~SYS_NM,ncol=3,scale="free_y")+
