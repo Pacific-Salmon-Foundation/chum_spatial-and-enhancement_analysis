@@ -1,0 +1,207 @@
+---
+title: "Spatial Analysis Figures"
+subtitle: "Area 08 Chum Salmon"
+author: "Coastland"
+date: "`r Sys.Date()`"
+papersize: ledger
+geometry: margin = 1.75cm
+toc: TRUE
+output:
+  pdf_document: default
+  pescdata.filt_document: default
+  html_document: default
+editor_options:
+  chunk_output_type: console
+---
+
+```{r setup, include=FALSE}
+
+knitr::opts_chunk$set(echo = FALSE, warning = FALSE, message = FALSE)
+
+library(tidyverse)
+
+# Load in objects from area 8 data prep script
+
+releases <- readRDS("RDS/a08cm_releases.rds")
+escdata <- readRDS("RDS/a08cm_escdata.rds")
+escdata.filtered <- readRDS("RDS/a08cm_escdata_filtered.rds")
+rps.clean <- readRDS("RDS/a08cm_rpsclean.rds")
+
+```
+
+
+\newpage
+
+# Summary statistics
+
+## Bubbleplot of escapement by enhancement rank
+
+```{r, Bubble plot, fig.align = "center", fig.height = 7, fig.width = 6, fig.cap = "Escapement to area streams by enhancement rank.",echo = FALSE, warning = FALSE, message = FALSE}
+
+escdata.raw<-escdata %>% filter(SPP == "CM" & Area == 8)
+
+ggplot(escdata.raw,aes(x=Year,y=SYS_NM,color=Enhancement_Rank,size=escapement))+
+  geom_point(alpha=.5)+
+  scale_colour_manual(breaks=c("NONE","LOW","MOD","HIGH"),
+                      values=c("grey50","steelblue","darkred","seagreen"))+
+  labs(y="Escapement",color="Enhancement",x="Year",size="Escapement")+
+  theme_bw()+
+  theme(legend.position="bottom")
+
+#unique(escdata.raw$SYS_NM)
+ggsave("figures/area 8 chum escapement all streams.png",dpi=600,height=8,width=7)
+```
+
+\newpage
+
+## Plot of total releases to area
+
+```{r total releases for area 8 terminal not including mcloughlin bay, include = TRUE, echo = FALSE, warning = FALSE, message = FALSE, fig.align = "center", fig.height = 6, fig.width = 8, fig.cap = "Total releases for Area 8 (not including McLoughlin Bay)"}
+
+#total releases for BC and MB
+releases.BCMB<-releases %>% 
+  filter(RELEASE_SITE_NAME%in%c("Fish Cr+Airport Ch","Saloompt R","Snootli Cr","Thorsen Cr/CCST","McLoughlin Bay"))
+
+totalrel.BCMB <- releases.BCMB %>% 
+  group_by(RELEASE_YEAR)%>%
+  summarise(totreleases=sum(releases))%>%
+  mutate(group="BC/MB")
+
+#total releases for just MB
+releases.MB<-releases %>% 
+  filter(RELEASE_SITE_NAME%in%c("McLoughlin Bay"))
+
+totalrel.MB <- releases.MB %>% 
+  group_by(RELEASE_YEAR)%>%
+  summarise(totreleases=sum(releases))%>%
+  mutate(group="MB")
+
+#total releases for just BC
+releases.BC<-releases %>% 
+  filter(RELEASE_SITE_NAME%in%c("Fish Cr+Airport Ch","Saloompt R","Snootli Cr","Thorsen Cr/CCST"))
+
+totalrel.BC <- releases.BC %>% 
+  group_by(RELEASE_YEAR)%>%
+  summarise(totreleases=sum(releases))%>%
+  mutate(group="BC")
+
+totrel<-rbind(totalrel.BC,totalrel.BCMB,totalrel.MB)
+
+totrelwide<-totrel%>%pivot_wider(names_from="group",values_from="totreleases")
+
+write.csv(totrelwide,"data/releases area 8 chum total terminal releases by group.csv")
+
+ggplot(totrel,aes(x=RELEASE_YEAR,y=totreleases,color=group))+
+  geom_point()+geom_line()+
+  theme_bw()+
+  geom_smooth() +
+  labs(x="Release Year",y="Total Releases",title="Area 8 Chum total terminal releases (excludes Mcloughlin Bay)")
+
+#ggsave("figures/releases chum area 8 total terminal.png",dpi=600,height=6,width=6)
+
+#write.csv(totrel,"~/R/PSF hatchery review/analysis/spatial/outputs/Area 25 chum releases totals.csv")
+```
+
+\newpage
+
+## Escapement to streams by enhancement rank
+
+```{r, Facet plot of escapements by enhancement ranking, echo = FALSE, message = FALSE, warning = FALSE, fig.align = "center", fig.height = 7, fig.width = 8, fig.cap = "Facet plot of escapements by enhancement level"}
+
+ggplot(escdata.filtered,aes(x=Year,y=escapement,color=Enhancement_Rank))+
+  geom_point()+geom_line()+theme_bw()+
+  facet_wrap(~SYS_NM,ncol=3,scale="free_y")+
+  labs(y="Escapement",color="Enhancement Level",title="Area 6 Escapement (filtered streams)")+
+  theme(legend.position="bottom")
+
+ggsave("figures/area 8 chum escapement filtered streams.png",dpi=600,height=8,width=7)
+
+```
+
+\newpage
+
+## Facet plot of all releases in Area 8
+
+```{r, Face plot of all releases in Area 8, echo = FALSE, message = FALSE, warning = FALSE, fig.align = "center", fig.height = 7, fig.width = 8, fig.cap = "Facet plot of all releases in Area 8"}
+
+species="Chum"
+rel.cu.name=c("BELLA COOLA RIVER-LATE","BELLA COOLA-DEAN RIVERS","SPILLER-FITZ HUGH-BURKE")
+fy=1980
+
+ggplot(releases,aes(x=RELEASE_YEAR,y=releases,color=RELEASE_STAGE_NAME,group=grp))+
+  geom_line()+geom_point()+
+  scale_color_brewer(palette="Set1")+
+  facet_wrap(~`site-stock`,ncol=4)+
+  theme_bw()+
+  labs(x="Release Year",y="Releases",color="Release Stage",
+       title=paste0(species,": ",paste0(rel.cu.name,collapse=" ")),subtitle="Release site:Origin stock")+
+  theme(legend.position = "bottom",
+        plot.title=element_text(size=8),strip.text=element_text(size=8))
+
+```
+
+\newpage
+
+## Recruits per spawner by system
+
+```{r, Plotting RPS by system, echo = FALSE, message = FALSE, warning = FALSE, fig.align = "center", fig.height = 7, fig.width = 8, fig.cap = "Recruits per spawner by system"}
+
+# RPS by system
+
+ggplot(rps.clean,aes(x=Year,y=rps))+
+  geom_line()+geom_point()+
+  geom_smooth(method='lm',se=TRUE)+
+  facet_wrap(~SYS_NM,ncol=3,scale="free_y")+
+  theme_bw()+
+  geom_hline(yintercept=1)
+
+```
+
+\newpage
+
+## Log recruits per spawner by system
+
+```{r, Log recruits per spawner by system, echo = FALSE, message = FALSE, warning = FALSE, fig.align = "center", fig.height = 7, fig.width = 8, fig.cap = "Log recruits per spawner by system"}
+
+# Log RPS by system
+
+logrps<-rps.clean%>%select(Year,prepost,logrpsclean,SYS_NM)%>%arrange(SYS_NM,prepost,Year)
+
+idx <- c(1, diff(logrps$Year))
+i2 <- c(1,which(idx != 1), nrow(logrps)+1)
+logrps$grp <- rep(1:length(diff(i2)), diff(i2))
+
+ggplot(logrps,aes(x=Year,y=logrpsclean,color=prepost,group=grp))+
+  geom_line(alpha=.5)+geom_point(alpha=.5)+
+  scale_color_brewer(palette="Set1")+
+  geom_smooth(method='lm',se=TRUE)+
+  facet_wrap(~SYS_NM,ncol=3,scale="free_y")+
+  theme_bw()+
+  geom_vline(xintercept=fy,color="seagreen")+
+  geom_hline(yintercept=0,linetype="dashed")+
+  labs(x="Brood Year",y="log(Recruits per spawner)",color="Period",title="Area 8 Chum")+
+  theme(legend.position="bottom")
+
+ggsave("figures/area 8 chum log rps pre vs post.png",dpi=600,height=8,width=7)
+
+```
+
+\newpage
+
+## Boxplot of log RPS by system
+
+```{r, Boxplot of log RPS by system, echo = FALSE, message = FALSE, warning = FALSE, fig.align = "center", fig.height = 7, fig.width = 8, fig.cap = "Boxplot of log recruits per spawner by system"}
+
+ggplot(logrps,aes( y = SYS_NM, x = logrpsclean, fill = prepost))+
+  geom_boxplot(notch=F)+
+  scale_fill_brewer(palette="Set1")+
+  geom_vline(xintercept=0)+
+  theme_bw()+
+  labs(y="System Name",x="log(Recruits per spawner)",title="Area 8 Chum")+
+  theme(legend.position="bottom")
+
+ggsave("figures/area 8 chum log rps pre vs post boxplot.png",dpi=600,height=8,width=7)
+
+```
+
+# Statistical models
