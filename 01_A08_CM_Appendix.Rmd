@@ -19,6 +19,7 @@ editor_options:
 knitr::opts_chunk$set(echo = FALSE, warning = FALSE, message = FALSE)
 
 library(tidyverse)
+library(jtools)
 
 # Load in objects from area 8 data prep script
 
@@ -165,13 +166,13 @@ ggplot(rps.clean,aes(x=Year,y=rps))+
 
 # Log RPS by system
 
-logrps<-rps.clean%>%select(Year,prepost,logrpsclean,SYS_NM)%>%arrange(SYS_NM,prepost,Year)
+logrps<-rps.clean%>%select(Year,prepost,logrps,SYS_NM)%>%arrange(SYS_NM,prepost,Year)
 
 idx <- c(1, diff(logrps$Year))
 i2 <- c(1,which(idx != 1), nrow(logrps)+1)
 logrps$grp <- rep(1:length(diff(i2)), diff(i2))
 
-ggplot(logrps,aes(x=Year,y=logrpsclean,color=prepost,group=grp))+
+ggplot(logrps,aes(x=Year,y=logrps,color=prepost,group=grp))+
   geom_line(alpha=.5)+geom_point(alpha=.5)+
   scale_color_brewer(palette="Set1")+
   geom_smooth(method='lm',se=TRUE)+
@@ -192,7 +193,7 @@ ggsave("figures/area 8 chum log rps pre vs post.png",dpi=600,height=8,width=7)
 
 ```{r, Boxplot of log RPS by system, echo = FALSE, message = FALSE, warning = FALSE, fig.align = "center", fig.height = 7, fig.width = 8, fig.cap = "Boxplot of log recruits per spawner by system"}
 
-ggplot(logrps,aes( y = SYS_NM, x = logrpsclean, fill = prepost))+
+ggplot(logrps,aes( y = SYS_NM, x = logrps, fill = prepost))+
   geom_boxplot(notch=F)+
   scale_fill_brewer(palette="Set1")+
   geom_vline(xintercept=0)+
@@ -205,3 +206,52 @@ ggsave("figures/area 8 chum log rps pre vs post boxplot.png",dpi=600,height=8,wi
 ```
 
 # Statistical models
+
+```{r, Statistical models, echo = FALSE, message = FALSE, warning = FALSE}
+
+rps.clean <- readRDS("RDS/a08cm_rpsclean.rds")
+
+# RPS MODELS
+
+# log rps ~ dist_km_bel + dist_km_mcl
+a <- glm(logrps ~ dist_km_bel + dist_km_mcl, 
+         data = rps.clean)
+summary(a)
+
+# log rps ~ dist_km_bel + dist_km_mcl + Year + subinlet
+b <- glm(logrps ~ dist_km_bel + dist_km_mcl + Year + subinlet, 
+         data = rps.clean)
+summary(b)
+
+# log rps ~ dist_km_bel + dist_km_mcl + Year + subinlet
+c <- glm(logrps ~ dist_km_bel + dist_km_mcl + Year + subinlet, 
+         data = rps.clean)
+summary(c)
+
+# log rps ~ dist_km_bel + dist_km_mcl + Year + SYS_NM
+d <- glm(logrps ~ dist_km_bel + dist_km_mcl + Year + SYS_NM, 
+         data = rps.clean)
+summary(d)
+
+# ESCAPEMENT MODELS
+
+ea <- glm(esc.log ~ dist_km_bel + dist_km_mcl, 
+         data = rps.clean)
+summary(ea)
+
+eb <- glm(esc.log ~ dist_km_bel + dist_km_mcl + SYS_NM + Year, 
+         data = rps.clean)
+summary(eb)
+```
+
+```{r, Weighted mean models, echo = FALSE, message = FALSE, warning = FALSE}
+
+
+```
+
+```{r, Effects plots, message = FALSE, echo = FALSE, warning = FALSE}
+
+effect_plot(eb, pred = SYS_NM, interval = TRUE, plot.points = TRUE, jitter = .25,
+            x.label = "Year", y.label = "Log recruits per spawner")
+
+```
