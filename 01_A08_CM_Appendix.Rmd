@@ -57,7 +57,10 @@ ggplot(escdata.raw,aes(x=Year,y=SYS_NM,color=Enhancement_Rank,size=escapement))+
                       values=c("grey50","steelblue","darkred","seagreen"))+
   labs(y="Escapement",color="Enhancement",x="Year",size="Escapement")+
   theme_bw()+
-  theme(legend.position="bottom")
+  theme(legend.position="bottom")+
+  guides(colour = guide_legend(nrow = 4))+
+  guides(size = guide_legend(nrow = 4))+ 
+  theme(axis.text.x = element_text(size = 7))
 
 #unique(escdata.raw$SYS_NM)
 ggsave("figures/area 8 chum escapement all streams.png",dpi=600,height=8,width=7)
