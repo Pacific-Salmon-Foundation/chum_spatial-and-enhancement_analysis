@@ -892,10 +892,12 @@ tanglegram(tangle.m, lab.cex = .8, margin_inner = 3, main = "Moving average ", m
 
 rpstab <- read_csv("data/rpsmodels.csv")
 
-rpstab %>%
-  kbl(align = colaligns, format.args = list(big.mark = ",")) %>%
-  kable_paper(full_width = F, html_font = "Courier New") %>%
-  kable_styling(latex_options = "HOLD_position")
+kable(rpstab, format = "latex")
+
+#rpstab %>%
+#  kbl(align = colaligns, format.args = list(big.mark = ",")) %>%
+#  kable_paper(full_width = F, html_font = "Courier New") %>%
+#  kable_styling(latex_options = "HOLD_position")
 
 ```
 
@@ -907,10 +909,12 @@ rpstab %>%
 
 esctab <- read_csv("data/escapementmodels.csv")
 
-esctab %>%
-  kbl(align = colaligns, format.args = list(big.mark = ",")) %>%
-  kable_paper(full_width = F, html_font = "Courier New") %>%
-  kable_styling(latex_options = "HOLD_position")
+kable(esctab, format = "latex")
+
+#esctab %>%
+#  #kbl(align = colaligns, format.args = list(big.mark = ",")) %>%
+#  kable_paper(full_width = F, html_font = "Courier New") %>%
+#  kable_styling(latex_options = "HOLD_position")
 
 ```
 
@@ -925,10 +929,12 @@ rpsaic <- readRDS("RDS/rpsaic.rds")
 rpstab$`Degrees of freedom` <- rpsaic$df
 rpstab$AIC <- rpsaic$AIC
 
-rpstab %>%
-  kbl(align = colaligns) %>%
-  kable_paper(full_width = F, html_font = "Courier New") %>%
-  kable_styling(latex_options = "HOLD_position")
+kable(rpstab, format = "latex")
+
+#rpstab %>%
+#  kbl(align = colaligns) %>%
+#  kable_paper(full_width = F, html_font = "Courier New") %>%
+#  kable_styling(latex_options = "HOLD_position")
 
 ```
 
@@ -943,10 +949,12 @@ escaic <- readRDS("RDS/escaic.rds")
 esctab$`Degrees of freedom` <- escaic$df
 esctab$AIC <- escaic$AIC
 
-esctab %>%
-  kbl(align = colaligns) %>%
-  kable_paper(full_width = F, html_font = "Courier New") %>%
-  kable_styling(latex_options = "HOLD_position")
+kable(esctab, format = "latex")
+
+#esctab %>%
+#  kbl(align = colaligns) %>%
+ # kable_paper(full_width = F, html_font = "Courier New") %>%
+  #kable_styling(latex_options = "HOLD_position")
 
 ```
 
