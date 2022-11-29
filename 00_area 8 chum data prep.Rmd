@@ -182,6 +182,8 @@ totalrel.MB <- releases.MB %>%
   summarise(totreleases=sum(releases))%>%
   mutate(group="MB")
 
+saveRDS(totalrel.MB, "RDS/totrelMB.rds")
+
 #total releases for just BC
 releases.BC<-releases %>% 
   filter(RELEASE_SITE_NAME%in%c("Fish Cr+Airport Ch","Saloompt R","Snootli Cr","Thorsen Cr/CCST"))
@@ -190,6 +192,8 @@ totalrel.BC <- releases.BC %>%
   group_by(RELEASE_YEAR)%>%
   summarise(totreleases=sum(releases))%>%
   mutate(group="BC")
+
+saveRDS(totalrel.BC, "RDS/totrelBC.rds")
 
 totrel<-rbind(totalrel.BC,totalrel.BCMB,totalrel.MB)
 
@@ -291,4 +295,51 @@ ggsave("figures/area 8 chum log rps pre vs post boxplot.png",dpi=600,height=8,wi
 
 ```
 
+```{r, Import and merge stream distances by system and (sub)inlets}
+mcloughlin <- read_csv("data/area 8 chum stream distance from mcloughlin.csv")
+bellacoola <- read_csv("data/area 8 chum stream distance from bella coola.csv")
 
+names(mcloughlin) <- c("SYS_NM", "dist_km_mcl")
+names(bellacoola) <- c("SYS_NM", "dist_km_bel")
+
+rps.clean <- read_csv("data/area 8 chum with rps raw and clean.csv")
+inlets <- read_csv("data/area 8 chum filtered stream list with inlets and distance.csv")
+
+rps.clean <- merge(mcloughlin, rps.clean, by = "SYS_NM")
+rps.clean <- merge(bellacoola, rps.clean, by = "SYS_NM")
+rps.clean <- merge(inlets, rps.clean, by = "SYS_NM")
+
+saveRDS(rps.clean, "RDS/a08cm_rpsclean.rds")
+```
+
+```{r, Prep weighted averages of distances by releases}
+
+totrelBC <- readRDS("RDS/totrelBC.rds")
+totrelMB <- readRDS("RDS/totrelMB.rds")
+
+colnames(totrelBC) <- c("Year", "releases_bel", "group")
+totrelBC <- totrelBC[,1:2]
+
+colnames(totrelMB) <- c("Year", "releases_mcl", "group")
+totrelMB <- totrelMB[,1:2]
+
+rps.clean <- merge(totrelBC, rps.clean, by = "Year", all = TRUE)
+rps.clean <- merge(totrelMB, rps.clean, by = "Year", all = TRUE)
+
+weightstable_bel <- rps.clean %>%
+  drop_na() %>%
+  group_by(SYS_NM) %>%
+  summarize(weighted.mean(dist_km_bel, releases_bel))
+colnames(weightstable_bel) <- c("SYS_NM", "wt_dist_bel")
+
+weightstable_mcl <- rps.clean %>%
+  drop_na() %>%
+  group_by(SYS_NM) %>%
+  summarize(weighted.mean(dist_km_mcl, releases_mcl))
+colnames(weightstable_mcl) <- c("SYS_NM", "wt_dist_mcl")
+
+rps.clean <- merge(weightstable_bel, rps.clean, by = "SYS_NM", all = TRUE)
+rps.clean <- merge(weightstable_mcl, rps.clean, by = "SYS_NM", all = TRUE)
+
+saveRDS(rps.clean, "RDS/a08cm_rpsclean.rds")
+```
