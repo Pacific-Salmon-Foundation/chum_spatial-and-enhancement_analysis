@@ -18,8 +18,16 @@ editor_options:
 
 knitr::opts_chunk$set(echo = FALSE, warning = FALSE, message = FALSE)
 
+
 library(tidyverse)
 library(jtools)
+library(kableExtra)
+library(flextable)
+library(knitr)
+library(magick)
+library(dendextend)
+library(corrplot)
+library(ggdendro)
 
 # Load in objects from area 8 data prep script
 
@@ -205,14 +213,99 @@ ggsave("figures/area 8 chum log rps pre vs post boxplot.png",dpi=600,height=8,wi
 
 ```
 
-# Statistical models
+\newpage
 
-```{r, Statistical models, echo = FALSE, message = FALSE, warning = FALSE}
+# Correlation analyses
+
+```{r, Correlation analyses, echo = FALSE, message = FALSE, warning = FALSE, fig.align = "center", fig.height = 9.5, fig.width = 8.5, fig.cap = "Cross correlation plots to compare metrics."}
 
 rps.clean <- readRDS("RDS/a08cm_rpsclean.rds")
 
+cor.data.z<-rps.clean%>%select(SYS_NM,Year,z)%>%
+  pivot_wider(names_from="Year",values_from="z")%>%
+  data.frame()
+cor.data.z <- cor.data.z[1:15,] # Drop NA row introduced by weighted distances - check here if errors later 
+rownames(cor.data.z)<-cor.data.z$SYS_NM
+cor.data.z<-cor.data.z%>%select(-SYS_NM)
+cor.z<-cor(t(cor.data.z),use="pairwise.complete.obs")
+dist.cor.z<- dist(cor.z)
+clust.dist.cor.z <- hclust(dist.cor.z)
+dendclust.z <- dendro_data(clust.dist.cor.z)
+
+dendclust.z[["labels"]][["inlet"]] <- inletlist
+
+cor.data.e<-rps.clean%>%select(SYS_NM,Year,esc.log)%>%
+  pivot_wider(names_from="Year",values_from="esc.log")%>%
+  data.frame()
+cor.data.e <- cor.data.e[1:15,] # Drop NA row introduced by weighted distances - check here if errors later 
+rownames(cor.data.e)<-cor.data.e$SYS_NM
+cor.data.e<-cor.data.e%>%select(-SYS_NM)
+cor.e<-cor(t(cor.data.e),use="pairwise.complete.obs")
+dist.cor.e<- dist(cor.e)
+clust.dist.cor.e <- hclust(dist.cor.e)
+dendclust.e <- dendro_data(clust.dist.cor.e)
 
 
+cor.data.s<-rps.clean%>%select(SYS_NM,Year,esc.stand)%>%
+  pivot_wider(names_from="Year",values_from="esc.stand")%>%
+  data.frame()
+cor.data.s <- cor.data.s[1:15,] # Drop NA row introduced by weighted distances - check here if errors later 
+rownames(cor.data.s)<-cor.data.s$SYS_NM
+cor.data.s<-cor.data.s%>%select(-SYS_NM)
+cor.s<-cor(t(cor.data.s),use="pairwise.complete.obs")
+dist.cor.s<- dist(cor.s)
+clust.dist.cor.s <- hclust(dist.cor.s)
+dendclust.s <- dendro_data(clust.dist.cor.s)
+
+
+cor.data.m<-rps.clean%>%select(SYS_NM,Year,m.ave)%>%
+  pivot_wider(names_from="Year",values_from="m.ave")%>%
+  data.frame()
+cor.data.m <- cor.data.m[1:15,] # Drop NA row introduced by weighted distances - check here if errors later 
+rownames(cor.data.m)<-cor.data.m$SYS_NM
+cor.data.m<-cor.data.m%>%select(-SYS_NM)
+cor.m<-cor(t(cor.data.m),use="pairwise.complete.obs")
+dist.cor.m<- dist(cor.m)
+clust.dist.cor.m <- hclust(dist.cor.m)
+dendclust.m <- dendro_data(clust.dist.cor.m)
+
+par(oma=c(0,0,0,0))
+par(mfrow=c(2,2))
+corrplot(cor.z, diag = FALSE, order="hclust", method="square", tl.col="black",
+         addrect = 6, tl.cex = 0.45, title = "Z-scores", mar=c(0,0,3,0))
+corrplot(cor.e, diag = FALSE, order="hclust", method="square", tl.col="black",
+         addrect = 6, tl.cex = 0.45, title = "Log escapement", mar=c(0,0,3,0))
+corrplot(cor.s, diag = FALSE, order="hclust", method="square", tl.col="black",
+         addrect = 6, tl.cex = 0.45, title = "Standardized escapement", mar=c(0,0,3,0))
+corrplot(cor.m, diag = FALSE, order="hclust", method="square", tl.col="black",
+         addrect = 6, tl.cex = 0.45, title = "Moving average", mar=c(0,0,3,0))
+
+```
+
+```{r, Prep data for dendrogram visualization, echo = FALSE, message = FALSE, warning = FALSE, include = FALSE}
+
+
+clust.dist.cor.z[["labels"]] <- str_to_sentence(word(clust.dist.cor.z[["labels"]]))
+dendz <- as.dendrogram(clust.dist.cor.z)
+plot(dendz, horiz = TRUE)
+
+dendz %>%
+    #set("labels_colors", subinlet) %>%
+    plot(main = "Z-scores", horiz = TRUE)
+
+
+```
+
+\newpage
+
+# Statistical models
+
+```{r, Statistical models, echo = FALSE, message = FALSE, warning = FALSE, include = FALSE}
+
+rps.clean <- readRDS("RDS/a08cm_rpsclean.rds")
+
+rps.clean$SYS_NM <- as.factor(rps.clean$SYS_NM)
+rps.clean$subinlet <- as.factor(rps.clean$subinlet)
 
 # RPS MODELS
 
@@ -269,7 +362,7 @@ AIC(ea, eb, ec, ed)
 
 
 
-# WEIGHTED MEAN MODELS
+# RPS MODELS ON WEIGHTED DISTANCE
 
 # log rps ~ dist_km_bel + dist_km_mcl
 wa <- glm(logrps ~ wt_dist_bel + wt_dist_mcl, 
@@ -293,12 +386,71 @@ summary(wd)
 
 AIC(wa, wb, wc, wd)
 
+
+
+
+
+
+# ESCAPEMENT MODELS ON WEIGHTED DISTANCE
+
+# log rps ~ dist_km_bel + dist_km_mcl
+wea <- glm(esc.log ~ wt_dist_bel + wt_dist_mcl, 
+         data = rps.clean)
+summary(wea)
+
+# log rps ~ dist_km_bel + dist_km_mcl + Year + subinlet
+web <- glm(esc.log ~ wt_dist_bel + wt_dist_mcl + Year + subinlet, 
+         data = rps.clean)
+summary(web)
+
+# log rps ~ dist_km_bel + dist_km_mcl + Year + SYS_NM
+wec <- glm(esc.log ~ wt_dist_bel + wt_dist_mcl + Year + SYS_NM, 
+         data = rps.clean)
+summary(wec)
+
+# log rps ~ dist_km_bel + dist_km_mcl + Year
+wed <- glm(esc.log ~ wt_dist_bel + wt_dist_mcl + Year, 
+         data = rps.clean)
+summary(wed)
+
+AIC(wea, web, wec, wed)
+
 ```
 
 
+```{r, Model summary tables, echo = FALSE, warning = FALSE, message = FALSE}
+candidates <- read_csv("data/area 8 chum candidate models.csv")
+
+rpscands <- as.data.frame(rbind(candidates[1:4,], candidates[9:12,]))
+esccands <- as.data.frame(rbind(candidates[5:8,], candidates[13:16,]))
+
+rpsaic <- AIC(a, b, c, d, wa, wb, wc, wd)
+escaic <- AIC(ea, eb, ec, ed, wea, web, wec, wed)
+
+rpscands$df <- rpsaic$df
+rpscands$AIC <- rpsaic$AIC
+
+esccands$df <- escaic$df
+esccands$AIC <- escaic$AIC
+
+
+#rpscands %>%
+#  kable_paper(full_width = F, html_font = "Courier New") %>%
+#  kable_styling(latex_options = "HOLD_position")
+
+
+#pl1 <- as_image(rpscands)
+
+
+#esccands %>%
+#  kable_classic(full_width = F, html_font = "Courier New")
+```
+
+\newpage
+
 ```{r, Effects plots, message = FALSE, echo = FALSE, warning = FALSE}
 
-effect_plot(wd, pred = releases_mcl, interval = TRUE, plot.points = TRUE)
+#effect_plot(wd, pred = releases_mcl, interval = TRUE, plot.points = TRUE)
 
 
 ```
