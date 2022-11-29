@@ -29,6 +29,7 @@ library(magick)
 library(dendextend)
 library(corrplot)
 library(ggdendro)
+library(ggpubr)
 
 # Load in objects from area 8 data prep script
 
@@ -111,6 +112,60 @@ ggplot(totrel,aes(x=RELEASE_YEAR,y=totreleases,color=group))+
 
 #write.csv(totrel,"~/R/PSF hatchery review/analysis/spatial/outputs/Area 25 chum releases totals.csv")
 ```
+
+\newpage
+
+## Escapement by enhancement rank per system
+
+```{r metric plots,fig.align="center",fig.height=8,fig.width=6,fig.cap="Various plots for escapement and transformations.",echo=FALSE,warning=FALSE,message=FALSE}
+#plot streams by enhancement
+
+p1<-ggplot(escdata.filtered,aes(x=Year,y=escapement,color=Enhancement_Rank,group=SYS_NM))+
+  geom_line()+
+  theme_bw()+
+  labs(y="Escapement",title="Raw Escapement",color="Enhancement Rank")
+
+p2<-ggplot(escdata.filtered,aes(x=Year,y=esc.log,color=Enhancement_Rank,group=SYS_NM))+
+ geom_line()+
+  theme_bw()+
+  labs(y="log(Escapement)",title="Logged Escapement")
+
+p3<-ggplot(escdata.filtered,aes(x=Year,y=z,color=Enhancement_Rank,group=SYS_NM))+
+  geom_line()+
+  geom_hline(yintercept=0)+
+  theme_bw()+
+  labs(y="Z-scores (Escapement)",title="Z-scores Escapement")
+
+p4<-ggplot(escdata.filtered,aes(x=Year,y=esc.stand,color=Enhancement_Rank,group=SYS_NM))+
+  geom_line()+
+  theme_bw()+
+  labs(y="Standardized Escapement (pavg)",title="Escapement/Average (Pavg)")
+
+ggarrange(p1,p2,p3,p4,ncol=1,common.legend = TRUE,align='v',legend="bottom")
+
+```
+
+\newpage
+
+## Moving average and LOESSS fit on enhancement ranking of log escapements
+
+```{r moving average and LOESS plots, echo=FALSE,warning=FALSE,message=FALSE,fig.align="center",fig.height=5,fig.width=6,fig.cap="Moving average and LOESS fits on logged escapement by enhancement ranking."}
+
+t1<-ggplot(escdata.filtered,aes(x=Year,y=m.ave,color=Enhancement_Rank,group=SYS_NM))+
+  geom_line()+
+  theme_bw()+
+  labs(y="Moving Average",title="Moving-Average",color="Enhancement Rank")
+
+t2<-ggplot(escdata.filtered,aes(x=Year,y=z,color=Enhancement_Rank,group=SYS_NM))+
+  geom_smooth(method="loess",se=FALSE,span=.1,linewidth=.7)+
+  geom_hline(yintercept=0)+
+  theme_bw()+
+  labs(y="Z-score",title="Loess fit on Z-scores")
+
+ggarrange(t1,t2,ncol=1,common.legend = TRUE,legend = "bottom",align='v')
+
+```
+
 
 \newpage
 
@@ -607,7 +662,7 @@ kable(esccands, format = "latex")
 
 ```{r, Effects plot of log RPS against releases from Bella Coola, message = FALSE, echo = FALSE, warning = FALSE}
 
-effect_plot(wx, pred = releases_bel, interval = TRUE, plot.points = TRUE, x.label = "Releases from Bella Coola", y.label = "Log escapement")
+effect_plot(wx, pred = releases_bel, interval = TRUE, plot.points = TRUE, x.label = "Releases from Bella Coola", y.label = "Log recruits per spawner")
 
 ```
 
@@ -617,7 +672,7 @@ effect_plot(wx, pred = releases_bel, interval = TRUE, plot.points = TRUE, x.labe
 
 ```{r, Effects plot of log RPS against releases from McLoughlin, message = FALSE, echo = FALSE, warning = FALSE}
 
-effect_plot(wx, pred = releases_mcl, interval = TRUE, plot.points = TRUE, x.label = "Releases from McLoughlin", y.label = "Log escapement")
+effect_plot(wx, pred = releases_mcl, interval = TRUE, plot.points = TRUE, x.label = "Releases from McLoughlin", y.label = "Log recruits per spawner")
 
 ```
 \newpage
