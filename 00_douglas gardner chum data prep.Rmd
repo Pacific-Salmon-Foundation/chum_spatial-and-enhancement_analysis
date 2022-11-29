@@ -41,12 +41,13 @@ escdata<-fread("data/all nuseds with enhancement rankings.csv")%>%
   select(-V1)
 
 escdata$escapement[escdata$escapement==0]<-NA
+unique(escdata$CU_name)
 
-escdata.raw<-escdata%>%filter(SPP=="CM"&Area==6)
+escdata.raw<-escdata%>%filter(SPP=="CM"&CU_name=="Douglas-Gardner")
 
-write.csv(escdata,"data/area 8 chum escapement data all.csv")
+write.csv(escdata,"data/douglas gardner chum escapement data all.csv")
 
-saveRDS(escdata, "RDS/a08cm_escdata.rds")
+saveRDS(escdata, "RDS/cm_douglasgardner_escdata.rds")
 
 #bubbleplot of escapements for whole area
 ggplot(escdata.raw,aes(x=Year,y=SYS_NM,color=Enhancement_Rank,size=escapement))+
@@ -55,16 +56,17 @@ ggplot(escdata.raw,aes(x=Year,y=SYS_NM,color=Enhancement_Rank,size=escapement))+
                       values=c("grey50","steelblue","darkred","seagreen"))+
   labs(y="Escapement",color="Enhancement",x="Year",size="Escapement")+
   theme_bw()+
-  theme(legend.position="bottom")
+  theme(legend.position="bottom",axis.text.y=element_text(size=6))
 
 #unique(escdata.raw$SYS_NM)
-ggsave("figures/area 8 chum escapement all streams.png",dpi=600,height=8,width=7)
+ggsave("figures/douglas gardner chum escapement all streams.png",dpi=600,height=9,width=7)
+
 ```
 
 
 ```{r filter escapement data, echo=FALSE,message=FALSE,warning=FALSE}
 # Add filter by year
-fy=1980
+fy=1985
 n.pre=(fy-1950)/2
 n.post=(2018-fy)/2
 
@@ -76,7 +78,7 @@ included.stream.list<-escdata.raw%>%
   pivot_wider(names_from="prepost",values_from="notnas")%>%
   filter(Post>n.post&Pre>n.pre)
 
-write.csv(included.stream.list,"data/area 8 chum filtered stream list.csv")
+write.csv(included.stream.list,"data/douglas-gardner chum filtered stream list.csv")
 
 #add escapement metrics and pre/post field
 escdata.filtered<-escdata.raw%>%filter(SYS_NM%in%included.stream.list$SYS_NM)%>%
@@ -89,17 +91,17 @@ escdata.filtered<-escdata.raw%>%filter(SYS_NM%in%included.stream.list$SYS_NM)%>%
          prepost=case_when(Year<1980~"Pre",
                            Year>=1980~"Post"))
 
-saveRDS(escdata.filtered, "RDS/a08cm_escdata_filtered.rds")
+saveRDS(escdata.filtered, "RDS/douglasgardner-cm_escdata_filtered.rds")
 
-write.csv(escdata.filtered,"data/area 8 chum escapement data filtered with metrics.csv")
+write.csv(escdata.filtered,"data/douglas-gardner chum escapement data filtered with metrics.csv")
 
 ggplot(escdata.filtered,aes(x=Year,y=escapement,color=Enhancement_Rank))+
   geom_point()+geom_line()+theme_bw()+
   facet_wrap(~SYS_NM,ncol=3,scale="free_y")+
-  labs(y="Escapement",color="Enhancement Level",title="Area 6 Escapement (filtered streams)")+
+  labs(y="Escapement",color="Enhancement Level",title="Douglas Gardner Escapement (filtered streams)")+
   theme(legend.position="bottom")
 
-ggsave("figures/area 8 chum escapement filtered streams.png",dpi=600,height=8,width=7)
+ggsave("figures/douglas-gardner chum escapement filtered streams.png",dpi=600,height=9,width=7)
 
 ```
 
@@ -120,7 +122,7 @@ allcunames<-allreleases%>%filter(SPECIES_NAME==species)%>%distinct(REL_CU_NAME)
 allreleasesites<-allreleases%>%filter(SPECIES_NAME==species&REL_CU_NAME=="")%>%distinct(RELEASE_SITE_NAME,STOCK_NAME)
 
 species="Chum"
-rel.cu.name=c("BELLA COOLA RIVER-LATE","BELLA COOLA-DEAN RIVERS","SPILLER-FITZ HUGH-BURKE")
+rel.cu.name=c("DOUGLAS-GARDNER")
 
 releases <- allreleases %>% 
   data.frame() %>% 
@@ -129,34 +131,25 @@ releases <- allreleases %>%
   filter(!is.na(releases))%>%
   arrange(`site-stock`,RELEASE_STAGE_NAME,RELEASE_YEAR)
 
-extra.releasesites<-c("Bella Coola Est","Bella Coola R Low","Bentinck Arm N","Hagensborg Sl","Nooklikonnick Cr")
-
-extras<-allreleases%>%data.frame()%>%
-  filter(REL_CU_NAME==""&RELEASE_SITE_NAME%in%extra.releasesites)%>%
-  mutate("site-stock"=paste0(RELEASE_SITE_NAME,":",STOCK_NAME))%>%
-  filter(!is.na(releases))%>%
-  arrange(`site-stock`,RELEASE_STAGE_NAME,RELEASE_YEAR)
-
-releases<-rbind(releases,extras)
-
 idx <- c(1, diff(releases$RELEASE_YEAR))
 i2 <- c(1,which(idx != 1), nrow(releases)+1)
 releases$grp <- rep(1:length(diff(i2)), diff(i2))
 
-saveRDS(releases, "RDS/a08cm_releases.rds")
+saveRDS(releases, "RDS/douglas-gardner_releases.rds")
 
 #plot all releases in area to determine which systems specifically to included
 ggplot(releases,aes(x=RELEASE_YEAR,y=releases,color=RELEASE_STAGE_NAME,group=grp))+
   geom_line()+geom_point()+
   scale_color_brewer(palette="Set1")+
-  facet_wrap(~`site-stock`,ncol=4)+
+  facet_wrap(~`site-stock`,ncol=2)+
   theme_bw()+
   labs(x="Release Year",y="Releases",color="Release Stage",
-       title=paste0(species,": ",paste0(rel.cu.name,collapse=" ")),subtitle="Release site:Origin stock")+
+       title=paste0(species,": ",paste0(rel.cu.name,collapse=" ")),
+       subtitle="Release site:Origin stock")+
   theme(legend.position = "bottom",
         plot.title=element_text(size=8),strip.text=element_text(size=8))
 
-#ggsave("figures/releases chum area 8 by CU.png",dpi=600,height=8,width=7)
+ggsave("figures/releases chum douglas-gardner.png",dpi=600,height=8,width=6)
 
 #write.csv(releases,"data/releases area 8 chum all.csv")
 
@@ -164,42 +157,14 @@ ggplot(releases,aes(x=RELEASE_YEAR,y=releases,color=RELEASE_STAGE_NAME,group=grp
 
 
 ```{r total releases for area 8 terminal not including mcloughlin bay}
-#total releases for BC and MB
-releases.BCMB<-releases %>% 
-  filter(RELEASE_SITE_NAME%in%c("Fish Cr+Airport Ch","Saloompt R","Snootli Cr","Thorsen Cr/CCST","McLoughlin Bay"))
 
-totalrel.BCMB <- releases.BCMB %>% 
+totalrel <- releases %>% 
   group_by(RELEASE_YEAR)%>%
-  summarise(totreleases=sum(releases))%>%
-  mutate(group="BC/MB")
+  summarise(totreleases=sum(releases))
 
-#total releases for just MB
-releases.MB<-releases %>% 
-  filter(RELEASE_SITE_NAME%in%c("McLoughlin Bay"))
+saveRDS(totalrel.BC, "RDS/area 6 chum totrel.rds")
+write.csv(totalrel,"area 6 chum total releases.rds")
 
-totalrel.MB <- releases.MB %>% 
-  group_by(RELEASE_YEAR)%>%
-  summarise(totreleases=sum(releases))%>%
-  mutate(group="MB")
-
-saveRDS(totalrel.MB, "RDS/totrelMB.rds")
-
-#total releases for just BC
-releases.BC<-releases %>% 
-  filter(RELEASE_SITE_NAME%in%c("Fish Cr+Airport Ch","Saloompt R","Snootli Cr","Thorsen Cr/CCST"))
-
-totalrel.BC <- releases.BC %>% 
-  group_by(RELEASE_YEAR)%>%
-  summarise(totreleases=sum(releases))%>%
-  mutate(group="BC")
-
-saveRDS(totalrel.BC, "RDS/totrelBC.rds")
-
-totrel<-rbind(totalrel.BC,totalrel.BCMB,totalrel.MB)
-
-totrelwide<-totrel%>%pivot_wider(names_from="group",values_from="totreleases")
-
-write.csv(totrelwide,"data/releases area 8 chum total terminal releases by group.csv")
 ```
 
 
@@ -215,11 +180,11 @@ ggplot(totrel,aes(x=RELEASE_YEAR,y=totreleases,color=group))+
 ```
 
 ``` {r prep rps data}
-escdata<-fread("data/area 8 chum escapement data filtered with metrics.csv")
+escdata<-fread("data/douglas-gardner chum escapement data filtered with metrics.csv")
 
 age<-fread("data/age and ERs NC CC PSE.csv")
 
-ageERs<-age%>%filter(SpeciesId=="CM",CU_Name=="Bella Coola-Dean Rivers, BELLA COOLA RIVER-LATE")%>%select(Year=BroodYear,`Total ER`,p3=Age3,p4=Age4,p5=Age5)
+ageERs<-age%>%filter(SpeciesId=="CM",CU_Name=="Douglas-Gardner")%>%select(Year=BroodYear,`Total ER`,p3=Age3,p4=Age4,p5=Age5)
 
 rps<-merge(escdata,ageERs,by="Year")%>%
   mutate(TR=escapement/(1-`Total ER`))%>%
@@ -239,9 +204,9 @@ rps.clean<-rps%>%select(Year,SYS_NM,prepost,escapement,r3,r4,r5,recruits,rps,log
   mutate(rpsclean=case_when(exclude=="N"~rps),
          logrpsclean=case_when(exclude=="N"~logrps))
 
-saveRDS(rps.clean, "RDS/a08cm_rpsclean.rds")
+saveRDS(rps.clean, "RDS/douglas-gardner_cm_rpsclean.rds")
 
-write.csv(rps,"data/area 8 chum with rps raw and clean.csv")
+write.csv(rps,"data/douglas-gardner chum with rps raw and clean.csv")
 
 ```
 
@@ -259,7 +224,7 @@ ggplot(rps.clean,aes(x=Year,y=rps))+
   theme_bw()+
   geom_hline(yintercept=1)
 
-ggsave("figures/releases chum area 8 total terminal.png",dpi=600,height=6,width=6)
+ggsave("figures/rps chum  douglas-gardner total terminal.png",dpi=600,height=9,width=6)
 
 #log rps plots
 names(rps.clean)
@@ -278,17 +243,17 @@ ggplot(logrps,aes(x=Year,y=logrpsclean,color=prepost,group=grp))+
   theme_bw()+
   geom_vline(xintercept=fy,color="seagreen")+
   geom_hline(yintercept=0,linetype="dashed")+
-  labs(x="Brood Year",y="log(Recruits per spawner)",color="Period",title="Area 8 Chum")+
+  labs(x="Brood Year",y="log(Recruits per spawner)",color="Period",title="Douglas Gardner Chum")+
   theme(legend.position="bottom")
 
-ggsave("figures/area 8 chum log rps pre vs post.png",dpi=600,height=8,width=7)
+ggsave("figures/douglas-gardner chum log rps pre vs post.png",dpi=600,height=9,width=7)
 
 ggplot(logrps,aes( y = SYS_NM, x = logrpsclean, fill = prepost))+
   geom_boxplot(notch=F)+
   scale_fill_brewer(palette="Set1")+
   geom_vline(xintercept=0)+
   theme_bw()+
-  labs(y="System Name",x="log(Recruits per spawner)",title="Area 8 Chum")+
+  labs(y="System Name",x="log(Recruits per spawner)",title="Douglas Gardner Chum")+
   theme(legend.position="bottom")
 
 ggsave("figures/area 8 chum log rps pre vs post boxplot.png",dpi=600,height=8,width=7)
