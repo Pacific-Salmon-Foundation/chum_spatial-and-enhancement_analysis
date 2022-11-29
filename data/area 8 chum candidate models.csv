@@ -1,0 +1,17 @@
+Candidate model
+Log recruits per spawner ~ distance from Bella Coola + Distance from McLoughlin
+Log recruits per spawner ~ distance from Bella Coola + Distance from McLoughlin + Year + Subinlet
+Log recruits per spawner ~ distance from Bella Coola + Distance from McLoughlin + Year + System name
+Log recruits per spawner ~ distance from Bella Coola + Distance from McLoughlin + Year
+Log escapement ~ distance from Bella Coola + Distance from McLoughlin
+Log escapement ~ distance from Bella Coola + Distance from McLoughlin + Year + Subinlet
+Log escapement ~ distance from Bella Coola + Distance from McLoughlin + Year + System name
+Log escapement ~ distance from Bella Coola + Distance from McLoughlin + Year
+Log recruits per spawner ~ Weighted distance from Bella Coola + Weighted distance from McLoughlin
+Log recruits per spawner ~ Weighted distance from Bella Coola + Weighted distance from McLoughlin + Year + Subinlet
+Log recruits per spawner ~ Weighted distance from Bella Coola + Weighted distance from McLoughlin + Year + System name
+Log recruits per spawner ~ Weighted distance from Bella Coola + Weighted distance from McLoughlin + Year
+Log escapement ~ Weighted distance from Bella Coola + Weighted distance from McLoughlin
+Log escapement ~ Weighted distance from Bella Coola + Weighted distance from McLoughlin + Year + Subinlet name
+Log escapement ~ Weighted distance from Bella Coola + Weighted distance from McLoughlin + Year + System name
+Log escapement ~ Weighted distance from Bella Coola + Weighted distance from McLoughlin + Year
