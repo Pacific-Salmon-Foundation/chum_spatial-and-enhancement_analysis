@@ -1,17 +1,15 @@
 Candidate model
-Log recruits per spawner ~ distance from Bella Coola + Distance from McLoughlin
-Log recruits per spawner ~ distance from Bella Coola + Distance from McLoughlin + Year + Subinlet
-Log recruits per spawner ~ distance from Bella Coola + Distance from McLoughlin + Year + System name
-Log recruits per spawner ~ distance from Bella Coola + Distance from McLoughlin + Year
-Log escapement ~ distance from Bella Coola + Distance from McLoughlin
-Log escapement ~ distance from Bella Coola + Distance from McLoughlin + Year + Subinlet
-Log escapement ~ distance from Bella Coola + Distance from McLoughlin + Year + System name
-Log escapement ~ distance from Bella Coola + Distance from McLoughlin + Year
-Log recruits per spawner ~ Weighted distance from Bella Coola + Weighted distance from McLoughlin
-Log recruits per spawner ~ Weighted distance from Bella Coola + Weighted distance from McLoughlin + Year + Subinlet
-Log recruits per spawner ~ Weighted distance from Bella Coola + Weighted distance from McLoughlin + Year + System name
-Log recruits per spawner ~ Weighted distance from Bella Coola + Weighted distance from McLoughlin + Year
-Log escapement ~ Weighted distance from Bella Coola + Weighted distance from McLoughlin
-Log escapement ~ Weighted distance from Bella Coola + Weighted distance from McLoughlin + Year + Subinlet name
-Log escapement ~ Weighted distance from Bella Coola + Weighted distance from McLoughlin + Year + System name
-Log escapement ~ Weighted distance from Bella Coola + Weighted distance from McLoughlin + Year
+Log RPS ~ dist from Bella Coola + dist from McLoughlin
+Log RPS ~ dist from Bella Coola + dist from McLoughlin + Year + Subinlet
+Log RPS ~ dist from Bella Coola + dist from McLoughlin + Year
+Log escapement ~ dist from Bella Coola + dist from McLoughlin
+Log escapement ~ dist from Bella Coola + dist from McLoughlin + Year + Subinlet
+Log escapement ~ dist from Bella Coola + dist from McLoughlin + Year
+Log RPS ~ Wt. dist. from Bella Coola + Wt. dist. from McLoughlin
+Log RPS ~ Wt. dist. from Bella Coola + Wt. dist. from McLoughlin + Year + Subinlet
+Log RPS ~ Wt. dist. from Bella Coola + Wt. dist. from McLoughlin + Year
+Log RPS ~ Wt. dist. Bella Coola + Wt. dist. McLoughlin + Rel.McLoughin + Rel.Bella Coola + Year
+Log escapement ~ Wt. dist. from Bella Coola + Wt. dist. from McLoughlin
+Log escapement ~ Wt. dist. from Bella Coola + Wt. dist. from McLoughlin + Year + Subinlet
+Log escapement ~ Wt. dist. from Bella Coola + Wt. dist. from McLoughlin + Year
+Log escapement ~ Wt. dist. Bella Coola + Wt. dist. McLoughlin + Rel.Bella Coola + Rel. McLoughlin + Year
