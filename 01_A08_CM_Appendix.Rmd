@@ -17,6 +17,7 @@ editor_options:
 ```{r setup, include=FALSE}
 
 knitr::opts_chunk$set(echo = FALSE, warning = FALSE, message = FALSE)
+knitr::opts_chunk$set(echo = TRUE, fig.pos = "!h")
 options(knitr.table.format ='pdf' )
 
 library(tidyverse)
@@ -157,6 +158,8 @@ ggplot(releases,aes(x=RELEASE_YEAR,y=releases,color=RELEASE_STAGE_NAME,group=grp
 
 # RPS by system
 
+rps.clean <- rps.clean[1:930,]
+
 ggplot(rps.clean,aes(x=Year,y=rps))+
   geom_line()+geom_point()+
   geom_smooth(method='lm',se=TRUE)+
@@ -179,6 +182,7 @@ logrps<-rps.clean%>%select(Year,prepost,logrps,SYS_NM)%>%arrange(SYS_NM,prepost,
 idx <- c(1, diff(logrps$Year))
 i2 <- c(1,which(idx != 1), nrow(logrps)+1)
 logrps$grp <- rep(1:length(diff(i2)), diff(i2))
+logrps <- logrps[1:930,]
 
 ggplot(logrps,aes(x=Year,y=logrps,color=prepost,group=grp))+
   geom_line(alpha=.5)+geom_point(alpha=.5)+
@@ -285,9 +289,81 @@ corrplot(cor.m, diag = FALSE, order="hclust", method="square", tl.col="black",
 
 ```
 
+```{r, Make colour vectors for dendrogram inlets, message=FALSE, warning=FALSE, echo=FALSE, include = FALSE}
+
+zlabs <- as.data.frame(dendclust.z[["labels"]][["label"]])
+colnames(zlabs) <- "SYS_NM"
+zlabs$order <- c(1:length(zlabs$SYS_NM))
+zlabs <- merge(zlabs, rps.clean, by = "SYS_NM")
+zlabs <- zlabs %>%
+  select(SYS_NM, order, subinlet)
+zlabs <- distinct(zlabs)
+zlabcols <- as.data.frame(unique(zlabs$subinlet))
+colnames(zlabcols) <- "subinlet"
+zlabcols <- zlabcols %>%
+  arrange(subinlet)
+zlabcols$colour <- c("red", "blue", "green", "goldenrod", "black")
+zlabs <- merge(zlabcols, zlabs, by = "subinlet")
+zlabs <- zlabs %>%
+  arrange(order)
+zlabs <- zlabs$colour
+
+elabs <- as.data.frame(dendclust.e[["labels"]][["label"]])
+colnames(elabs) <- "SYS_NM"
+elabs$order <- c(1:length(elabs$SYS_NM))
+elabs <- merge(elabs, rps.clean, by = "SYS_NM")
+elabs <- elabs %>%
+  select(SYS_NM, order, subinlet)
+elabs <- distinct(elabs)
+elabcols <- as.data.frame(unique(elabs$subinlet))
+colnames(elabcols) <- "subinlet"
+elabcols <- elabcols %>%
+  arrange(subinlet)
+elabcols$colour <- c("red", "blue", "green", "goldenrod", "black")
+elabs <- merge(elabcols, elabs, by = "subinlet")
+elabs <- elabs %>%
+  arrange(order)
+elabs <- elabs$colour
+
+slabs <- as.data.frame(dendclust.s[["labels"]][["label"]])
+colnames(slabs) <- "SYS_NM"
+slabs$order <- c(1:length(slabs$SYS_NM))
+slabs <- merge(slabs, rps.clean, by = "SYS_NM")
+slabs <- slabs %>%
+  select(SYS_NM, order, subinlet)
+slabs <- distinct(slabs)
+slabcols <- as.data.frame(unique(slabs$subinlet))
+colnames(slabcols) <- "subinlet"
+slabcols <- slabcols %>%
+  arrange(subinlet)
+slabcols$colour <- c("red", "blue", "green", "goldenrod", "black")
+slabs <- merge(slabcols, slabs, by = "subinlet")
+slabs <- slabs %>%
+  arrange(order)
+slabs <- slabs$colour
+
+mlabs <- as.data.frame(dendclust.m[["labels"]][["label"]])
+colnames(mlabs) <- "SYS_NM"
+mlabs$order <- c(1:length(mlabs$SYS_NM))
+mlabs <- merge(mlabs, rps.clean, by = "SYS_NM")
+mlabs <- mlabs %>%
+  select(SYS_NM, order, subinlet)
+mlabs <- distinct(mlabs)
+mlabcols <- as.data.frame(unique(mlabs$subinlet))
+colnames(mlabcols) <- "subinlet"
+mlabcols <- mlabcols %>%
+  arrange(subinlet)
+mlabcols$colour <- c("red", "blue", "green", "goldenrod", "black")
+mlabs <- merge(mlabcols, mlabs, by = "subinlet")
+mlabs <- mlabs %>%
+  arrange(order)
+mlabs <- mlabs$colour
+
+
+```
 \newpage
 
-# Dendrogram clusters analysis
+## Dendrogram clusters analysis
 
 ```{r, Dendrogram plots, echo = FALSE, message = FALSE, warning = FALSE, fig.align = "center", fig.height = 9.5, fig.width = 8.5, fig.cap = "Dendrogram cluster analysis to compare uses of different metrics."}
 
@@ -297,25 +373,25 @@ par(mfrow=c(2,2))
 clust.dist.cor.z[["labels"]] <- str_to_sentence(word(clust.dist.cor.z[["labels"]]))
 dendz <- as.dendrogram(clust.dist.cor.z)
 dendz %>%
-    #set("labels_colors", subinlet) %>%
+    set("labels_colors", zlabs) %>%
     plot(main = "Z-scores", horiz = TRUE)
 
 clust.dist.cor.e[["labels"]] <- str_to_sentence(word(clust.dist.cor.e[["labels"]]))
 dende <- as.dendrogram(clust.dist.cor.e)
 dende %>%
-    #set("labels_colors", subinlet) %>%
+    set("labels_colors", elabs) %>%
     plot(main = "Log escapement", horiz = TRUE)
 
 clust.dist.cor.s[["labels"]] <- str_to_sentence(word(clust.dist.cor.s[["labels"]]))
 dends <- as.dendrogram(clust.dist.cor.s)
 dends %>%
-    #set("labels_colors", subinlet) %>%
+    set("labels_colors", slabs) %>%
     plot(main = "Standardized escapement", horiz = TRUE)
 
 clust.dist.cor.m[["labels"]] <- str_to_sentence(word(clust.dist.cor.m[["labels"]]))
 dendm <- as.dendrogram(clust.dist.cor.m)
 dendm %>%
-    #set("labels_colors", subinlet) %>%
+    set("labels_colors", mlabs) %>%
     plot(main = "Moving average", horiz = TRUE)
 ```
 
@@ -340,6 +416,8 @@ tanglegram(tangle1, lab.cex = .8, margin_inner = 3, main_left = "Z-score",
 
 ```
 
+\newpage
+
 ```{r, Tanglegrams z vs std. esc, echo = FALSE, message = FALSE, warning = FALSE, fig.align = "center", fig.height = 9.5, fig.width = 8.5, fig.cap = "Tanglegram of z-score vs. standardized escapements"}
 
 #png(file = "figures/a06cm_tanglegram_z_v_stdesc.png", width = 2000, height = 3000, pointsize = 36)
@@ -352,6 +430,8 @@ tanglegram(tangle2, lab.cex = .8, margin_inner = 3, main_left = "Z-score",
 
 #dev.off()
 ```
+
+\newpage
 
 ```{r, Tanglegrams z vs m.ave, echo = FALSE, message = FALSE, warning = FALSE, fig.align = "center", fig.height = 9.5, fig.width = 8.5, fig.cap = "Tanglegram of z-score vs. moving average"}
 
@@ -488,7 +568,6 @@ AIC(wea, web, wec, wed)
 
 ```
 
-
 ```{r, Model summary tables, echo = FALSE, warning = FALSE, message = FALSE}
 candidates <- read_csv("data/area 8 chum candidate models.csv")
 
@@ -504,17 +583,22 @@ rpscands$AIC <- rpsaic$AIC
 esccands$df <- escaic$df
 esccands$AIC <- escaic$AIC
 
+```
 
-rpscands %>%
-  kable_paper(full_width = F, html_font = "Courier New") %>%
-  kable_styling(latex_options = "HOLD_position")
+## Table of log RPS candidate models and AIC selection
 
+```{r, Log RPS candidate models and AIC selection, echo = FALSE, warning = FALSE, message = FALSE}
+kable(esccands, format = "latex")
 
-#pl1 <- as_image(rpscands)
+```
 
+\newpage
 
-#esccands %>%
-#  kable_classic(full_width = F, html_font = "Courier New")
+## Table of log escapement candidate models and AIC selection
+
+```{r, Log escapement candidate models and AIC selection, echo = FALSE, warning = FALSE, message = FALSE}
+kable(esccands, format = "latex")
+
 ```
 
 \newpage
