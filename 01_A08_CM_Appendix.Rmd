@@ -112,7 +112,7 @@ ggplot(totrel,aes(x=RELEASE_YEAR,y=totreleases,color=group))+
 ggplot(escdata.filtered,aes(x=Year,y=escapement,color=Enhancement_Rank))+
   geom_point()+geom_line()+theme_bw()+
   facet_wrap(~SYS_NM,ncol=3,scale="free_y")+
-  labs(y="Escapement",color="Enhancement Level",title="Area 6 Escapement (filtered streams)")+
+  labs(y="Escapement",color="Enhancement Level",title="Area 8 Escapement (filtered streams)")+
   theme(legend.position="bottom")
 
 ggsave("figures/area 8 chum escapement filtered streams.png",dpi=600,height=8,width=7)
@@ -211,6 +211,9 @@ ggsave("figures/area 8 chum log rps pre vs post boxplot.png",dpi=600,height=8,wi
 
 rps.clean <- readRDS("RDS/a08cm_rpsclean.rds")
 
+
+
+
 # RPS MODELS
 
 # log rps ~ dist_km_bel + dist_km_mcl
@@ -223,35 +226,79 @@ b <- glm(logrps ~ dist_km_bel + dist_km_mcl + Year + subinlet,
          data = rps.clean)
 summary(b)
 
-# log rps ~ dist_km_bel + dist_km_mcl + Year + subinlet
-c <- glm(logrps ~ dist_km_bel + dist_km_mcl + Year + subinlet, 
+# log rps ~ dist_km_bel + dist_km_mcl + Year + SYS_NM
+c <- glm(logrps ~ dist_km_bel + dist_km_mcl + Year + SYS_NM, 
          data = rps.clean)
 summary(c)
 
-# log rps ~ dist_km_bel + dist_km_mcl + Year + SYS_NM
-d <- glm(logrps ~ dist_km_bel + dist_km_mcl + Year + SYS_NM, 
+# log rps ~ dist_km_bel + dist_km_mcl + Year
+d <- glm(logrps ~ dist_km_bel + dist_km_mcl + Year, 
          data = rps.clean)
 summary(d)
 
+AIC(a, b, c, d)
+
+
+
+
 # ESCAPEMENT MODELS
 
+# log rps ~ dist_km_bel + dist_km_mcl
 ea <- glm(esc.log ~ dist_km_bel + dist_km_mcl, 
          data = rps.clean)
 summary(ea)
 
-eb <- glm(esc.log ~ dist_km_bel + dist_km_mcl + SYS_NM + Year, 
+# log rps ~ dist_km_bel + dist_km_mcl + Year + subinlet
+eb <- glm(esc.log ~ dist_km_bel + dist_km_mcl + Year + subinlet, 
          data = rps.clean)
 summary(eb)
+
+# log rps ~ dist_km_bel + dist_km_mcl + Year + SYS_NM
+ec <- glm(esc.log ~ dist_km_bel + dist_km_mcl + Year + SYS_NM, 
+         data = rps.clean)
+summary(ec)
+
+# log rps ~ dist_km_bel + dist_km_mcl + Year
+ed <- glm(esc.log ~ dist_km_bel + dist_km_mcl + Year, 
+         data = rps.clean)
+summary(ed)
+
+AIC(ea, eb, ec, ed)
+
+
+
+
+
+# WEIGHTED MEAN MODELS
+
+# log rps ~ dist_km_bel + dist_km_mcl
+wa <- glm(logrps ~ wt_dist_bel + wt_dist_mcl, 
+         data = rps.clean)
+summary(wa)
+
+# log rps ~ dist_km_bel + dist_km_mcl + Year + subinlet
+wb <- glm(logrps ~ wt_dist_bel + wt_dist_mcl + Year + subinlet, 
+         data = rps.clean)
+summary(wb)
+
+# log rps ~ dist_km_bel + dist_km_mcl + Year + SYS_NM
+wc <- glm(logrps ~ wt_dist_bel + wt_dist_mcl + Year + SYS_NM, 
+         data = rps.clean)
+summary(wc)
+
+# log rps ~ dist_km_bel + dist_km_mcl + Year
+wd <- glm(logrps ~ wt_dist_bel + wt_dist_mcl + Year, 
+         data = rps.clean)
+summary(wd)
+
+AIC(wa, wb, wc, wd)
+
 ```
 
-```{r, Weighted mean models, echo = FALSE, message = FALSE, warning = FALSE}
-
-
-```
 
 ```{r, Effects plots, message = FALSE, echo = FALSE, warning = FALSE}
 
-effect_plot(eb, pred = SYS_NM, interval = TRUE, plot.points = TRUE, jitter = .25,
-            x.label = "Year", y.label = "Log recruits per spawner")
+effect_plot(wd, pred = releases_mcl, interval = TRUE, plot.points = TRUE)
+
 
 ```
