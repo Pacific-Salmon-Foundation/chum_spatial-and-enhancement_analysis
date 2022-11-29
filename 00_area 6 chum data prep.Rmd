@@ -44,9 +44,9 @@ escdata$escapement[escdata$escapement==0]<-NA
 
 escdata.raw<-escdata%>%filter(SPP=="CM"&Area==6)
 
-write.csv(escdata,"data/area 8 chum escapement data all.csv")
+write.csv(escdata,"data/Area 6 chum escapement data all.csv")
 
-saveRDS(escdata, "RDS/a08cm_escdata.rds")
+saveRDS(escdata, "RDS/a06cm_escdata.rds")
 
 #bubbleplot of escapements for whole area
 ggplot(escdata.raw,aes(x=Year,y=SYS_NM,color=Enhancement_Rank,size=escapement))+
@@ -58,7 +58,7 @@ ggplot(escdata.raw,aes(x=Year,y=SYS_NM,color=Enhancement_Rank,size=escapement))+
   theme(legend.position="bottom")
 
 #unique(escdata.raw$SYS_NM)
-ggsave("figures/area 8 chum escapement all streams.png",dpi=600,height=8,width=7)
+ggsave("figures/Area 6 chum escapement all streams.png",dpi=600,height=8,width=7)
 ```
 
 
@@ -76,7 +76,7 @@ included.stream.list<-escdata.raw%>%
   pivot_wider(names_from="prepost",values_from="notnas")%>%
   filter(Post>n.post&Pre>n.pre)
 
-write.csv(included.stream.list,"data/area 8 chum filtered stream list.csv")
+write.csv(included.stream.list,"data/Area 6 chum filtered stream list.csv")
 
 #add escapement metrics and pre/post field
 escdata.filtered<-escdata.raw%>%filter(SYS_NM%in%included.stream.list$SYS_NM)%>%
@@ -89,9 +89,9 @@ escdata.filtered<-escdata.raw%>%filter(SYS_NM%in%included.stream.list$SYS_NM)%>%
          prepost=case_when(Year<1980~"Pre",
                            Year>=1980~"Post"))
 
-saveRDS(escdata.filtered, "RDS/a08cm_escdata_filtered.rds")
+saveRDS(escdata.filtered, "RDS/a06cm_escdata_filtered.rds")
 
-write.csv(escdata.filtered,"data/area 8 chum escapement data filtered with metrics.csv")
+write.csv(escdata.filtered,"data/Area 6 chum escapement data filtered with metrics.csv")
 
 ggplot(escdata.filtered,aes(x=Year,y=escapement,color=Enhancement_Rank))+
   geom_point()+geom_line()+theme_bw()+
@@ -99,12 +99,12 @@ ggplot(escdata.filtered,aes(x=Year,y=escapement,color=Enhancement_Rank))+
   labs(y="Escapement",color="Enhancement Level",title="Area 6 Escapement (filtered streams)")+
   theme(legend.position="bottom")
 
-ggsave("figures/area 8 chum escapement filtered streams.png",dpi=600,height=8,width=7)
+ggsave("figures/Area 6 chum escapement filtered streams.png",dpi=600,height=8,width=7)
 
 ```
 
 
-```{r releases for area 8}
+```{r releases for Area 6}
 releases.raw<-fread("data/AllSEPReleases_2021-01-21 with otoliths revised.csv")
 
 allreleases <- releases.raw %>%
@@ -143,7 +143,7 @@ idx <- c(1, diff(releases$RELEASE_YEAR))
 i2 <- c(1,which(idx != 1), nrow(releases)+1)
 releases$grp <- rep(1:length(diff(i2)), diff(i2))
 
-saveRDS(releases, "RDS/a08cm_releases.rds")
+saveRDS(releases, "RDS/a06cm_releases.rds")
 
 #plot all releases in area to determine which systems specifically to included
 ggplot(releases,aes(x=RELEASE_YEAR,y=releases,color=RELEASE_STAGE_NAME,group=grp))+
@@ -156,14 +156,14 @@ ggplot(releases,aes(x=RELEASE_YEAR,y=releases,color=RELEASE_STAGE_NAME,group=grp
   theme(legend.position = "bottom",
         plot.title=element_text(size=8),strip.text=element_text(size=8))
 
-#ggsave("figures/releases chum area 8 by CU.png",dpi=600,height=8,width=7)
+#ggsave("figures/releases chum Area 6 by CU.png",dpi=600,height=8,width=7)
 
-#write.csv(releases,"data/releases area 8 chum all.csv")
+#write.csv(releases,"data/releases Area 6 chum all.csv")
 
 ```
 
 
-```{r total releases for area 8 terminal not including mcloughlin bay}
+```{r total releases for Area 6 terminal not including mcloughlin bay}
 #total releases for BC and MB
 releases.BCMB<-releases %>% 
   filter(RELEASE_SITE_NAME%in%c("Fish Cr+Airport Ch","Saloompt R","Snootli Cr","Thorsen Cr/CCST","McLoughlin Bay"))
@@ -199,7 +199,7 @@ totrel<-rbind(totalrel.BC,totalrel.BCMB,totalrel.MB)
 
 totrelwide<-totrel%>%pivot_wider(names_from="group",values_from="totreleases")
 
-write.csv(totrelwide,"data/releases area 8 chum total terminal releases by group.csv")
+write.csv(totrelwide,"data/releases Area 6 chum total terminal releases by group.csv")
 ```
 
 
@@ -207,15 +207,15 @@ write.csv(totrelwide,"data/releases area 8 chum total terminal releases by group
 ggplot(totrel,aes(x=RELEASE_YEAR,y=totreleases,color=group))+
   geom_point()+geom_line()+
   theme_bw()+
-  labs(x="Release Year",y="Total Releases",title="Area 8 Chum total terminal releases (excludes Mcloughlin Bay)")
+  labs(x="Release Year",y="Total Releases",title="Area 6 Chum total terminal releases (excludes Mcloughlin Bay)")
 
-#ggsave("figures/releases chum area 8 total terminal.png",dpi=600,height=6,width=6)
+#ggsave("figures/releases chum Area 6 total terminal.png",dpi=600,height=6,width=6)
 
 #write.csv(totrel,"~/R/PSF hatchery review/analysis/spatial/outputs/Area 25 chum releases totals.csv")
 ```
 
 ``` {r prep rps data}
-escdata<-fread("data/area 8 chum escapement data filtered with metrics.csv")
+escdata<-fread("data/Area 6 chum escapement data filtered with metrics.csv")
 
 age<-fread("data/age and ERs NC CC PSE.csv")
 
@@ -239,9 +239,9 @@ rps.clean<-rps%>%select(Year,SYS_NM,prepost,escapement,r3,r4,r5,recruits,rps,log
   mutate(rpsclean=case_when(exclude=="N"~rps),
          logrpsclean=case_when(exclude=="N"~logrps))
 
-saveRDS(rps.clean, "RDS/a08cm_rpsclean.rds")
+saveRDS(rps.clean, "RDS/a06cm_rpsclean.rds")
 
-write.csv(rps,"data/area 8 chum with rps raw and clean.csv")
+write.csv(rps,"data/Area 6 chum with rps raw and clean.csv")
 
 ```
 
@@ -259,7 +259,7 @@ ggplot(rps.clean,aes(x=Year,y=rps))+
   theme_bw()+
   geom_hline(yintercept=1)
 
-ggsave("figures/releases chum area 8 total terminal.png",dpi=600,height=6,width=6)
+ggsave("figures/releases chum Area 6 total terminal.png",dpi=600,height=6,width=6)
 
 #log rps plots
 names(rps.clean)
@@ -278,38 +278,38 @@ ggplot(logrps,aes(x=Year,y=logrpsclean,color=prepost,group=grp))+
   theme_bw()+
   geom_vline(xintercept=fy,color="seagreen")+
   geom_hline(yintercept=0,linetype="dashed")+
-  labs(x="Brood Year",y="log(Recruits per spawner)",color="Period",title="Area 8 Chum")+
+  labs(x="Brood Year",y="log(Recruits per spawner)",color="Period",title="Area 6 Chum")+
   theme(legend.position="bottom")
 
-ggsave("figures/area 8 chum log rps pre vs post.png",dpi=600,height=8,width=7)
+ggsave("figures/Area 6 chum log rps pre vs post.png",dpi=600,height=8,width=7)
 
 ggplot(logrps,aes( y = SYS_NM, x = logrpsclean, fill = prepost))+
   geom_boxplot(notch=F)+
   scale_fill_brewer(palette="Set1")+
   geom_vline(xintercept=0)+
   theme_bw()+
-  labs(y="System Name",x="log(Recruits per spawner)",title="Area 8 Chum")+
+  labs(y="System Name",x="log(Recruits per spawner)",title="Area 6 Chum")+
   theme(legend.position="bottom")
 
-ggsave("figures/area 8 chum log rps pre vs post boxplot.png",dpi=600,height=8,width=7)
+ggsave("figures/Area 6 chum log rps pre vs post boxplot.png",dpi=600,height=8,width=7)
 
 ```
 
 ```{r, Import and merge stream distances by system and (sub)inlets}
-mcloughlin <- read_csv("data/area 8 chum stream distance from mcloughlin.csv")
-bellacoola <- read_csv("data/area 8 chum stream distance from bella coola.csv")
+mcloughlin <- read_csv("data/Area 6 chum stream distance from mcloughlin.csv")
+bellacoola <- read_csv("data/Area 6 chum stream distance from bella coola.csv")
 
 names(mcloughlin) <- c("SYS_NM", "dist_km_mcl")
 names(bellacoola) <- c("SYS_NM", "dist_km_bel")
 
-rps.clean <- read_csv("data/area 8 chum with rps raw and clean.csv")
-inlets <- read_csv("data/area 8 chum filtered stream list with inlets and distance.csv")
+rps.clean <- read_csv("data/Area 6 chum with rps raw and clean.csv")
+inlets <- read_csv("data/Area 6 chum filtered stream list with inlets and distance.csv")
 
 rps.clean <- merge(mcloughlin, rps.clean, by = "SYS_NM")
 rps.clean <- merge(bellacoola, rps.clean, by = "SYS_NM")
 rps.clean <- merge(inlets, rps.clean, by = "SYS_NM")
 
-saveRDS(rps.clean, "RDS/a08cm_rpsclean.rds")
+saveRDS(rps.clean, "RDS/a06cm_rpsclean.rds")
 ```
 
 ```{r, Prep weighted averages of distances by releases}
@@ -341,5 +341,5 @@ colnames(weightstable_mcl) <- c("SYS_NM", "wt_dist_mcl")
 rps.clean <- merge(weightstable_bel, rps.clean, by = "SYS_NM", all = TRUE)
 rps.clean <- merge(weightstable_mcl, rps.clean, by = "SYS_NM", all = TRUE)
 
-saveRDS(rps.clean, "RDS/a08cm_rpsclean.rds")
+saveRDS(rps.clean, "RDS/a06cm_rpsclean.rds")
 ```
