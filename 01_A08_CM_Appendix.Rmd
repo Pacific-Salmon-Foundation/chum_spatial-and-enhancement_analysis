@@ -17,7 +17,7 @@ editor_options:
 ```{r setup, include=FALSE}
 
 knitr::opts_chunk$set(echo = FALSE, warning = FALSE, message = FALSE)
-
+options(knitr.table.format ='pdf' )
 
 library(tidyverse)
 library(jtools)
@@ -323,7 +323,7 @@ dendm %>%
 
 ## Tanglegrams
 
-```{r, Tanglegrams, echo = FALSE, message = FALSE, warning = FALSE}
+```{r, Tanglegrams z v log, echo = FALSE, message = FALSE, warning = FALSE, fig.align = "center", fig.height = 9.5, fig.width = 8.5, fig.cap = "Tanglegram of z-score vs. logged escapements"}
 
 #png(file = "figures/a06cm_tanglegram_z_v_log.png", width = 2000, height = 3000, pointsize = 36)
 
@@ -338,10 +338,11 @@ tanglegram(tangle1, lab.cex = .8, margin_inner = 3, main_left = "Z-score",
 
 #dev.off()
 
-#png(file = "figures/a06cm_tanglegram_z_v_log.png", width = 2000, height = 3000, pointsize = 36)
+```
 
-par(oma=c(2,2,2,2))
-par(mfrow=c(1,1))
+```{r, Tanglegrams z vs std. esc, echo = FALSE, message = FALSE, warning = FALSE, fig.align = "center", fig.height = 9.5, fig.width = 8.5, fig.cap = "Tanglegram of z-score vs. standardized escapements"}
+
+#png(file = "figures/a06cm_tanglegram_z_v_stdesc.png", width = 2000, height = 3000, pointsize = 36)
 
 tangle2 <- dendlist(dendz, dends)
                                                                                                             
@@ -350,11 +351,11 @@ tanglegram(tangle2, lab.cex = .8, margin_inner = 3, main_left = "Z-score",
            lwd = 2, edge.lwd = 1)
 
 #dev.off()
+```
 
-#png(file = "figures/a06cm_tanglegram_z_v_log.png", width = 2000, height = 3000, pointsize = 36)
+```{r, Tanglegrams z vs m.ave, echo = FALSE, message = FALSE, warning = FALSE, fig.align = "center", fig.height = 9.5, fig.width = 8.5, fig.cap = "Tanglegram of z-score vs. moving average"}
 
-par(oma=c(2,2,2,2))
-par(mfrow=c(1,1))
+#png(file = "figures/a06cm_tanglegram_z_v_mave.png", width = 2000, height = 3000, pointsize = 36)
 
 tangle3 <- dendlist(dendz, dendm)
                                                                                                             
@@ -365,7 +366,6 @@ tanglegram(tangle3, lab.cex = .8, margin_inner = 3, main_left = "Z-score",
 #dev.off()
 
 ```
-
 
 \newpage
 
@@ -505,9 +505,9 @@ esccands$df <- escaic$df
 esccands$AIC <- escaic$AIC
 
 
-#rpscands %>%
-#  kable_paper(full_width = F, html_font = "Courier New") %>%
-#  kable_styling(latex_options = "HOLD_position")
+rpscands %>%
+  kable_paper(full_width = F, html_font = "Courier New") %>%
+  kable_styling(latex_options = "HOLD_position")
 
 
 #pl1 <- as_image(rpscands)
