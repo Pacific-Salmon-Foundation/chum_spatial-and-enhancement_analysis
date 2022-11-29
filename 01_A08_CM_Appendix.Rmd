@@ -365,7 +365,7 @@ mlabs <- mlabs$colour
 
 ## Dendrogram clusters analysis
 
-```{r, Dendrogram plots, echo = FALSE, message = FALSE, warning = FALSE, fig.align = "center", fig.height = 9.5, fig.width = 8.5, fig.cap = "Dendrogram cluster analysis to compare uses of different metrics."}
+```{r, Dendrogram plots, echo = FALSE, message = FALSE, warning = FALSE, fig.align = "center", fig.height = 9.5, fig.width = 8.5, fig.cap = "Dendrogram cluster analysis to compare uses of different metrics. Colours represent different subinlets; Bella Coola = red; Dean = blue; Kimsquit = green; Martin = yellow; Sagar = black"}
 
 par(oma=c(0,0,0,0))
 par(mfrow=c(2,2))
@@ -470,17 +470,13 @@ b <- glm(logrps ~ dist_km_bel + dist_km_mcl + Year + subinlet,
          data = rps.clean)
 summary(b)
 
-# log rps ~ dist_km_bel + dist_km_mcl + Year + SYS_NM
-c <- glm(logrps ~ dist_km_bel + dist_km_mcl + Year + SYS_NM, 
-         data = rps.clean)
-summary(c)
 
 # log rps ~ dist_km_bel + dist_km_mcl + Year
 d <- glm(logrps ~ dist_km_bel + dist_km_mcl + Year, 
          data = rps.clean)
 summary(d)
 
-AIC(a, b, c, d)
+AIC(a, b, d)
 
 
 
@@ -497,17 +493,13 @@ eb <- glm(esc.log ~ dist_km_bel + dist_km_mcl + Year + subinlet,
          data = rps.clean)
 summary(eb)
 
-# log rps ~ dist_km_bel + dist_km_mcl + Year + SYS_NM
-ec <- glm(esc.log ~ dist_km_bel + dist_km_mcl + Year + SYS_NM, 
-         data = rps.clean)
-summary(ec)
 
 # log rps ~ dist_km_bel + dist_km_mcl + Year
 ed <- glm(esc.log ~ dist_km_bel + dist_km_mcl + Year, 
          data = rps.clean)
 summary(ed)
 
-AIC(ea, eb, ec, ed)
+AIC(ea, eb, ed)
 
 
 
@@ -525,17 +517,12 @@ wb <- glm(logrps ~ wt_dist_bel + wt_dist_mcl + Year + subinlet,
          data = rps.clean)
 summary(wb)
 
-# log rps ~ dist_km_bel + dist_km_mcl + Year + SYS_NM
-wc <- glm(logrps ~ wt_dist_bel + wt_dist_mcl + Year + SYS_NM, 
-         data = rps.clean)
-summary(wc)
-
 # log rps ~ dist_km_bel + dist_km_mcl + Year
 wd <- glm(logrps ~ wt_dist_bel + wt_dist_mcl + Year, 
          data = rps.clean)
 summary(wd)
 
-AIC(wa, wb, wc, wd)
+AIC(wa, wb, wd)
 
 
 
@@ -544,44 +531,44 @@ AIC(wa, wb, wc, wd)
 
 # ESCAPEMENT MODELS ON WEIGHTED DISTANCE
 
-# log rps ~ dist_km_bel + dist_km_mcl
+# log esc ~ dist_km_bel + dist_km_mcl
 wea <- glm(esc.log ~ wt_dist_bel + wt_dist_mcl, 
          data = rps.clean)
 summary(wea)
 
-# log rps ~ dist_km_bel + dist_km_mcl + Year + subinlet
+# log esc ~ dist_km_bel + dist_km_mcl + Year + subinlet
 web <- glm(esc.log ~ wt_dist_bel + wt_dist_mcl + Year + subinlet, 
          data = rps.clean)
 summary(web)
 
-# log rps ~ dist_km_bel + dist_km_mcl + Year + SYS_NM
-wec <- glm(esc.log ~ wt_dist_bel + wt_dist_mcl + Year + SYS_NM, 
-         data = rps.clean)
-summary(wec)
 
-# log rps ~ dist_km_bel + dist_km_mcl + Year
+# log esc ~ dist_km_bel + dist_km_mcl + Year
 wed <- glm(esc.log ~ wt_dist_bel + wt_dist_mcl + Year, 
          data = rps.clean)
 summary(wed)
 
-AIC(wea, web, wec, wed)
+AIC(wea, web,wed)
 
 ```
 
 ```{r, Model summary tables, echo = FALSE, warning = FALSE, message = FALSE}
 candidates <- read_csv("data/area 8 chum candidate models.csv")
 
-rpscands <- as.data.frame(rbind(candidates[1:4,], candidates[9:12,]))
-esccands <- as.data.frame(rbind(candidates[5:8,], candidates[13:16,]))
+rpscands <- as.data.frame(rbind(candidates[1:3,], candidates[7:9,]))
+esccands <- as.data.frame(rbind(candidates[4:6,], candidates[10:12,]))
 
-rpsaic <- AIC(a, b, c, d, wa, wb, wc, wd)
-escaic <- AIC(ea, eb, ec, ed, wea, web, wec, wed)
+rpsaic <- AIC(a, b, d, wa, wb, wd)
+escaic <- AIC(ea, eb, ed, wea, web, wed)
 
 rpscands$df <- rpsaic$df
 rpscands$AIC <- rpsaic$AIC
+rpscands <- rpscands %>%
+  arrange(AIC)
 
 esccands$df <- escaic$df
 esccands$AIC <- escaic$AIC
+esccands <- esccands %>%
+  arrange(AIC)
 
 ```
 
@@ -603,9 +590,20 @@ kable(esccands, format = "latex")
 
 \newpage
 
-```{r, Effects plots, message = FALSE, echo = FALSE, warning = FALSE}
+## Effects plot of log escapements against weighted distance from Bella Coola
 
-#effect_plot(wd, pred = releases_mcl, interval = TRUE, plot.points = TRUE)
+```{r, Effects plot of log escapements against distance from Bella Coola, message = FALSE, echo = FALSE, warning = FALSE}
 
+effect_plot(web, pred = wt_dist_bel, interval = TRUE, plot.points = TRUE, x.label = "Weighted distance from Bella Coola (km)", y.label = "Log escapement")
+
+```
+
+\newpage
+
+## Effects plot of log escapements against weighted distance from McLoughlin
+
+```{r, Effects plot of log escapements against distance from McLoughlin, message = FALSE, echo = FALSE, warning = FALSE}
+
+effect_plot(web, pred = wt_dist_mcl, interval = TRUE, plot.points = TRUE, x.label = "Weighted distance from McLoughlin (km)", y.label = "Log escapement")
 
 ```
