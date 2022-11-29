@@ -1,0 +1,7 @@
+Candidate models
+log escapement ~ distance from enhancement + year
+log escapement ~ distance from enhancement + total releases + year
+log escapement ~ correlation coefficient + total releases + year
+log escapement ~ correlation coefficient + total releases + inlet + year
+log escapement ~ correlation coefficient + total releases + subinlet + year
+log escapement ~ correlation coefficient + distance from enhancement + total releases + year

@@ -1,0 +1,11 @@
+Candidate model
+log rps ~ distance from enhancement + year
+log rps ~ distance from enhancement + total releases + year
+log rps ~ total releases + year
+logrps ~ total releases + factor(year)
+logrps ~ total releases + factor(year) + year
+logrps ~ total releases + year + system name
+logrps ~ total releases + year + subinlet
+logrps ~ correlation coefficient + year
+logrps ~ correlation coefficient + year + system name
+logrps ~ correlation coefficient + year + total releases
