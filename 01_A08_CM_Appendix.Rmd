@@ -457,6 +457,8 @@ rps.clean <- readRDS("RDS/a08cm_rpsclean.rds")
 
 rps.clean$SYS_NM <- as.factor(rps.clean$SYS_NM)
 rps.clean$subinlet <- as.factor(rps.clean$subinlet)
+rps.clean$releases_mcl[is.na(rps.clean$releases_mcl)] <- 0
+rps.clean$releases_bel[is.na(rps.clean$releases_bel)] <- 0
 
 # RPS MODELS
 
@@ -499,6 +501,8 @@ ed <- glm(esc.log ~ dist_km_bel + dist_km_mcl + Year,
          data = rps.clean)
 summary(ed)
 
+
+
 AIC(ea, eb, ed)
 
 
@@ -522,7 +526,11 @@ wd <- glm(logrps ~ wt_dist_bel + wt_dist_mcl + Year,
          data = rps.clean)
 summary(wd)
 
-AIC(wa, wb, wd)
+wx <- glm(logrps ~ dist_km_bel + dist_km_mcl + releases_mcl + releases_bel + Year, 
+         data = rps.clean)
+summary(wx)
+
+AIC(wa, wb, wd, wx)
 
 
 
@@ -547,18 +555,23 @@ wed <- glm(esc.log ~ wt_dist_bel + wt_dist_mcl + Year,
          data = rps.clean)
 summary(wed)
 
-AIC(wea, web,wed)
+
+wex <- glm(esc.log ~ wt_dist_bel + wt_dist_mcl + releases_mcl + releases_bel + Year,
+           data = rps.clean)
+
+summary(wex)
+AIC(wea, web,wed, wex)
 
 ```
 
 ```{r, Model summary tables, echo = FALSE, warning = FALSE, message = FALSE}
 candidates <- read_csv("data/area 8 chum candidate models.csv")
 
-rpscands <- as.data.frame(rbind(candidates[1:3,], candidates[7:9,]))
-esccands <- as.data.frame(rbind(candidates[4:6,], candidates[10:12,]))
+rpscands <- as.data.frame(rbind(candidates[1:3,], candidates[7:10,]))
+esccands <- as.data.frame(rbind(candidates[4:6,], candidates[11:14,]))
 
-rpsaic <- AIC(a, b, d, wa, wb, wd)
-escaic <- AIC(ea, eb, ed, wea, web, wed)
+rpsaic <- AIC(a, b, d, wa, wb, wd, wx)
+escaic <- AIC(ea, eb, ed, wea, web, wed, wex)
 
 rpscands$df <- rpsaic$df
 rpscands$AIC <- rpsaic$AIC
@@ -575,7 +588,7 @@ esccands <- esccands %>%
 ## Table of log RPS candidate models and AIC selection
 
 ```{r, Log RPS candidate models and AIC selection, echo = FALSE, warning = FALSE, message = FALSE}
-kable(esccands, format = "latex")
+kable(rpscands, format = "latex")
 
 ```
 
@@ -588,6 +601,25 @@ kable(esccands, format = "latex")
 
 ```
 
+\newpage
+
+## Effects plot of log RPS against releases from Bella Coola
+
+```{r, Effects plot of log RPS against releases from Bella Coola, message = FALSE, echo = FALSE, warning = FALSE}
+
+effect_plot(wx, pred = releases_bel, interval = TRUE, plot.points = TRUE, x.label = "Releases from Bella Coola", y.label = "Log escapement")
+
+```
+
+\newpage
+
+## Effects plot of log RPS against releases from McLoughlin
+
+```{r, Effects plot of log RPS against releases from McLoughlin, message = FALSE, echo = FALSE, warning = FALSE}
+
+effect_plot(wx, pred = releases_mcl, interval = TRUE, plot.points = TRUE, x.label = "Releases from McLoughlin", y.label = "Log escapement")
+
+```
 \newpage
 
 ## Effects plot of log escapements against weighted distance from Bella Coola
