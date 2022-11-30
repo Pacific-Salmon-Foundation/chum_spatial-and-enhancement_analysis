@@ -472,7 +472,7 @@ tanglegram(tangle3, lab.cex = .8, margin_inner = 3, main_left = "Z-score",
 
 \newpage
 
-```{r, Tanglegrams z vs logRPS, echo = FALSE, message = FALSE, warning = FALSE, fig.align = "center", fig.height = 9.5, fig.width = 8.5, fig.cap = "Tanglegram of z-score vs. moving average"}
+```{r, Tanglegrams z vs logRPS, echo = FALSE, message = FALSE, warning = FALSE, fig.align = "center", fig.height = 9.5, fig.width = 8.5, fig.cap = "Tanglegram of z-score vs. Log RPS"}
 
 #png(file = "figures/a06cm_tanglegram_z_v_mave.png", width = 2000, height = 3000, pointsize = 36)
 
