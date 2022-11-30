@@ -37,8 +37,8 @@ getridofggplotlinesbetweenpoints<-function(data,colstokeep,yearcolumnname) {
 ```{r load prep data, echo=FALSE,message=FALSE,warning=FALSE}
 #load escapement data and remove 0's
 
-escdata<-fread("data/all nuseds with enhancement rankings.csv")%>%
-  select(-V1)
+escdata<- read_csv("data/all nuseds with enhancement rankings.csv")%>%
+  select(-Column1)
 
 escdata$escapement[escdata$escapement==0]<-NA
 unique(escdata$CU_name)
@@ -180,10 +180,8 @@ ggplot(totrel,aes(x=RELEASE_YEAR,y=totreleases,color=group))+
 ```
 
 ``` {r prep rps data}
-escdata<-readRDS("RDS/douglasgardner-cm_escdata_filtered.rds")
-  
- # fread("data/douglas-gardner chum escapement data filtered with metrics.csv")
-
+escdata<- read_csv("data/douglas-gardner chum escapement data filtered with metrics.csv")
+escdata<-fread("data/douglas-gardner chum escapement data filtered with metrics.csv")
 age<-fread("data/age and ERs NC CC PSE.csv")
 
 ageERs<-age%>%filter(SpeciesId=="CM",CU_Name=="Douglas-Gardner")%>%select(Year=BroodYear,`Total ER`,p3=Age3,p4=Age4,p5=Age5)
@@ -200,7 +198,7 @@ rps<-merge(escdata,ageERs,by="Year")%>%
          rps=replace(rps,rps==0,NA),
          logrps=log(rps))
 
-rps.clean<-rps%>%select(Year,SYS_NM,prepost,escapement,r3,r4,r5,recruits,esc.log,z,m.ave,esc.stand,rps,logrps)%>%
+rps.clean<-rps%>%select(Year,SYS_NM,prepost,escapement,r3,r4,r5,z, m.ave, esc.log,esc.stand,recruits,rps,logrps)%>%
   mutate(rps=replace(rps,rps>100,NA))%>%
   mutate(exclude=ifelse(is.na(r3)|is.na(r4)|is.na(r5)|rps>50,"Y","N"))%>%
   mutate(rpsclean=case_when(exclude=="N"~rps),
