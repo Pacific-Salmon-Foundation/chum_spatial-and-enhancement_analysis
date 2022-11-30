@@ -330,7 +330,7 @@ dendclust.m <- dendro_data(clust.dist.cor.m)
 
 ```
 
-```{r, Correlation plots by metric, echo = FALSE, message = FALSE, error = FALSE, fig.align = "center", fig.height = 7, fig.width = 8.5, fig.cap = "Cross correlation plots to compare metrics."}
+```{r, Correlation plots by metric, echo = FALSE, message = FALSE, error = FALSE, fig.align = "center", fig.height = 7.5, fig.width = 8.5, fig.cap = "Cross correlation plots to compare metrics."}
 par(oma=c(0,0,0,0))
 par(mfrow=c(2,2))
 
