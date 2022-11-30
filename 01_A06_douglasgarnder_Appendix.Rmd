@@ -83,6 +83,7 @@ totalrel.DG <- releases.DG %>%
   mutate(group="Douglas Gardner CU")
 
 write.csv(totalrel.DG,"data/releases area 6 chum total terminal releases.csv")
+saveRDS(totalrel.DG, "RDS/a06cm_totrel.rds")
 
 ggplot(totalrel.DG,aes(x=RELEASE_YEAR,y=totreleases,color=group))+
   geom_point()+geom_line()+
@@ -258,7 +259,7 @@ ggsave("figures/area 6 chum log rps pre vs post boxplot.png",dpi=600,height=8,wi
 
 ```{r, Kable of distances by inlet, echo = FALSE, warning = FALSE, message = FALSE, fig.align="center", fig.height = 7, fig.width = 7}
 
-streaminlet <- fread("data/douglas gardner stream distances.csv")
+streaminlet <- read_csv("data/douglas gardner stream distances.csv")
 streaminlet <- streaminlet[,2:3]
 
 colnames(streaminlet) <- c("Stream", "Dist. from enhancement")
@@ -434,6 +435,13 @@ streams <- streaminlet
 colnames(streams) <- c("SYS_NM", "dist")
 rps.clean <- merge(rps.clean, streams, by = "SYS_NM", all = TRUE)
 
+totrel <- readRDS("RDS/a06cm_totrel.rds")
+totrel <- totrel[,1:2]
+colnames(totrel) <- c("Year", "totrel")
+
+rps.clean <- merge(rps.clean, totrel, by = "Year", all = TRUE)
+rps.clean$totrel[is.na(rps.clean$totrel)] <- 0
+
 # RPS MODELS
 
 a <- glm(logrps ~ dist, 
@@ -444,12 +452,23 @@ b <- glm(logrps ~ Year,
          data = rps.clean)
 summary(b)
 
-c <- glm(logrps ~ dist + Year, 
+c <- glm(logrps ~ totrel, 
          data = rps.clean)
 summary(c)
 
+d <- glm(logrps ~ dist + Year,
+         data = rps.clean)
+summary(d)
 
-AIC(a, b, c)
+e <- glm(logrps ~ dist + totrel,
+         data = rps.clean)
+summary(e)
+
+f <- glm(logrps ~ dist + totrel + Year,
+         data = rps.clean)
+summary(f)
+
+AIC(a, b, c, d, e, f)
 
 
 # ESCAPEMENT MODELS
@@ -462,14 +481,23 @@ eb <- glm(esc.log ~ Year,
          data = rps.clean)
 summary(eb)
 
-
-ec <- glm(esc.log ~ dist + Year, 
+ec <- glm(esc.log ~ totrel, 
          data = rps.clean)
 summary(ec)
 
+ed <- glm(esc.log ~ dist + Year,
+         data = rps.clean)
+summary(ed)
 
+ee <- glm(esc.log ~ dist + totrel,
+         data = rps.clean)
+summary(ee)
 
-AIC(ea, eb, ec)
+ef <- glm(esc.log ~ dist + totrel + Year,
+         data = rps.clean)
+summary(ef)
+
+AIC(ea, eb, ec, ed, ee, ef)
 
 
 
@@ -478,11 +506,11 @@ AIC(ea, eb, ec)
 ```{r, Model summary tables, echo = FALSE, warning = FALSE, message = FALSE}
 candidates <- read_csv("data/area 6 chum candidate models.csv")
 
-rpscands <- as.data.frame(rbind(candidates[1:3,], candidates[7:10,]))
-esccands <- as.data.frame(rbind(candidates[4:6,], candidates[11:14,]))
+rpscands <- as.data.frame(rbind(candidates[1:6,]))
+esccands <- as.data.frame(rbind(candidates[7:12,]))
 
-rpsaic <- AIC(a, b, d, wa, wb, wd, wx)
-escaic <- AIC(ea, eb, ed, wea, web, wed, wex)
+rpsaic <- AIC(a, b, c, d, e, f)
+escaic <- AIC(ea, eb, ec, ed, ee, ef)
 
 rpscands$df <- rpsaic$df
 rpscands$AIC <- rpsaic$AIC
@@ -518,7 +546,7 @@ kable(esccands, format = "latex")
 
 ```{r, Effects plot of log RPS against releases from Bella Coola, message = FALSE, echo = FALSE, warning = FALSE}
 
-effect_plot(wx, pred = releases_bel, interval = TRUE, plot.points = TRUE, x.label = "Releases from Bella Coola", y.label = "Log recruits per spawner")
+
 
 ```
 
@@ -528,7 +556,7 @@ effect_plot(wx, pred = releases_bel, interval = TRUE, plot.points = TRUE, x.labe
 
 ```{r, Effects plot of log RPS against releases from McLoughlin, message = FALSE, echo = FALSE, warning = FALSE}
 
-effect_plot(wx, pred = releases_mcl, interval = TRUE, plot.points = TRUE, x.label = "Releases from McLoughlin", y.label = "Log recruits per spawner")
+
 
 ```
 \newpage
@@ -537,7 +565,6 @@ effect_plot(wx, pred = releases_mcl, interval = TRUE, plot.points = TRUE, x.labe
 
 ```{r, Effects plot of log escapements against distance from Bella Coola, message = FALSE, echo = FALSE, warning = FALSE}
 
-effect_plot(web, pred = wt_dist_bel, interval = TRUE, plot.points = TRUE, x.label = "Weighted distance from Bella Coola (km)", y.label = "Log escapement")
 
 ```
 
@@ -547,6 +574,6 @@ effect_plot(web, pred = wt_dist_bel, interval = TRUE, plot.points = TRUE, x.labe
 
 ```{r, Effects plot of log escapements against distance from McLoughlin, message = FALSE, echo = FALSE, warning = FALSE}
 
-effect_plot(web, pred = wt_dist_mcl, interval = TRUE, plot.points = TRUE, x.label = "Weighted distance from McLoughlin (km)", y.label = "Log escapement")
+
 
 ```
