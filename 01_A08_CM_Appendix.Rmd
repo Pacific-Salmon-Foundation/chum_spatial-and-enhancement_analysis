@@ -40,6 +40,13 @@ rps.clean <- readRDS("RDS/a08cm_rpsclean.rds")
 
 ```
 
+\newpage
+
+# Study area
+
+## Area 8
+
+![](figures/Area 8 stream distances.png)
 
 \newpage
 
