@@ -145,7 +145,9 @@ ggplot(releases.raw, aes(x = RELEASE_YEAR, y = totreleases/1000000)) +
   geom_line() + 
   geom_smooth() + 
   xlab("Year") + 
-  ylab("Total A25 chum salmon releases (millions)")
+  ylab("Total A25 chum salmon releases (millions)") +
+  theme_bw() +
+  scale_fill_grey()
 
 ```
 
