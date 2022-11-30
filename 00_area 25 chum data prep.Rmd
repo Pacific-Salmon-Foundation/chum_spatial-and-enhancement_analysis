@@ -189,6 +189,8 @@ rps.clean<-rps%>%select(Year,SYS_NM,prepost,escapement,r3,r4,r5,recruits,rps,log
   mutate(rpsclean=case_when(exclude=="N"~rps),
          logrpsclean=case_when(exclude=="N"~logrps))
 
+saveRDS(rps.clean, "RDS/a25cm_rps.clean.rds")
+
 write.csv(rps.clean,"data/area 25 chum rps raw and clean.csv")
 
 
