@@ -43,6 +43,14 @@ rps.clean <- readRDS("RDS/douglas-gardner_cm_rpsclean.rds")
 
 \newpage
 
+# Study area
+
+## Douglas Gardner CU
+
+![](figures/Douglas gardner chum distances.png)
+
+\newpage
+
 # Summary statistics
 
 ## Bubbleplot of escapement by enhancement rank
