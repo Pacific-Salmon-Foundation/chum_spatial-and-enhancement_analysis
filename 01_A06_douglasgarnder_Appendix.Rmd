@@ -284,6 +284,10 @@ kable(streaminlet, format = "latex")
 ```{r, Correlation analyses, echo = FALSE, message = FALSE, warning = FALSE}
 
 rps.clean <- readRDS("RDS/douglas-gardner_cm_rpsclean.rds")
+inlets <- read_csv("data/douglas-gardner subinlets.csv")
+
+rps.clean <- merge(inlets, rps.clean, by = "SYS_NM")
+
 #escdata.filtered <- readRDS("RDS/douglasgardner-cm_escdata_filtered.rds") %>%
 #  select(SYS_NM, Year, esc.log, z, m.ave, esc.stand)
 
@@ -373,11 +377,118 @@ corrplot(cor.rpslog, diag = FALSE, order="hclust", method="square", tl.col="blac
 
 ```
 
+```{r, Make colour vectors for dendrogram inlets, message=FALSE, warning=FALSE, echo=FALSE, include = FALSE}
+
+zlabs <- as.data.frame(dendclust.z[["labels"]][["label"]])
+colnames(zlabs) <- "SYS_NM"
+zlabs$order <- c(1:length(zlabs$SYS_NM))
+zlabs <- merge(zlabs, rps.clean, by = "SYS_NM")
+zlabs <- zlabs %>%
+  select(SYS_NM, order, subinlet)
+zlabs <- distinct(zlabs)
+zlabcols <- as.data.frame(unique(zlabs$subinlet))
+colnames(zlabcols) <- "subinlet"
+zlabcols <- zlabcols %>%
+  arrange(subinlet)
+zlabcols$colour <- c("red", "blue", "green", "goldenrod", "black", "turquoise1")
+zlabs <- merge(zlabcols, zlabs, by = "subinlet")
+zlabs <- zlabs %>%
+  arrange(order)
+zlabs <- zlabs$colour
+
+elabs <- as.data.frame(dendclust.e[["labels"]][["label"]])
+colnames(elabs) <- "SYS_NM"
+elabs$order <- c(1:length(elabs$SYS_NM))
+elabs <- merge(elabs, rps.clean, by = "SYS_NM")
+elabs <- elabs %>%
+  select(SYS_NM, order, subinlet)
+elabs <- distinct(elabs)
+elabcols <- as.data.frame(unique(elabs$subinlet))
+colnames(elabcols) <- "subinlet"
+elabcols <- elabcols %>%
+  arrange(subinlet)
+elabcols$colour <- c("red", "blue", "green", "goldenrod", "black", "turquoise1")
+elabs <- merge(elabcols, elabs, by = "subinlet")
+elabs <- elabs %>%
+  arrange(order)
+elabs <- elabs$colour
+
+slabs <- as.data.frame(dendclust.s[["labels"]][["label"]])
+colnames(slabs) <- "SYS_NM"
+slabs$order <- c(1:length(slabs$SYS_NM))
+slabs <- merge(slabs, rps.clean, by = "SYS_NM")
+slabs <- slabs %>%
+  select(SYS_NM, order, subinlet)
+slabs <- distinct(slabs)
+slabcols <- as.data.frame(unique(slabs$subinlet))
+colnames(slabcols) <- "subinlet"
+slabcols <- slabcols %>%
+  arrange(subinlet)
+slabcols$colour <- c("red", "blue", "green", "goldenrod", "black", "turquoise1")
+slabs <- merge(slabcols, slabs, by = "subinlet")
+slabs <- slabs %>%
+  arrange(order)
+slabs <- slabs$colour
+
+mlabs <- as.data.frame(dendclust.m[["labels"]][["label"]])
+colnames(mlabs) <- "SYS_NM"
+mlabs$order <- c(1:length(mlabs$SYS_NM))
+mlabs <- merge(mlabs, rps.clean, by = "SYS_NM")
+mlabs <- mlabs %>%
+  select(SYS_NM, order, subinlet)
+mlabs <- distinct(mlabs)
+mlabcols <- as.data.frame(unique(mlabs$subinlet))
+colnames(mlabcols) <- "subinlet"
+mlabcols <- mlabcols %>%
+  arrange(subinlet)
+mlabcols$colour <- c("red", "blue", "green", "goldenrod", "black", "turquoise1")
+mlabs <- merge(mlabcols, mlabs, by = "subinlet")
+mlabs <- mlabs %>%
+  arrange(order)
+mlabs <- mlabs$colour
+
+rpslabs <- as.data.frame(dendclust.rps[["labels"]][["label"]])
+colnames(rpslabs) <- "SYS_NM"
+rpslabs$order <- c(1:length(rpslabs$SYS_NM))
+rpslabs <- merge(rpslabs, rps.clean, by = "SYS_NM")
+rpslabs <- rpslabs %>%
+  select(SYS_NM, order, subinlet)
+rpslabs <- distinct(rpslabs)
+rpslabcols <- as.data.frame(unique(rpslabs$subinlet))
+colnames(rpslabcols) <- "subinlet"
+rpslabcols <- rpslabcols %>%
+  arrange(subinlet)
+rpslabcols$colour <- c("red", "blue", "green", "goldenrod", "black", "turquoise1")
+rpslabs <- merge(rpslabcols, rpslabs, by = "subinlet")
+rpslabs <- rpslabs %>%
+  arrange(order)
+rpslabs <- rpslabs$colour
+
+
+rpsloglabs <- as.data.frame(dendclust.rpslog[["labels"]][["label"]])
+colnames(rpsloglabs) <- "SYS_NM"
+rpsloglabs$order <- c(1:length(rpsloglabs$SYS_NM))
+rpsloglabs <- merge(rpsloglabs, rps.clean, by = "SYS_NM")
+rpsloglabs <- rpsloglabs %>%
+  select(SYS_NM, order, subinlet)
+rpsloglabs <- distinct(rpsloglabs)
+rpsloglabcols <- as.data.frame(unique(rpsloglabs$subinlet))
+colnames(rpsloglabcols) <- "subinlet"
+rpsloglabcols <- rpsloglabcols %>%
+  arrange(subinlet)
+rpsloglabcols$colour <- c("red", "blue", "green", "goldenrod", "black", "turquoise1")
+rpsloglabs <- merge(rpsloglabcols, rpsloglabs, by = "subinlet")
+rpsloglabs <- rpsloglabs %>%
+  arrange(order)
+rpsloglabs <- rpsloglabs$colour
+
+```
+
 \newpage
 
 ## Dendrogram clusters analysis
 
-```{r, Dendrogram plots, echo = FALSE, message = FALSE, warning = FALSE,  fig.align = "center", fig.height = 9.5, fig.width = 8.5, fig.cap = "Dendrogram cluster analysis to compare uses of different metrics."}
+```{r, Dendrogram plots, echo = FALSE, message = FALSE, warning = FALSE,  fig.align = "center", fig.height = 9.5, fig.width = 8.5, fig.cap = "Dendrogram cluster analysis to compare uses of different metrics. Colours plotted by subinlet; Dala = red; Douglas = blue; Kemano = green; Khutze = yellow; Kitimat arm = black; Quaal = turquoise"}
 
 par(oma=c(0,0,0,0))
 par(mfrow=c(3,2))
@@ -385,37 +496,37 @@ par(mfrow=c(3,2))
 clust.dist.cor.z[["labels"]] <- str_to_sentence(word(clust.dist.cor.z[["labels"]]))
 dendz <- as.dendrogram(clust.dist.cor.z)
 dendz %>%
-    #set("labels_colors", zlabs) %>%
+    set("labels_colors", zlabs) %>%
     plot(main = "Z-scores", horiz = TRUE)
 
 clust.dist.cor.e[["labels"]] <- str_to_sentence(word(clust.dist.cor.e[["labels"]]))
 dende <- as.dendrogram(clust.dist.cor.e)
 dende %>%
-    #set("labels_colors", elabs) %>%
+    set("labels_colors", elabs) %>%
     plot(main = "Log escapement", horiz = TRUE)
 
 clust.dist.cor.s[["labels"]] <- str_to_sentence(word(clust.dist.cor.s[["labels"]]))
 dends <- as.dendrogram(clust.dist.cor.s)
 dends %>%
-    #set("labels_colors", slabs) %>%
+    set("labels_colors", slabs) %>%
     plot(main = "Standardized escapement", horiz = TRUE)
 
 clust.dist.cor.m[["labels"]] <- str_to_sentence(word(clust.dist.cor.m[["labels"]]))
 dendm <- as.dendrogram(clust.dist.cor.m)
 dendm %>%
-    #set("labels_colors", mlabs) %>%
+    set("labels_colors", mlabs) %>%
     plot(main = "Moving average", horiz = TRUE)
 
 clust.dist.cor.rps[["labels"]] <- str_to_sentence(word(clust.dist.cor.rps[["labels"]]))
 dendrps <- as.dendrogram(clust.dist.cor.rps)
 dendrps %>%
-    #set("labels_colors", rpslabs) %>%
+    set("labels_colors", rpslabs) %>%
     plot(main = "RPS", horiz = TRUE)
 
 clust.dist.cor.rpslog[["labels"]] <- str_to_sentence(word(clust.dist.cor.rpslog[["labels"]]))
 dendrpslog <- as.dendrogram(clust.dist.cor.rpslog)
 dendrpslog %>%
-    #set("labels_colors", rpsloglabs) %>%
+    set("labels_colors", rpsloglabs) %>%
     plot(main = "Log RPS", horiz = TRUE)
 ```
 \newpage
