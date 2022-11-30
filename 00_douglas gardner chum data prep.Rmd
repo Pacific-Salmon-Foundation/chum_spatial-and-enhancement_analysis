@@ -180,7 +180,9 @@ ggplot(totrel,aes(x=RELEASE_YEAR,y=totreleases,color=group))+
 ```
 
 ``` {r prep rps data}
-escdata<-fread("data/douglas-gardner chum escapement data filtered with metrics.csv")
+escdata<-readRDS("RDS/douglasgardner-cm_escdata_filtered.rds")
+  
+ # fread("data/douglas-gardner chum escapement data filtered with metrics.csv")
 
 age<-fread("data/age and ERs NC CC PSE.csv")
 
@@ -198,7 +200,7 @@ rps<-merge(escdata,ageERs,by="Year")%>%
          rps=replace(rps,rps==0,NA),
          logrps=log(rps))
 
-rps.clean<-rps%>%select(Year,SYS_NM,prepost,escapement,r3,r4,r5,recruits,rps,logrps)%>%
+rps.clean<-rps%>%select(Year,SYS_NM,prepost,escapement,r3,r4,r5,recruits,esc.log,z,m.ave,esc.stand,rps,logrps)%>%
   mutate(rps=replace(rps,rps>100,NA))%>%
   mutate(exclude=ifelse(is.na(r3)|is.na(r4)|is.na(r5)|rps>50,"Y","N"))%>%
   mutate(rpsclean=case_when(exclude=="N"~rps),
@@ -224,7 +226,7 @@ ggplot(rps.clean,aes(x=Year,y=rps))+
   theme_bw()+
   geom_hline(yintercept=1)
 
-ggsave("figures/rps chum  douglas-gardner total terminal.png",dpi=600,height=9,width=6)
+ggsave("figures/rps chum douglas-gardner total terminal.png",dpi=600,height=9,width=6)
 
 #log rps plots
 names(rps.clean)
@@ -261,50 +263,8 @@ ggsave("figures/area 8 chum log rps pre vs post boxplot.png",dpi=600,height=8,wi
 ```
 
 ```{r, Import and merge stream distances by system and (sub)inlets}
-mcloughlin <- read_csv("data/area 8 chum stream distance from mcloughlin.csv")
-bellacoola <- read_csv("data/area 8 chum stream distance from bella coola.csv")
 
-names(mcloughlin) <- c("SYS_NM", "dist_km_mcl")
-names(bellacoola) <- c("SYS_NM", "dist_km_bel")
 
-rps.clean <- read_csv("data/area 8 chum with rps raw and clean.csv")
-inlets <- read_csv("data/area 8 chum filtered stream list with inlets and distance.csv")
-
-rps.clean <- merge(mcloughlin, rps.clean, by = "SYS_NM")
-rps.clean <- merge(bellacoola, rps.clean, by = "SYS_NM")
-rps.clean <- merge(inlets, rps.clean, by = "SYS_NM")
-
-saveRDS(rps.clean, "RDS/a08cm_rpsclean.rds")
 ```
 
-```{r, Prep weighted averages of distances by releases}
 
-totrelBC <- readRDS("RDS/totrelBC.rds")
-totrelMB <- readRDS("RDS/totrelMB.rds")
-
-colnames(totrelBC) <- c("Year", "releases_bel", "group")
-totrelBC <- totrelBC[,1:2]
-
-colnames(totrelMB) <- c("Year", "releases_mcl", "group")
-totrelMB <- totrelMB[,1:2]
-
-rps.clean <- merge(totrelBC, rps.clean, by = "Year", all = TRUE)
-rps.clean <- merge(totrelMB, rps.clean, by = "Year", all = TRUE)
-
-weightstable_bel <- rps.clean %>%
-  drop_na() %>%
-  group_by(SYS_NM) %>%
-  summarize(weighted.mean(dist_km_bel, releases_bel))
-colnames(weightstable_bel) <- c("SYS_NM", "wt_dist_bel")
-
-weightstable_mcl <- rps.clean %>%
-  drop_na() %>%
-  group_by(SYS_NM) %>%
-  summarize(weighted.mean(dist_km_mcl, releases_mcl))
-colnames(weightstable_mcl) <- c("SYS_NM", "wt_dist_mcl")
-
-rps.clean <- merge(weightstable_bel, rps.clean, by = "SYS_NM", all = TRUE)
-rps.clean <- merge(weightstable_mcl, rps.clean, by = "SYS_NM", all = TRUE)
-
-saveRDS(rps.clean, "RDS/a08cm_rpsclean.rds")
-```
