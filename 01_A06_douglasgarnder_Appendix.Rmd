@@ -276,6 +276,159 @@ kable(streaminlet, format = "latex")
 
 ```
 
+\newpage
+
+# Correlation analyses
+
+```{r, Correlation analyses, echo = FALSE, message = FALSE, warning = FALSE}
+
+rps.clean <- readRDS("RDS/douglas-gardner_cm_rpsclean.rds")
+#escdata.filtered <- readRDS("RDS/douglasgardner-cm_escdata_filtered.rds") %>%
+#  select(SYS_NM, Year, esc.log, z, m.ave, esc.stand)
+
+cor.data.z<-rps.clean%>%select(SYS_NM,Year,z)%>%
+  pivot_wider(names_from="Year",values_from="z")%>%
+  data.frame()
+rownames(cor.data.z)<-cor.data.z$SYS_NM
+cor.data.z<-cor.data.z%>%select(-SYS_NM)
+cor.z<-cor(t(cor.data.z),use="pairwise.complete.obs")
+dist.cor.z<- dist(cor.z)
+clust.dist.cor.z <- hclust(dist.cor.z)
+dendclust.z <- dendro_data(clust.dist.cor.z)
+
+cor.data.e<-rps.clean%>%select(SYS_NM,Year,esc.log)%>%
+  pivot_wider(names_from="Year",values_from="esc.log")%>%
+  data.frame()
+rownames(cor.data.e)<-cor.data.e$SYS_NM
+cor.data.e<-cor.data.e%>%select(-SYS_NM)
+cor.e<-cor(t(cor.data.e),use="pairwise.complete.obs")
+dist.cor.e<- dist(cor.e)
+clust.dist.cor.e <- hclust(dist.cor.e)
+dendclust.e <- dendro_data(clust.dist.cor.e)
+
+
+cor.data.s<-rps.clean%>%select(SYS_NM,Year,esc.stand)%>%
+  pivot_wider(names_from="Year",values_from="esc.stand")%>%
+  data.frame()
+rownames(cor.data.s)<-cor.data.s$SYS_NM
+cor.data.s<-cor.data.s%>%select(-SYS_NM)
+cor.s<-cor(t(cor.data.s),use="pairwise.complete.obs")
+dist.cor.s<- dist(cor.s)
+clust.dist.cor.s <- hclust(dist.cor.s)
+dendclust.s <- dendro_data(clust.dist.cor.s)
+
+
+cor.data.m<-rps.clean%>%select(SYS_NM,Year,m.ave)%>%
+  pivot_wider(names_from="Year",values_from="m.ave")%>%
+  data.frame()
+rownames(cor.data.m)<-cor.data.m$SYS_NM
+cor.data.m<-cor.data.m%>%select(-SYS_NM)
+cor.m<-cor(t(cor.data.m),use="pairwise.complete.obs")
+dist.cor.m<- dist(cor.m)
+clust.dist.cor.m <- hclust(dist.cor.m)
+dendclust.m <- dendro_data(clust.dist.cor.m)
+
+```
+
+```{r, Correlation plots by metric, echo = FALSE, message = FALSE, error = FALSE, fig.align = "center", fig.height = 7, fig.width = 8.5, fig.cap = "Cross correlation plots to compare metrics."}
+par(oma=c(0,0,0,0))
+par(mfrow=c(2,2))
+
+corrplot(cor.z, diag = FALSE, order="hclust", method="square", tl.col="black",
+         addrect = 6, tl.cex = 0.45, title = "Z-scores", mar=c(0,0,3,0))
+corrplot(cor.e, diag = FALSE, order="hclust", method="square", tl.col="black",
+         addrect = 6, tl.cex = 0.45, title = "Log escapement", mar=c(0,0,3,0))
+corrplot(cor.s, diag = FALSE, order="hclust", method="square", tl.col="black",
+         addrect = 6, tl.cex = 0.45, title = "Standardized escapement", mar=c(0,0,3,0))
+corrplot(cor.m, diag = FALSE, order="hclust", method="square", tl.col="black",
+         addrect = 6, tl.cex = 0.45, title = "Moving average", mar=c(0,0,3,0))
+
+```
+
+\newpage
+
+## Dendrogram clusters analysis
+
+```{r, Dendrogram plots, echo = FALSE, message = FALSE, warning = FALSE,  fig.align = "center", fig.height = 9.5, fig.width = 8.5, fig.cap = "Dendrogram cluster analysis to compare uses of different metrics.}
+
+par(oma=c(0,0,0,0))
+par(mfrow=c(2,2))
+
+clust.dist.cor.z[["labels"]] <- str_to_sentence(word(clust.dist.cor.z[["labels"]]))
+dendz <- as.dendrogram(clust.dist.cor.z)
+dendz %>%
+    #set("labels_colors", zlabs) %>%
+    plot(main = "Z-scores", horiz = TRUE)
+
+clust.dist.cor.e[["labels"]] <- str_to_sentence(word(clust.dist.cor.e[["labels"]]))
+dende <- as.dendrogram(clust.dist.cor.e)
+dende %>%
+    #set("labels_colors", elabs) %>%
+    plot(main = "Log escapement", horiz = TRUE)
+
+clust.dist.cor.s[["labels"]] <- str_to_sentence(word(clust.dist.cor.s[["labels"]]))
+dends <- as.dendrogram(clust.dist.cor.s)
+dends %>%
+    #set("labels_colors", slabs) %>%
+    plot(main = "Standardized escapement", horiz = TRUE)
+
+clust.dist.cor.m[["labels"]] <- str_to_sentence(word(clust.dist.cor.m[["labels"]]))
+dendm <- as.dendrogram(clust.dist.cor.m)
+dendm %>%
+    #set("labels_colors", mlabs) %>%
+    plot(main = "Moving average", horiz = TRUE)
+```
+\newpage
+
+## Tanglegrams
+
+```{r, Tanglegrams z v log, echo = FALSE, message = FALSE, warning = FALSE, fig.align = "center", fig.height = 9.5, fig.width = 8.5, fig.cap = "Tanglegram of z-score vs. logged escapements"}
+
+#png(file = "figures/a06cm_tanglegram_z_v_log.png", width = 2000, height = 3000, pointsize = 36)
+
+par(oma=c(2,2,2,2))
+par(mfrow=c(1,1))
+
+tangle1 <- dendlist(dendz, dende)
+                                                                                                            
+tanglegram(tangle1, lab.cex = .8, margin_inner = 3, main_left = "Z-score",
+           main_right = "Log escapement", cex_main = 1, highlight_distinct_edges = FALSE,
+           lwd = 2, edge.lwd = 1)
+
+#dev.off()
+
+```
+
+\newpage
+
+```{r, Tanglegrams z vs std. esc, echo = FALSE, message = FALSE, warning = FALSE, fig.align = "center", fig.height = 9.5, fig.width = 8.5, fig.cap = "Tanglegram of z-score vs. standardized escapements"}
+
+#png(file = "figures/a06cm_tanglegram_z_v_stdesc.png", width = 2000, height = 3000, pointsize = 36)
+
+tangle2 <- dendlist(dendz, dends)
+                                                                                                            
+tanglegram(tangle2, lab.cex = .8, margin_inner = 3, main_left = "Z-score",
+           main_right = "Standardized escapement", cex_main = 1, highlight_distinct_edges = FALSE,
+           lwd = 2, edge.lwd = 1)
+
+#dev.off()
+```
+
+\newpage
+
+```{r, Tanglegrams z vs m.ave, echo = FALSE, message = FALSE, warning = FALSE, fig.align = "center", fig.height = 9.5, fig.width = 8.5, fig.cap = "Tanglegram of z-score vs. moving average"}
+
+#png(file = "figures/a06cm_tanglegram_z_v_mave.png", width = 2000, height = 3000, pointsize = 36)
+
+tangle3 <- dendlist(dendz, dendm)
+                                                                                                            
+tanglegram(tangle3, lab.cex = .8, margin_inner = 3, main_left = "Z-score",
+           main_right = "Moving average", cex_main = 1, highlight_distinct_edges = FALSE,
+           lwd = 2, edge.lwd = 1)
+
+#dev.off()
+
+```
 
 \newpage
 
