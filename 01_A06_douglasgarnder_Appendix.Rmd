@@ -280,6 +280,7 @@ kable(streaminlet, format = "latex")
 
 # Correlation analyses
 
+## Cross correlation plots
 ```{r, Correlation analyses, echo = FALSE, message = FALSE, warning = FALSE}
 
 rps.clean <- readRDS("RDS/douglas-gardner_cm_rpsclean.rds")
@@ -328,11 +329,34 @@ dist.cor.m<- dist(cor.m)
 clust.dist.cor.m <- hclust(dist.cor.m)
 dendclust.m <- dendro_data(clust.dist.cor.m)
 
+
+cor.data.rps<-rps.clean%>%select(SYS_NM,Year,rps)%>%
+  pivot_wider(names_from="Year",values_from="rps")%>%
+  data.frame()
+rownames(cor.data.rps)<-cor.data.rps$SYS_NM
+cor.data.rps<-cor.data.rps%>%select(-SYS_NM)
+cor.rps<-cor(t(cor.data.rps),use="pairwise.complete.obs")
+dist.cor.rps<- dist(cor.rps)
+clust.dist.cor.rps <- hclust(dist.cor.rps)
+dendclust.rps <- dendro_data(clust.dist.cor.rps)
+
+
+
+cor.data.rpslog<-rps.clean%>%select(SYS_NM,Year,logrps)%>%
+  pivot_wider(names_from="Year",values_from="logrps")%>%
+  data.frame()
+rownames(cor.data.rpslog)<-cor.data.rpslog$SYS_NM
+cor.data.rpslog<-cor.data.rpslog%>%select(-SYS_NM)
+cor.rpslog<-cor(t(cor.data.rpslog),use="pairwise.complete.obs")
+dist.cor.rpslog<- dist(cor.rpslog)
+clust.dist.cor.rpslog <- hclust(dist.cor.rpslog)
+dendclust.rpslog <- dendro_data(clust.dist.cor.rpslog)
+
 ```
 
 ```{r, Correlation plots by metric, echo = FALSE, message = FALSE, error = FALSE, fig.align = "center", fig.height = 7.5, fig.width = 8.5, fig.cap = "Cross correlation plots to compare metrics."}
 par(oma=c(0,0,0,0))
-par(mfrow=c(2,2))
+par(mfrow=c(3,2))
 
 corrplot(cor.z, diag = FALSE, order="hclust", method="square", tl.col="black",
          addrect = 6, tl.cex = 0.45, title = "Z-scores", mar=c(0,0,3,0))
@@ -342,6 +366,10 @@ corrplot(cor.s, diag = FALSE, order="hclust", method="square", tl.col="black",
          addrect = 6, tl.cex = 0.45, title = "Standardized escapement", mar=c(0,0,3,0))
 corrplot(cor.m, diag = FALSE, order="hclust", method="square", tl.col="black",
          addrect = 6, tl.cex = 0.45, title = "Moving average", mar=c(0,0,3,0))
+corrplot(cor.rps, diag = FALSE, order="hclust", method="square", tl.col="black",
+         addrect = 6, tl.cex = 0.45, title = "RPS", mar=c(0,0,3,0))
+corrplot(cor.rpslog, diag = FALSE, order="hclust", method="square", tl.col="black",
+         addrect = 6, tl.cex = 0.45, title = "Log RPS", mar=c(0,0,3,0))
 
 ```
 
@@ -352,7 +380,7 @@ corrplot(cor.m, diag = FALSE, order="hclust", method="square", tl.col="black",
 ```{r, Dendrogram plots, echo = FALSE, message = FALSE, warning = FALSE,  fig.align = "center", fig.height = 9.5, fig.width = 8.5, fig.cap = "Dendrogram cluster analysis to compare uses of different metrics."}
 
 par(oma=c(0,0,0,0))
-par(mfrow=c(2,2))
+par(mfrow=c(3,2))
 
 clust.dist.cor.z[["labels"]] <- str_to_sentence(word(clust.dist.cor.z[["labels"]]))
 dendz <- as.dendrogram(clust.dist.cor.z)
@@ -377,6 +405,18 @@ dendm <- as.dendrogram(clust.dist.cor.m)
 dendm %>%
     #set("labels_colors", mlabs) %>%
     plot(main = "Moving average", horiz = TRUE)
+
+clust.dist.cor.rps[["labels"]] <- str_to_sentence(word(clust.dist.cor.rps[["labels"]]))
+dendrps <- as.dendrogram(clust.dist.cor.rps)
+dendrps %>%
+    #set("labels_colors", rpslabs) %>%
+    plot(main = "RPS", horiz = TRUE)
+
+clust.dist.cor.rpslog[["labels"]] <- str_to_sentence(word(clust.dist.cor.rpslog[["labels"]]))
+dendrpslog <- as.dendrogram(clust.dist.cor.rpslog)
+dendrpslog %>%
+    #set("labels_colors", rpsloglabs) %>%
+    plot(main = "Log RPS", horiz = TRUE)
 ```
 \newpage
 
@@ -430,6 +470,21 @@ tanglegram(tangle3, lab.cex = .8, margin_inner = 3, main_left = "Z-score",
 
 ```
 
+\newpage
+
+```{r, Tanglegrams z vs logRPS, echo = FALSE, message = FALSE, warning = FALSE, fig.align = "center", fig.height = 9.5, fig.width = 8.5, fig.cap = "Tanglegram of z-score vs. moving average"}
+
+#png(file = "figures/a06cm_tanglegram_z_v_mave.png", width = 2000, height = 3000, pointsize = 36)
+
+tangle4 <- dendlist(dendz, dendrpslog)
+                                                                                                            
+tanglegram(tangle4, lab.cex = .8, margin_inner = 3, main_left = "Z-score",
+           main_right = "Log RPS", cex_main = 1, highlight_distinct_edges = FALSE,
+           lwd = 2, edge.lwd = 1)
+
+#dev.off()
+
+```
 \newpage
 
 # Statistical models
