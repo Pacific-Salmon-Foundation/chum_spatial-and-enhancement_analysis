@@ -31,6 +31,8 @@ library(tinytex)
 
 options(scipen=10000)
 
+rps.clean <- readRDS("RDS/a25cm_rps.clean.rds")
+
 ```
 
 
@@ -69,7 +71,10 @@ ggplot(escdata.raw,aes(x=Year,y=SYS_NM,color=Enhancement_Rank,size=escapement))+
                       values=c("grey50","steelblue","darkred"))+
   labs(y="Escapement",color="Enhancement",x="Year",size="Escapement")+
   theme_bw()+
-  theme(legend.position="bottom")
+  theme(legend.position="bottom")+
+  guides(colour = guide_legend(nrow = 4))+
+  guides(size = guide_legend(nrow = 4))+ 
+  theme(axis.text.x = element_text(size = 7))
 
 ```
 
@@ -95,6 +100,7 @@ ggplot(escdata.filt,aes(x=Year,y=escapement,color=Enhancement_Rank))+
 swvi.chum<-fread("data/swvi chum releases filtered.csv")
 
 ggdata.rel <- swvi.chum
+ggdata.rel <- ggdata.rel[,2:14]
 
 idx <- c(1, diff(ggdata.rel$RELEASE_YEAR))
 i2 <- c(1,which(idx != 1), nrow(ggdata.rel)+1)
@@ -265,6 +271,8 @@ ggplot(gga25.logrps,aes(y=SYS_NM,x=logrps,fill=prepost))+
 
 streaminlet <- fread("data/CM A25 filtered stream list_with inlets.csv")
 
+rps.clean <- merge(streaminlet, rps.clean, by = "SYS_NM", all = TRUE)
+
 escdata.filt<-merge(escdata.filt,streaminlet,by="SYS_NM")
 
 #old way
@@ -429,6 +437,27 @@ dendclust.m[["labels"]][["inlet"]] <- inletlist
 xlenm <- .95 * length(mlabs$SYS_NM)
 ylenm <- .95 * (max(dendclust.m[["segments"]][["y"]]))
 
+cor.data.rps<-rps.clean%>%select(SYS_NM,Year,rps)%>%
+  pivot_wider(names_from="Year",values_from="rps")%>%
+  data.frame()
+rownames(cor.data.rps)<-cor.data.rps$SYS_NM
+cor.data.rps<-cor.data.rps%>%select(-SYS_NM)
+cor.rps<-cor(t(cor.data.rps),use="pairwise.complete.obs")
+dist.cor.rps<- dist(cor.rps)
+clust.dist.cor.rps <- hclust(dist.cor.rps)
+dendclust.rps <- dendro_data(clust.dist.cor.rps)
+
+cor.data.rpslog<-rps.clean%>%select(SYS_NM,Year,logrps)%>%
+  pivot_wider(names_from="Year",values_from="logrps")%>%
+  data.frame()
+rownames(cor.data.rpslog)<-cor.data.rpslog$SYS_NM
+cor.data.rpslog<-cor.data.rpslog%>%select(-SYS_NM)
+cor.rpslog<-cor(t(cor.data.rpslog),use="pairwise.complete.obs")
+dist.cor.rpslog<- dist(cor.rpslog)
+clust.dist.cor.rpslog <- hclust(dist.cor.rpslog)
+dendclust.rpslog <- dendro_data(clust.dist.cor.rpslog)
+
+
 ```
 
 \newpage
@@ -444,7 +473,7 @@ ylenm <- .95 * (max(dendclust.m[["segments"]][["y"]]))
 #png(file = "figures/corrplots.png", width = 2000, height = 3000, pointsize = 48)
 
 par(oma=c(0,0,0,0))
-par(mfrow=c(2,2))
+par(mfrow=c(3,2))
 
 corrplot(cor.z, diag = FALSE, order="hclust", method="square", tl.col="black",
          addrect = 6, tl.cex = 0.45, title = "Z-scores", mar=c(0,0,3,0))
@@ -454,121 +483,163 @@ corrplot(cor.s, diag = FALSE, order="hclust", method="square", tl.col="black",
          addrect = 6, tl.cex = 0.45, title = "Standardized escapement", mar=c(0,0,3,0))
 corrplot(cor.m, diag = FALSE, order="hclust", method="square", tl.col="black",
          addrect = 6, tl.cex = 0.45, title = "Moving average", mar=c(0,0,3,0))
+corrplot(cor.rps, diag = FALSE, order="hclust", method="square", tl.col="black",
+         addrect = 6, tl.cex = 0.45, title = "RPS", mar=c(0,0,3,0))
+corrplot(cor.rpslog, diag = FALSE, order="hclust", method="square", tl.col="black",
+         addrect = 6, tl.cex = 0.45, title = "Log RPS", mar=c(0,0,3,0))
 
 #dev.off()
 ```
 
 \newpage
 
-## Dendrograms by metric
+```{r, Make colour vectors for dendrogram inlets, message=FALSE, warning=FALSE, echo=FALSE, include = FALSE}
 
-```{r dendrograms for all metrics, echo = FALSE, warning = FALSE, message = FALSE, fig.align = "center", fig.height = 10.5, fig.width = 9.5, fig.cap = "Dendrograms by metric. Red labels are from Esperanza inlet, blue are from Nootka inlet, and green are from Tahsis inlet. Rivers and creeks denoted with black circles have no enhancement rank, blue have low, orange have medium, and red have high enhancement ranks."}
+zlabs <- as.data.frame(dendclust.z[["labels"]][["label"]])
+colnames(zlabs) <- "SYS_NM"
+zlabs$order <- c(1:length(zlabs$SYS_NM))
+zlabs <- merge(zlabs, rps.clean, by = "SYS_NM")
+zlabs <- zlabs %>%
+  select(SYS_NM, order, inlet)
+zlabs <- distinct(zlabs)
+zlabcols <- as.data.frame(unique(zlabs$inlet))
+colnames(zlabcols) <- "inlet"
+zlabcols <- zlabcols %>%
+  arrange(inlet)
+zlabcols$colour <- c("red", "blue", "green")
+zlabs <- merge(zlabcols, zlabs, by = "inlet")
+zlabs <- zlabs %>%
+  arrange(order)
+zlabs <- zlabs$colour
 
-#png(file = "figures/dendrograms_by_metric.png", width = 2000, height = 3000, pointsize = 48)
+elabs <- as.data.frame(dendclust.e[["labels"]][["label"]])
+colnames(elabs) <- "SYS_NM"
+elabs$order <- c(1:length(elabs$SYS_NM))
+elabs <- merge(elabs, rps.clean, by = "SYS_NM")
+elabs <- elabs %>%
+  select(SYS_NM, order, inlet)
+elabs <- distinct(elabs)
+elabcols <- as.data.frame(unique(elabs$inlet))
+colnames(elabcols) <- "inlet"
+elabcols <- elabcols %>%
+  arrange(inlet)
+elabcols$colour <- c("red", "blue", "green")
+elabs <- merge(elabcols, elabs, by = "inlet")
+elabs <- elabs %>%
+  arrange(order)
+elabs <- elabs$colour
 
-# Dendrograms to knit
-par(oma=c(2,2,2,2))
-par(mfrow=c(2,2))
+slabs <- as.data.frame(dendclust.s[["labels"]][["label"]])
+colnames(slabs) <- "SYS_NM"
+slabs$order <- c(1:length(slabs$SYS_NM))
+slabs <- merge(slabs, rps.clean, by = "SYS_NM")
+slabs <- slabs %>%
+  select(SYS_NM, order, inlet)
+slabs <- distinct(slabs)
+slabcols <- as.data.frame(unique(slabs$inlet))
+colnames(slabcols) <- "inlet"
+slabcols <- slabcols %>%
+  arrange(inlet)
+slabcols$colour <- c("red", "blue", "green")
+slabs <- merge(slabcols, slabs, by = "inlet")
+slabs <- slabs %>%
+  arrange(order)
+slabs <- slabs$colour
 
-#ggdendrogram(dendclust.z, rotate = TRUE, size = 3) +
-#  labs(title = "Z-scores") +
-#  theme(axis.text.y = element_text(colour = dendclust.z[["labels"]][["inlet"]])) +
-#  annotate("text", x = xlenz, y = ylenz, colour = "red", label = "Nootka inlet") +
-#  annotate("text", x = xlenz-1, y = ylenz, colour = "black", label = "Esperanza inlet") +  
-#  annotate("text", x = xlenz-2, y = ylenz, colour = "99FF33", label = "Tahsis inlet")
+mlabs <- as.data.frame(dendclust.m[["labels"]][["label"]])
+colnames(mlabs) <- "SYS_NM"
+mlabs$order <- c(1:length(mlabs$SYS_NM))
+mlabs <- merge(mlabs, rps.clean, by = "SYS_NM")
+mlabs <- mlabs %>%
+  select(SYS_NM, order, inlet)
+mlabs <- distinct(mlabs)
+mlabcols <- as.data.frame(unique(mlabs$inlet))
+colnames(mlabcols) <- "inlet"
+mlabcols <- mlabcols %>%
+  arrange(inlet)
+mlabcols$colour <- c("red", "blue", "green")
+mlabs <- merge(mlabcols, mlabs, by = "inlet")
+mlabs <- mlabs %>%
+  arrange(order)
+mlabs <- mlabs$colour
+
+rpslabs <- as.data.frame(dendclust.rps[["labels"]][["label"]])
+colnames(rpslabs) <- "SYS_NM"
+rpslabs$order <- c(1:length(rpslabs$SYS_NM))
+rpslabs <- merge(rpslabs, rps.clean, by = "SYS_NM")
+rpslabs <- rpslabs %>%
+  select(SYS_NM, order, inlet)
+rpslabs <- distinct(rpslabs)
+rpslabcols <- as.data.frame(unique(rpslabs$inlet))
+colnames(rpslabcols) <- "inlet"
+rpslabcols <- rpslabcols %>%
+  arrange(inlet)
+rpslabcols$colour <- c("red", "blue", "green")
+rpslabs <- merge(rpslabcols, rpslabs, by = "inlet")
+rpslabs <- rpslabs %>%
+  arrange(order)
+rpslabs <- rpslabs$colour
 
 
+rpsloglabs <- as.data.frame(dendclust.rpslog[["labels"]][["label"]])
+colnames(rpsloglabs) <- "SYS_NM"
+rpsloglabs$order <- c(1:length(rpsloglabs$SYS_NM))
+rpsloglabs <- merge(rpsloglabs, rps.clean, by = "SYS_NM")
+rpsloglabs <- rpsloglabs %>%
+  select(SYS_NM, order, inlet)
+rpsloglabs <- distinct(rpsloglabs)
+rpsloglabcols <- as.data.frame(unique(rpsloglabs$inlet))
+colnames(rpsloglabcols) <- "inlet"
+rpsloglabcols <- rpsloglabcols %>%
+  arrange(inlet)
+rpsloglabcols$colour <- c("red", "blue", "green")
+rpsloglabs <- merge(rpsloglabcols, rpsloglabs, by = "inlet")
+rpsloglabs <- rpsloglabs %>%
+  arrange(order)
+rpsloglabs <- rpsloglabs$colour
+
+```
+
+```{r, Dendrogram plots, echo = FALSE, message = FALSE, warning = FALSE, fig.align = "center", fig.height = 9.5, fig.width = 8.5, fig.cap = "Dendrograms by metric. Red labels are from Esperanza inlet, blue are from Nootka inlet, and green are from Tahsis inlet."}
+
+par(oma=c(0,0,0,0))
+par(mfrow=c(3,2))
+
+clust.dist.cor.z[["labels"]] <- str_to_sentence(word(clust.dist.cor.z[["labels"]]))
 dendz <- as.dendrogram(clust.dist.cor.z)
 dendz %>%
-  set("labels_colors", zlabcolours) %>%
-  set("labels_cex", 0.65) %>%
-  set("labels", nameslookup$shortnames) %>%
-  set("leaves_pch", 19) %>%
-  set("leaves_col", nameslookup$erank) %>%
-  plot(main = "Z-scores", horiz = TRUE)
+    set("labels_colors", zlabs) %>%
+    plot(main = "Z-scores", horiz = TRUE)
 
-
-#ggdendrogram(dendclust.e, rotate = TRUE) +
-#  labs(title = "Log escapement") +
-#  theme(axis.text.y = element_text(colour = dendclust.e[["labels"]][["inlet"]])) +
-#  annotate("text", x = xlene, y = ylene, colour = "red", label = "Nootka inlet") +
-#  annotate("text", x = xlene-1, y = ylene, colour = "black", label = "Esperanza inlet") +  
-#  annotate("text", x = xlene-2, y = ylene, colour = "99FF33", label = "Tahsis inlet")
-
-# Name lookup table was defined using z-scores, so all subsequent analyses have
-# this section.
-elabnames <- elabs$SYS_NM
-elabnames <- as.data.frame(elabnames)
-elabnames$order <- c(1:length(elabnames[,1]))
-colnames(elabnames) <- c("SYS_NM", "order")
-elabnames <- merge(elabnames, nameslookup, by = "SYS_NM")
-elabnames <- elabnames %>%
-  arrange(order)
-elabranks <- elabnames$erank
-elabnames <- elabnames$shortnames
+clust.dist.cor.e[["labels"]] <- str_to_sentence(word(clust.dist.cor.e[["labels"]]))
 dende <- as.dendrogram(clust.dist.cor.e)
 dende %>%
-  set("labels_colors", elabcolours) %>%
-  set("labels_cex", 0.65) %>%
-  set("labels", elabnames) %>%
-  set("leaves_pch", 19) %>%
-  set("leaves_col", elabranks) %>%
-  plot(main = "Log escapement", horiz = TRUE)
+    set("labels_colors", elabs) %>%
+    plot(main = "Log escapement", horiz = TRUE)
 
-#ggdendrogram(dendclust.s, rotate = TRUE) +
-#  labs(title = "Standardized escapement") +
-#  theme(axis.text.y = element_text(colour = dendclust.s[["labels"]][["inlet"]])) +
-#  annotate("text", x = xlens, y = ylens, colour = "red", label = "Nootka inlet") +
-#  annotate("text", x = xlens-1, y = ylens, colour = "black", label = "Esperanza inlet") +  
-#  annotate("text", x = xlens-2, y = ylens, colour = "99FF33", label = "Tahsis inlet")
-
-slabnames <- slabs$SYS_NM
-slabnames <- as.data.frame(slabnames)
-slabnames$order <- c(1:length(slabnames[,1]))
-colnames(slabnames) <- c("SYS_NM", "order")
-slabnames <- merge(slabnames, nameslookup, by = "SYS_NM")
-slabnames <- slabnames %>%
-  arrange(order)
-slabranks <- slabnames$erank
-slabnames <- slabnames$shortnames
+clust.dist.cor.s[["labels"]] <- str_to_sentence(word(clust.dist.cor.s[["labels"]]))
 dends <- as.dendrogram(clust.dist.cor.s)
 dends %>%
-  set("labels_colors", slabcolours) %>%
-  set("labels_cex", 0.65) %>%
-  set("labels", slabnames) %>%
-  set("leaves_pch", 19) %>%
-  set("leaves_col", slabranks) %>%
-  plot(main = "Standardized escapement", horiz = TRUE)
+    set("labels_colors", slabs) %>%
+    plot(main = "Standardized escapement", horiz = TRUE)
 
-
-
-#ggdendrogram(dendclust.m, rotate = TRUE) +
-#  labs(title = "Moving average") +
-#  theme(axis.text.y = element_text(colour = dendclust.m[["labels"]][["inlet"]])) +
-#  annotate("text", x = xlenm, y = ylenm, colour = "red", label = "Nootka inlet") +
-#  annotate("text", x = xlenm-1, y = ylenm, colour = "black", label = "Esperanza inlet") +  
-#  annotate("text", x = xlenm-2, y = ylenm, colour = "99FF33", label = "Tahsis inlet")
-
-
-mlabnames <- mlabs$SYS_NM
-mlabnames <- as.data.frame(mlabnames)
-mlabnames$order <- c(1:length(mlabnames[,1]))
-colnames(mlabnames) <- c("SYS_NM", "order")
-mlabnames <- merge(mlabnames, nameslookup, by = "SYS_NM")
-mlabnames <- mlabnames %>%
-  arrange(order)
-mlabranks <- mlabnames$erank
-mlabnames <- mlabnames$shortnames
+clust.dist.cor.m[["labels"]] <- str_to_sentence(word(clust.dist.cor.m[["labels"]]))
 dendm <- as.dendrogram(clust.dist.cor.m)
 dendm %>%
-  set("labels_colors", mlabcolours) %>%
-  set("labels_cex", 0.65) %>%
-  set("labels", mlabnames) %>%
-  set("leaves_pch", 19) %>%
-  set("leaves_col", mlabranks) %>%
-  plot(main = "Moving average", horiz = TRUE)
+    set("labels_colors", mlabs) %>%
+    plot(main = "Moving average", horiz = TRUE)
 
-#dev.off()
+clust.dist.cor.rps[["labels"]] <- str_to_sentence(word(clust.dist.cor.rps[["labels"]]))
+dendrps <- as.dendrogram(clust.dist.cor.rps)
+dendrps %>%
+    set("labels_colors", rpslabs) %>%
+    plot(main = "RPS", horiz = TRUE)
+
+clust.dist.cor.rpslog[["labels"]] <- str_to_sentence(word(clust.dist.cor.rpslog[["labels"]]))
+dendrpslog <- as.dendrogram(clust.dist.cor.rpslog)
+dendrpslog %>%
+    set("labels_colors", rpsloglabs) %>%
+    plot(main = "Log RPS", horiz = TRUE)
 ```
 
 \newpage
@@ -582,7 +653,7 @@ dendm %>%
 par(oma=c(2,2,2,2))
 par(mfrow=c(1,1))
 
-tangle1 <- dendlist(dendz%>%set("labels", nameslookup$shortnames), dende%>%set("labels", elabnames))
+tangle1 <- dendlist(dendz, dende)
 tanglegram(tangle1, lab.cex = .8, margin_inner = 3, main_left = "Z-score",
            main_right = "Log escapement", cex_main = 1, highlight_distinct_edges = FALSE,
            lwd = 2, edge.lwd = 1)
@@ -595,7 +666,7 @@ tanglegram(tangle1, lab.cex = .8, margin_inner = 3, main_left = "Z-score",
 
 #png(file = "figures/tanglegram_z_v_stdesc.png", width = 2000, height = 3000, pointsize = 36)
 
-tangle2 <- dendlist(dendz%>%set("labels", nameslookup$shortnames), dends%>%set("labels", slabnames))
+tangle2 <- dendlist(dendz, dends)
 tanglegram(tangle2, lab.cex = .8, margin_inner = 3, main_left = "Z-score",
            main_right = "Standardized escapement", cex_main = 1, highlight_distinct_edges = FALSE,
            lwd = 2, edge.lwd = 1)
@@ -607,10 +678,26 @@ tanglegram(tangle2, lab.cex = .8, margin_inner = 3, main_left = "Z-score",
 
 #png(file = "figures/tanglegram_z_v_mave.png", width = 2000, height = 3000, pointsize = 36)
 
-tangle3 <- dendlist(dendz%>%set("labels", nameslookup$shortnames), dendm%>%set("labels", mlabnames))
+tangle3 <- dendlist(dendz, dendm)
 tanglegram(tangle3, lab.cex = .8, margin_inner = 3, main_left = "Z-score",
            main_right = "Moving average", cex_main = 1, highlight_distinct_edges = FALSE,
            lwd = 2, edge.lwd = 1)
+#dev.off()
+
+```
+
+\newpage
+
+```{r, Tanglegrams z vs logRPS, echo = FALSE, message = FALSE, warning = FALSE, fig.align = "center", fig.height = 9.5, fig.width = 8.5, fig.cap = "Tanglegram of z-score vs. Log RPS"}
+
+#png(file = "figures/a06cm_tanglegram_z_v_mave.png", width = 2000, height = 3000, pointsize = 36)
+
+tangle4 <- dendlist(dendz, dendrpslog)
+                                                                                                            
+tanglegram(tangle4, lab.cex = .8, margin_inner = 3, main_left = "Z-score",
+           main_right = "Log RPS", cex_main = 1, highlight_distinct_edges = FALSE,
+           lwd = 2, edge.lwd = 1)
+
 #dev.off()
 
 ```
@@ -741,6 +828,7 @@ corrplot(cor.m.post, diag = FALSE, order="hclust", method="square", tl.col="blac
 ```
 
 \newpage
+
 ## Tanglegrams
 
 ```{r, z-score tanglegram, echo = FALSE, fig.align = "center", fig.height = 8, fig.width = 6, fig.cap = "Tanglegram comparing z-scores pre- and post-enhancement (1980)"}
