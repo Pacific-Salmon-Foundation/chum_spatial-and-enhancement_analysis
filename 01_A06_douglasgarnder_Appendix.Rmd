@@ -349,7 +349,7 @@ corrplot(cor.m, diag = FALSE, order="hclust", method="square", tl.col="black",
 
 ## Dendrogram clusters analysis
 
-```{r, Dendrogram plots, echo = FALSE, message = FALSE, warning = FALSE,  fig.align = "center", fig.height = 9.5, fig.width = 8.5, fig.cap = "Dendrogram cluster analysis to compare uses of different metrics.}
+```{r, Dendrogram plots, echo = FALSE, message = FALSE, warning = FALSE,  fig.align = "center", fig.height = 9.5, fig.width = 8.5, fig.cap = "Dendrogram cluster analysis to compare uses of different metrics."}
 
 par(oma=c(0,0,0,0))
 par(mfrow=c(2,2))
