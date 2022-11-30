@@ -1,0 +1,13 @@
+Candidate model
+Log RPS ~ dist 
+Log RPS ~ year
+Log RPS ~ releases
+Log RPS ~ dist + year
+Log RPS ~ dist + totrel
+Log RPS ~ dist + totrel + year
+Log esc ~ dist 
+Log esc ~ year
+Log esc ~ releases
+Log esc ~ dist + year
+Log esc ~ dist + totrel
+Log esc ~ dist + totrel + year
