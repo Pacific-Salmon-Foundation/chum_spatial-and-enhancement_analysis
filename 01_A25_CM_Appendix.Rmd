@@ -35,6 +35,13 @@ rps.clean <- readRDS("RDS/a25cm_rps.clean.rds")
 
 ```
 
+\newpage
+
+# Study area
+
+## Area 25 Chum streams
+
+![](figures/area 25 chum stream distances.png)
 
 ```{r functions, echo=FALSE,message=FALSE,warning=FALSE}
 #function to extract data and group it
