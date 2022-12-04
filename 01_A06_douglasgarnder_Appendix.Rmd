@@ -1,5 +1,5 @@
 ---
-title: "Spatial Analysis Figures"
+title: "Appendix 3"
 subtitle: "Area 06 - Douglas Gardner CU Chum Salmon"
 author: "Coastland"
 date: "`r Sys.Date()`"
