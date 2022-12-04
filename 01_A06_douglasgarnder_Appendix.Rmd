@@ -596,6 +596,197 @@ tanglegram(tangle4, lab.cex = .8, margin_inner = 3, main_left = "Z-score",
 #dev.off()
 
 ```
+
+\newpage
+
+## Pre- and post-1980 correlation analyses
+
+```{r, Pre-1980 z, echo = FALSE, message = FALSE, warning = FALSE, fig.align = "center", fig.height = 8, fig.width = 6, fig.cap = "Cross correlation plots of z-scores to compare pre- and post-enhancement."}
+
+cor.data.z <-escdata.filtered %>%
+  select(SYS_NM,Year,z) %>%
+  pivot_wider(names_from="Year",values_from="z") %>%
+  data.frame()
+
+cor.data.z.pre<-cor.data.z[,1:26]
+rownames(cor.data.z.pre)<-cor.data.z.pre$SYS_NM
+cor.data.z.pre<-cor.data.z.pre%>%select(-SYS_NM)
+cor.z.pre<-cor(t(cor.data.z.pre),use="pairwise.complete.obs")
+
+cor.data.z.post<-cor.data.z[,c(1,27:62)]
+rownames(cor.data.z.post)<-cor.data.z.post$SYS_NM
+cor.data.z.post<-cor.data.z.post%>%select(-SYS_NM)
+cor.z.post<-cor(t(cor.data.z.post),use="pairwise.complete.obs")
+
+dist.cor.z.pre <- dist(cor.z.pre)
+clust.dist.cor.z.pre <- hclust(dist.cor.z.pre)
+tanglelabs.z.pre <- as.data.frame(clust.dist.cor.z.pre[["labels"]])
+colnames(tanglelabs.z.pre) <- "SYS_NM"
+tanglelabs.z.pre$shortnames <- str_to_sentence(word(tanglelabs.z.pre$SYS_NM))
+clust.dist.cor.z.pre[["labels"]] <- tanglelabs.z.pre$shortnames
+dendz.pre <- as.dendrogram(clust.dist.cor.z.pre)
+
+# Post-1980
+cor.data.z.post<-cor.data.z[,1:26]
+rownames(cor.data.z.post)<-cor.data.z.post$SYS_NM
+cor.data.z.post<-cor.data.z.post%>%select(-SYS_NM)
+cor.z.post<-cor(t(cor.data.z.post),use="pairwise.complete.obs")
+
+cor.data.z.post<-cor.data.z[,c(1,27:62)]
+rownames(cor.data.z.post)<-cor.data.z.post$SYS_NM
+cor.data.z.post<-cor.data.z.post%>%select(-SYS_NM)
+cor.z.post<-cor(t(cor.data.z.post),use="pairwise.complete.obs")
+
+dist.cor.z.post <- dist(cor.z.post)
+clust.dist.cor.z.post <- hclust(dist.cor.z.post)
+tanglelabs.z.post <- as.data.frame(clust.dist.cor.z.post[["labels"]])
+colnames(tanglelabs.z.post) <- "SYS_NM"
+tanglelabs.z.post$shortnames <- str_to_sentence(word(tanglelabs.z.post$SYS_NM))
+clust.dist.cor.z.post[["labels"]] <- tanglelabs.z.post$shortnames
+dendz.post <- as.dendrogram(clust.dist.cor.z.post)
+
+par(mfrow=c(2,1))
+corrplot(cor.z.pre, diag = FALSE, order="hclust", method="square", tl.col="black",
+         addrect = 6, tl.cex = 0.5, title = "Z-scores (Pre-1980)", cex.main = .7, mar=c(0,0,1,0))
+corrplot(cor.z.post, diag = FALSE, order="hclust", method="square", tl.col="black",
+         addrect = 6, tl.cex = 0.5, title = "Z-score (Post-1980)", sub = "Z-scores", cex.main = .7, mar=c(0,0,1,0))
+
+
+```
+
+\newpage
+
+```{r, z-score tanglegram, echo = FALSE, warning = FALSE, message = FALSE, fig.align = "center", fig.height = 8, fig.width = 6, fig.cap = "Tanglegram comparing z-scores pre- and post-enhancement (1980)"}
+# Dendrogram, factored by inlet, by z-score
+
+#png(file = "figures/tanglegram_1980_z.png", width = 2000, height = 3000, pointsize = 48)
+
+par(mfrow=c(1,1))
+
+# Pre-1980
+dist.cor.z.pre <- dist(cor.z.pre)
+clust.dist.cor.z.pre <- hclust(dist.cor.z.pre)
+tanglelabs.z.pre <- as.data.frame(clust.dist.cor.z.pre[["labels"]])
+colnames(tanglelabs.z.pre) <- "SYS_NM"
+tanglelabs.z.pre$shortnames <- str_to_sentence(word(tanglelabs.z.pre$SYS_NM))
+clust.dist.cor.z.pre[["labels"]] <- tanglelabs.z.pre$shortnames
+dendz.pre <- as.dendrogram(clust.dist.cor.z.pre)
+
+# Post-1980
+dist.cor.z.post <- dist(cor.z.post)
+clust.dist.cor.z.post <- hclust(dist.cor.z.post)
+tanglelabs.z.post <- as.data.frame(clust.dist.cor.z.post[["labels"]])
+colnames(tanglelabs.z.post) <- "SYS_NM"
+tanglelabs.z.post$shortnames <- str_to_sentence(word(tanglelabs.z.post$SYS_NM))
+clust.dist.cor.z.post[["labels"]] <- tanglelabs.z.post$shortnames
+dendz.post <- as.dendrogram(clust.dist.cor.z.post)
+
+# Tanglegram
+tangle.z <- dendlist(dendz.pre, dendz.post)
+tanglegram(tangle.z, lab.cex = .8, margin_inner = 3, main = "Z-scores", main_left = "Pre-1980",
+           main_right = "Post-1980", cex_main = 1, highlight_distinct_edges = FALSE,
+           lwd = 2, edge.lwd = 1)
+
+#dev.off()
+
+```
+
+\newpage
+
+```{r, Pre-1980 logrps, echo = FALSE, message = FALSE, warning = FALSE, fig.align = "center", fig.height = 8, fig.width = 6, fig.cap = "Cross correlation plots of Log RPS to compare pre- and post-enhancement."}
+
+cor.data.logrps <-rps.clean %>%
+  select(SYS_NM,Year,logrps) %>%
+  pivot_wider(names_from="Year",values_from="logrps") %>%
+  data.frame()
+
+cor.data.logrps.pre<-cor.data.logrps[,1:27]
+rownames(cor.data.logrps.pre)<-cor.data.logrps.pre$SYS_NM
+cor.data.logrps.pre<-cor.data.logrps.pre%>%select(-SYS_NM)
+cor.logrps.pre<-cor(t(cor.data.logrps.pre),use="pairwise.complete.obs")
+
+cor.data.logrps.post<-cor.data.logrps[,c(1,28:63)]
+rownames(cor.data.logrps.post)<-cor.data.logrps.post$SYS_NM
+cor.data.logrps.post<-cor.data.logrps.post%>%select(-SYS_NM)
+cor.logrps.post<-cor(t(cor.data.logrps.post),use="pairwise.complete.obs")
+
+dist.cor.logrps.pre <- dist(cor.logrps.pre)
+clust.dist.cor.logrps.pre <- hclust(dist.cor.logrps.pre)
+tanglelabs.logrps.pre <- as.data.frame(clust.dist.cor.logrps.pre[["labels"]])
+colnames(tanglelabs.logrps.pre) <- "SYS_NM"
+tanglelabs.logrps.pre$shortnames <- str_to_sentence(word(tanglelabs.logrps.pre$SYS_NM))
+#colnames(nameslookup) <- "SYS_NM"
+clust.dist.cor.logrps.pre[["labels"]] <- tanglelabs.logrps.pre$shortnames
+dendlogrps.pre <- as.dendrogram(clust.dist.cor.logrps.pre)
+
+# Post-1980
+cor.data.logrps.post<-cor.data.logrps[,1:26]
+rownames(cor.data.logrps.post)<-cor.data.logrps.post$SYS_NM
+cor.data.logrps.post<-cor.data.logrps.post%>%select(-SYS_NM)
+cor.logrps.post<-cor(t(cor.data.logrps.post),use="pairwise.complete.obs")
+
+cor.data.logrps.post<-cor.data.logrps[,c(1,27:62)]
+rownames(cor.data.logrps.post)<-cor.data.logrps.post$SYS_NM
+cor.data.logrps.post<-cor.data.logrps.post%>%select(-SYS_NM)
+cor.logrps.post<-cor(t(cor.data.logrps.post),use="pairwise.complete.obs")
+
+dist.cor.logrps.post <- dist(cor.logrps.post)
+clust.dist.cor.logrps.post <- hclust(dist.cor.logrps.post)
+tanglelabs.logrps.post <- as.data.frame(clust.dist.cor.logrps.post[["labels"]])
+colnames(tanglelabs.logrps.post) <- "SYS_NM"
+tanglelabs.logrps.post$shortnames <- str_to_sentence(word(tanglelabs.logrps.post$SYS_NM))
+#colnames(nameslookup) <- "SYS_NM"
+clust.dist.cor.logrps.post[["labels"]] <- tanglelabs.logrps.post$shortnames
+dendlogrps.post <- as.dendrogram(clust.dist.cor.logrps.post)
+
+par(mfrow=c(2,1))
+corrplot(cor.logrps.pre, diag = FALSE, order="hclust", method="square", tl.col="black",
+         addrect = 6, tl.cex = 0.5, title = "Log RPS (Pre-1980)", cex.main = .7, mar=c(0,0,1,0))
+corrplot(cor.logrps.post, diag = FALSE, order="hclust", method="square", tl.col="black",
+         addrect = 6, tl.cex = 0.5, title = "Lof RPS (Post-1980)", cex.main = .7, mar=c(0,0,1,0))
+
+
+```
+
+\newpage
+
+```{r, Log RPS tanglegram, echo = FALSE, message = FALSE, warning = FALSE, fig.align = "center", fig.height = 8, fig.width = 6, fig.cap = "Tanglegram comparing Log RPS pre- and post-enhancement (1980)"}
+# Dendrogram, factored by inlet, by logrps-score
+
+#png(file = "figures/tanglegram_1980_logrps.png", width = 2000, height = 3000, pointsilogrpse = 48)
+
+par(mfrow=c(1,1))
+
+# Pre-1980
+dist.cor.logrps.pre <- dist(cor.logrps.pre)
+clust.dist.cor.logrps.pre <- hclust(dist.cor.logrps.pre)
+tanglelabs.logrps.pre <- as.data.frame(clust.dist.cor.logrps.pre[["labels"]])
+colnames(tanglelabs.logrps.pre) <- "SYS_NM"
+#tanglelabs.logrps.pre <- merge(tanglelabs.logrps.pre, nameslookup, on = "SYS_NM")
+tanglelabs.logrps.pre$shortnames <- str_to_sentence(word(tanglelabs.logrps.pre$SYS_NM))
+clust.dist.cor.logrps.pre[["labels"]] <- tanglelabs.logrps.pre$shortnames
+dendlogrps.pre <- as.dendrogram(clust.dist.cor.logrps.pre)
+
+# Post-1980
+dist.cor.logrps.post <- dist(cor.logrps.post)
+clust.dist.cor.logrps.post <- hclust(dist.cor.logrps.post)
+tanglelabs.logrps.post <- as.data.frame(clust.dist.cor.logrps.post[["labels"]])
+colnames(tanglelabs.logrps.post) <- "SYS_NM"
+#tanglelabs.logrps.post <- merge(tanglelabs.logrps.post, nameslookup, on = "SYS_NM")
+tanglelabs.logrps.post$shortnames <- str_to_sentence(word(tanglelabs.logrps.post$SYS_NM))
+clust.dist.cor.logrps.post[["labels"]] <- tanglelabs.logrps.post$shortnames
+dendlogrps.post <- as.dendrogram(clust.dist.cor.logrps.post)
+
+# Tanglegram
+tangle.logrps <- dendlist(dendlogrps.pre, dendlogrps.post)
+tanglegram(tangle.logrps, lab.cex = .8, margin_inner = 3, main = "Log RPS", main_left = "Pre-1980",
+           main_right = "Post-1980", cex_main = 1, highlight_distinct_edges = FALSE,
+           lwd = 2, edge.lwd = 1)
+
+#dev.off()
+
+```
+
 \newpage
 
 # Statistical models
