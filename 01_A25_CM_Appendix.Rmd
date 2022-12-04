@@ -1,5 +1,5 @@
 ---
-title: "Spatial Analysis Figures"
+title: "Appendix 1"
 subtitle: "Area 25 Chum Salmon"
 author: "Coastland"
 date: "`r Sys.Date()`"
