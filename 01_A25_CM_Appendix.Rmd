@@ -1115,7 +1115,7 @@ ggplot(dg,aes(x=period,y=cc,fill=period))+
 
 ```
 
-```{r, Correlation plot by distance, echo = FALSE, warning = FALSE, message = FALSE, include = FALSE}
+```{r, Correlation plot by z-score distance, echo = FALSE, warning = FALSE, message = FALSE, include = FALSE}
 
 cordist <- as.data.frame(cor.z) %>%
   select(`CONUMA RIVER`)
@@ -1129,6 +1129,28 @@ cordist <- merge(streamdist, cordist, by = "SYS_NM")
 colnames(cordist) <- c("SYS_NM", "dist", "corcoef")
 
 saveRDS(cordist, "RDS/A25cordist.rds")
+
+ggplot(cordist, aes(x = dist, y = corcoef)) +
+  geom_point() +
+  ylab("Correlation coefficient") +
+  xlab("Distance from Conuma enhancement (km)")+
+  geom_smooth()
+```
+
+```{r, Correlation plot by logrps distance, echo = FALSE, warning = FALSE, message = FALSE, include = FALSE}
+
+cordist <- as.data.frame(cor.rpslog) %>%
+  select(`CONUMA RIVER`)
+cordist$SYS_NM <- rownames(cordist)
+
+streamdist <- streaminlet %>%
+  select(SYS_NM, distancefromconuma)
+colnames(streamdist) <- c("SYS_NM", "dist")
+streamdist$dist <- streamdist$dist/1000
+cordist <- merge(streamdist, cordist, by = "SYS_NM")
+colnames(cordist) <- c("SYS_NM", "dist", "corcoef")
+
+saveRDS(cordist, "RDS/A25cordist_rpslog.rds")
 
 ggplot(cordist, aes(x = dist, y = corcoef)) +
   geom_point() +
