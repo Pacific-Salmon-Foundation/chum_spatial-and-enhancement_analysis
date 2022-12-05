@@ -407,7 +407,7 @@ corrplot(cor.e, diag = FALSE, order="hclust", method="square", tl.col="black",
 corrplot(cor.s, diag = FALSE, order="hclust", method="square", tl.col="black",
          addrect = 6, tl.cex = 0.45, title = "Standardized escapement", mar=c(0,0,3,0))
 corrplot(cor.m, diag = FALSE, order="hclust", method="square", tl.col="black",
-         addrect = 6, tl.cex = 0.45, title = "Moving average", mar=c(0,0,3,0))
+         addrect = 6, tl.cex = 0.45,title = "Moving average", mar=c(0,0,3,0))
 corrplot(cor.rps, diag = FALSE, order="hclust", method="square", tl.col="black",
          addrect = 6, tl.cex = 0.45, title = "RPS", mar=c(0,0,3,0))
 corrplot(cor.rpslog, diag = FALSE, order="hclust", method="square", tl.col="black",
@@ -825,9 +825,7 @@ tanglegram(tangle.logrps, lab.cex = .8, margin_inner = 3, main = "Log RPS", main
 
 ```
 
-\newpage
 
-# Statistical models
 
 ```{r, Statistical models, echo = FALSE, message = FALSE, warning = FALSE, include = FALSE}
 
@@ -848,142 +846,142 @@ rps.clean$totrel[is.na(rps.clean$totrel)] <- 0
 rps.clean$totrel.M<-rps.clean$totrel/10e6
 # RPS MODELS
 
-a <- glm(logrps ~ dist, 
-         data = rps.clean)
-summary(a)
-
-b <- glm(logrps ~ Year, 
-         data = rps.clean)
-summary(b)
-
-c <- glm(logrps ~ totrel, 
-         data = rps.clean)
-summary(c)
-
-d <- glm(logrps ~ dist + Year,
+#d is distance, y is year, r is releases
+d <- glm(logrps ~ dist, 
          data = rps.clean)
 summary(d)
 
-e <- glm(logrps ~ dist + totrel,
+y <- glm(logrps ~ Year, 
          data = rps.clean)
-summary(e)
+summary(y)
 
-f <- glm(logrps ~ dist + totrel + Year,
+r <- glm(logrps ~ totrel, 
          data = rps.clean)
-summary(f)
+summary(r)
+
+dy <- glm(logrps ~ dist + Year,
+         data = rps.clean)
+summary(dy)
+
+ry<- glm(logrps ~ totrel + Year,
+         data = rps.clean)
+summary(ry)
+
+dr <- glm(logrps ~ dist + totrel,
+         data = rps.clean)
+summary(dr)
+
+dry <- glm(logrps ~ dist + totrel + Year,
+         data = rps.clean)
+summary(dry)
 
 g <- glm(logrps ~ dist + totrel.M + Year,
          data = rps.clean)
 summary(g)
 
-plot_summs(g)
-
-AIC(a, b, c, d, e, f)
+AIC(d,y,r,dy,ry,dr,dry)
 
 
 # ESCAPEMENT MODELS
 
-ea <- glm(esc.log ~ dist, 
+e.d <- glm(esc.log ~ dist, 
          data = rps.clean)
-summary(ea)
+summary(e.d)
 
-eb <- glm(esc.log ~ Year, 
+e.y <- glm(esc.log ~ Year, 
          data = rps.clean)
-summary(eb)
+summary(e.y)
 
-ec <- glm(esc.log ~ totrel, 
+e.r <- glm(esc.log ~ totrel, 
          data = rps.clean)
-summary(ec)
+summary(e.r)
 
-ed <- glm(esc.log ~ dist + Year,
+e.dy <- glm(esc.log ~ dist + Year,
          data = rps.clean)
-summary(ed)
+summary(e.dy)
 
-ee <- glm(esc.log ~ dist + totrel,
+e.dr <- glm(esc.log ~ dist + totrel,
          data = rps.clean)
-summary(ee)
+summary(e.dr)
 
-ef <- glm(esc.log ~ dist + totrel + Year,
+e.ry <- glm(esc.log ~ totrel + Year,
          data = rps.clean)
-summary(ef)
+summary(e.ry)
 
-AIC(ea, eb, ec, ed, ee, ef)
+e.dry <- glm(esc.log ~ dist + totrel + Year,
+         data = rps.clean)
+summary(e.dry)
+
+AIC(e.d,e.y,e.r,e.dy,e.dr,e.ry,e.dry)
 
 ```
 
 ```{r, Model summary tables, echo = FALSE, warning = FALSE, message = FALSE}
 candidates <- read_csv("data/area 6 chum candidate models.csv")
 
-rpscands <- as.data.frame(rbind(candidates[1:6,]))
-esccands <- as.data.frame(rbind(candidates[7:12,]))
+rpscands <- candidates %>% filter(Response=="Log RPS")
 
-rpsaic <- AIC(a, b, c, d, e, f)
-escaic <- AIC(ea, eb, ec, ed, ee, ef)
+rpsaic <- AIC(d,y,r,dy,dr,ry,dry)
+rpsaic$link<-rownames(rpsaic)
 
-rpscands$df <- rpsaic$df
-rpscands$AIC <- rpsaic$AIC
-rpscands <- rpscands %>%
-  arrange(AIC)
+rps.cand.AIC<-merge(rpscands,rpsaic)%>%select(-link)%>%arrange(AIC)
 
-esccands$df <- escaic$df
-esccands$AIC <- escaic$AIC
-esccands <- esccands %>%
-  arrange(AIC)
+esccands <- candidates %>% filter(Response=="Log esc")
+
+escaic <- AIC(e.d,e.y,e.r,e.dy,e.dr,e.ry,e.dry)
+escaic$link<-rownames(escaic)
+
+esc.cand.AIC<-merge(esccands,escaic)%>%select(-link)%>%arrange(AIC)
 
 ```
 
-## Table of log RPS candidate models and AIC selection
+\clearpage
+
+# Statistical models
+
+## Candidate Models with AIC scores for log RPS and log escapement
+
 
 ```{r, Log RPS candidate models and AIC selection, echo = FALSE, warning = FALSE, message = FALSE}
-kable(rpscands, format = "latex")
+kable(rps.cand.AIC, format = "latex",caption="Candidate models for log RPS and distance from enhancement (dist), total releases (totrel), and year, with AIC scores.")
 
 ```
 
-\newpage
-
-## Table of log escapement candidate models and AIC selection
 
 ```{r, Log escapement candidate models and AIC selection, echo = FALSE, warning = FALSE, message = FALSE}
-kable(esccands, format = "latex")
+kable(esc.cand.AIC, format = "latex",caption="Candidate models for log escapement and distance from enhancement (dist), total releases (totrel), and year, with AIC scores.")
 
 ```
 
-\newpage
 
-## Effects plot of log RPS against releases to area
+\clearpage
+
+## Effects plots for top model for log RPS
 
 ```{r, Effects plot of log RPS against releases to area, message = FALSE, echo = FALSE, warning = FALSE}
 
-effect_plot(f, pred = totrel, interval = TRUE, plot.points = TRUE, x.label = "Total releases to area", y.label = "Log recruits per spawner")
+effect_plot(dry, pred = totrel, interval = TRUE, plot.points = TRUE, x.label = "Total releases to area", y.label = "Log recruits per spawner")
 
 ```
-
-\newpage
-
-## Effects plot of log RPS against year
 
 ```{r, Effects plot of log RPS against year, message = FALSE, echo = FALSE, warning = FALSE}
 
-effect_plot(f, pred = Year, interval = TRUE, plot.points = TRUE, x.label = "Year", y.label = "Log recruits per spawner")
+effect_plot(dry, pred = Year, interval = TRUE, plot.points = TRUE, x.label = "Year", y.label = "Log recruits per spawner")
 
 ```
 
 \newpage
 
-## Effects plot of log Escapement against distance from enhancement
+## Effects plots for top model for log escapement
 
-```{r, Effects plot of log escapement against distance, message = FALSE, echo = FALSE, warning = FALSE}
+```{r, Effects plot of log escapement against distance, message = FALSE, echo = FALSE, warning = FALSE, fig.height=4}
 
-effect_plot(ed, pred = dist, interval = TRUE, plot.points = TRUE, x.label = "Distance from enhancement (km)", y.label = "Log escapement")
+effect_plot(e.dy, pred = dist, interval = TRUE, plot.points = TRUE, x.label = "Distance from enhancement (km)", y.label = "Log escapement")
 
 ```
 
-\newpage
+```{r, Effects plot, message = FALSE, echo = FALSE, warning = FALSE,fig.height=4}
 
-## Effects plot of log Escapement against year
-
-```{r, Effects plot of log escapement against year, message = FALSE, echo = FALSE, warning = FALSE}
-
-effect_plot(ed, pred = Year, interval = TRUE, plot.points = TRUE, x.label = "Year", y.label = "Log escapement")
+effect_plot(e.dy, pred = Year, interval = TRUE, plot.points = TRUE, x.label = "Year", y.label = "Log escapement")
 
 ```
