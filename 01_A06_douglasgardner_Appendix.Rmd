@@ -90,7 +90,22 @@ ggplot(escdata.filtered,aes(x=Year,y=escapement,color=Enhancement_Rank))+
 
 ```
 
-\newpage
+\clearpage
+
+## Douglas Gardner chum: distance from the Kitimat River by system
+
+```{r, Kable of distances by inlet, echo = FALSE, warning = FALSE, message = FALSE, fig.align="center", fig.height = 7, fig.width = 7}
+
+streaminlet <- read_csv("data/douglas gardner stream distances.csv")
+streaminlet <- streaminlet[,2:3]%>%arrange(dist_km)
+
+colnames(streaminlet) <- c("Stream", "Dist. from enhancement")
+
+kable(streaminlet, format = "latex",caption="Distance from Kitimat River (major enhancement location for chum systems included in analysis.")
+
+```
+
+\clearpage
 
 ## Hatchery Releases: Total and by release site
 
@@ -198,15 +213,17 @@ mean.z<-escdata.filtered%>%group_by(Enhancement_Rank,Year)%>%summarise(u=mean(z,
 
 ### Means trends by enhancement rank
 
-```{r means by enhancement rank, echo=FALSE,warning=FALSE,message=FALSE,fig.align="center",fig.height=4,fig.width=6,fig.cap="Douglas-Gardner chum: Mean Z-score for analsyis streams by enhancement rank."}
+```{r means by enhancement rank, echo=FALSE,warning=FALSE,message=FALSE,fig.align="center",fig.height=7,fig.width=6,fig.cap="Douglas-Gardner chum: Mean Z-score for analysis streams by enhancement rank. Linear regression over all years with SE are shown."}
 ggplot(mean.z,aes(x=Year,y=u,color=Enhancement_Rank))+
   geom_line(size=1.5,alpha=.7)+theme_bw()+
   scale_color_brewer(palette = "Set1")+
   labs(y="Mean Z-score")+
   geom_hline(yintercept=0,linetype="dashed")+
-  geom_vline(xintercept=1980)
+  geom_vline(xintercept=1980)+
+  facet_wrap(~Enhancement_Rank,ncol=1)+
+  geom_smooth(method="lm",color="black")+
+  guides(color=FALSE)
   
-
 ```
 
 \clearpage
@@ -215,7 +232,7 @@ ggplot(mean.z,aes(x=Year,y=u,color=Enhancement_Rank))+
 
 ### Recruits per spawner by system
 
-```{r, Plotting RPS by system, echo = FALSE, message = FALSE, warning = FALSE, fig.align = "center", fig.height = 10, fig.width = 8, fig.cap = "Douglas-Gardner chum: recruits per spawner by system."}
+```{r, Plotting RPS by system, echo = FALSE, message = FALSE, warning = FALSE, fig.align = "center", fig.height = 8, fig.width = 7, fig.cap = "Douglas-Gardner chum: recruits per spawner by system."}
 
 # RPS by system
 
@@ -230,9 +247,9 @@ ggplot(rps.clean,aes(x=Year,y=rps))+
 
 \newpage
 
-### Log recruits per spawner by system
+### Log recruits per spawner by system by period
 
-```{r, Log recruits per spawner by system, echo = FALSE, message = FALSE, warning = FALSE, fig.align = "center", fig.height = 10, fig.width = 8, fig.cap = "Douglas-Gardner chum: log recruits per spawner by system."}
+```{r, Log recruits per spawner by system, echo = FALSE, message = FALSE, warning = FALSE, fig.align = "center", fig.height = 8, fig.width = 8, fig.cap = "Douglas-Gardner chum: log recruits per spawner by system."}
 
 # Log RPS by system
 fy=1980
@@ -261,7 +278,7 @@ ggplot(logrps,aes(x=Year,y=logrps,color=prepost,group=grp))+
 
 \newpage
 
-## Boxplot of log RPS by system
+### Log RPS comparison before and after enhancement
 
 ```{r, Boxplot of log RPS by system, echo = FALSE, message = FALSE, warning = FALSE, fig.align = "center", fig.height = 7, fig.width = 8, fig.cap = "Douglas-Gardner chum: boxplot of log recruits per spawner by system."}
 
@@ -276,26 +293,13 @@ ggplot(logrps,aes( y = SYS_NM, x = logrps, fill = prepost))+
 #ggsave("figures/area 6 chum log rps pre vs post boxplot.png",dpi=600,height=8,width=7)
 
 ```
-\newpage
 
-## Douglas Gardner chum: distance from the Kitimat River by system
+\clearpage
 
-```{r, Kable of distances by inlet, echo = FALSE, warning = FALSE, message = FALSE, fig.align="center", fig.height = 7, fig.width = 7}
-
-streaminlet <- read_csv("data/douglas gardner stream distances.csv")
-streaminlet <- streaminlet[,2:3]%>%arrange(dist_km)
-
-colnames(streaminlet) <- c("Stream", "Dist. from enhancement")
-
-kable(streaminlet, format = "latex",caption="Distance from Kitimat River (major enhancement location for chum systems included in analysis.")
-
-```
-
-\newpage
-
-# Correlation analyses
+# Correlation analyses and Dendrograms
 
 ## Cross correlation plots
+
 ```{r, Correlation analyses, echo = FALSE, message = FALSE, warning = FALSE}
 
 rps.clean <- readRDS("RDS/douglas-gardner_cm_rpsclean.rds")
@@ -372,6 +376,7 @@ clust.dist.cor.rpslog <- hclust(dist.cor.rpslog)
 dendclust.rpslog <- dendro_data(clust.dist.cor.rpslog)
 
 ```
+
 
 ```{r, Correlation plots by metric, echo = FALSE, message = FALSE, error = FALSE, fig.align = "center", fig.height = 9.5, fig.width = 8.5, fig.cap = "Cross correlation plots to compare metrics."}
 par(oma=c(0,0,0,0))
@@ -501,7 +506,7 @@ rpsloglabs <- rpsloglabs$colour
 
 \newpage
 
-## Dendrogram clusters analysis
+## Dendrogram cluster analysis
 
 ```{r, Dendrogram plots, echo = FALSE, message = FALSE, warning = FALSE,  fig.align = "center", fig.height = 9.5, fig.width = 8.5, fig.cap = "Dendrogram cluster analysis to compare uses of different metrics. Colours plotted by subinlet; Dala = red; Douglas = blue; Kemano = green; Khutze = yellow; Kitimat arm = black; Quaal = turquoise"}
 
@@ -546,7 +551,7 @@ dendrpslog %>%
 ```
 \newpage
 
-## Tanglegrams
+## Tanglegrams to compare dendrograms
 
 ```{r, Tanglegrams z v log, echo = FALSE, message = FALSE, warning = FALSE, fig.align = "center", fig.height = 9.5, fig.width = 8.5, fig.cap = "Tanglegram of z-score vs. logged escapements"}
 
@@ -614,7 +619,7 @@ tanglegram(tangle4, lab.cex = .8, margin_inner = 3, main_left = "Z-score",
 
 \newpage
 
-## Pre- and post-1980 correlation analyses
+## Pre- and post-enhancement correlation analyses
 
 ```{r, Pre-1980 z, echo = FALSE, message = FALSE, warning = FALSE, fig.align = "center", fig.height = 8, fig.width = 6, fig.cap = "Cross correlation plots of z-scores to compare pre- and post-enhancement."}
 
