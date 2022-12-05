@@ -714,6 +714,7 @@ post<-post%>%pivot_longer(1:ncol(post)-1,names_to="stream2",values_to="cc")%>%
   mutate(cc=replace(cc,cc==1,NA),
          area="DG",period="Post")
 dg<-rbind(pre,post)
+
 u.pre<-mean(pre$cc,na.rm=TRUE)
 sd.pre<-sd(pre$cc,na.rm=TRUE)
 u.post<-mean(post$cc,na.rm=TRUE)
@@ -727,6 +728,8 @@ t.test(pre$cc,post$cc)
 ```
 
 ```{r, Comparison of Z-score pre- and post-1980, message = FALSE, error = FALSE, echo = FALSE,fig.align = "center", fig.height = 8, fig.width = 7, fig.cap = "Boxplot comparing Z-score pre- and post-1980."}
+
+saveRDS(dg, "RDS/a08_z_dg.rds")
 
 ggplot(dg,aes(x=period,y=cc,fill=period))+
   geom_boxplot() +
@@ -867,6 +870,8 @@ t.test(pre$cc,post$cc)
 ```
 
 ```{r, Comparison of log RPS pre- and post-1980, message = FALSE, error = FALSE, echo = FALSE,fig.align = "center", fig.height = 8, fig.width = 7, fig.cap = "Boxplot comparing log RPS pre- and post-1980."}
+
+saveRDS(dg, "RDS/a08_logrps_dg.rds")
 
 ggplot(dg,aes(x=period,y=cc,fill=period))+
   geom_boxplot() +
