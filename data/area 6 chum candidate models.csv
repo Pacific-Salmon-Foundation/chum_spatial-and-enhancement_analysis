@@ -1,15 +1,15 @@
-Response,Candidate model
-Log RPS,Log RPS ~ dist 
-Log RPS,Log RPS ~ year
-Log RPS,Log RPS ~ releases
-Log RPS,Log RPS ~ dist + year
-Log RPS,Log RPS ~ dist + totrel
-Log RPS,Log RPS ~ totrel + year
-Log RPS,Log RPS ~ dist + totrel + year
-Log esc,Log esc ~ dist 
-Log esc,Log esc ~ year
-Log esc,Log esc ~ releases
-Log esc,Log esc ~ dist + year
-Log esc,Log esc ~ dist + totrel
-Log esc,Log esc ~ totrel + year
-Log esc,Log esc ~ dist + totrel + year
+Response,Candidate model,link
+log RPS,Log RPS ~ dist ,d
+log RPS,Log RPS ~ year,y
+log RPS,Log RPS ~ releases,r
+log RPS,Log RPS ~ dist + year,dy
+log RPS,Log RPS ~ dist + totrel,dr
+log RPS,Log RPS ~ totrel + year,ry
+log RPS,Log RPS ~ dist + totrel + year,dry
+log escapement,Log esc ~ dist ,e.d
+log escapement,Log esc ~ year,e.y
+log escapement,Log esc ~ releases,e.r
+log escapement,Log esc ~ dist + year,e.dy
+log escapement,Log esc ~ dist + totrel,e.dr
+log escapement,Log esc ~ totrel + year,e.ry
+log escapement,Log esc ~ dist + totrel + year,e.dry

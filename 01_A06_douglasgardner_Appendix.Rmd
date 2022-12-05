@@ -919,14 +919,14 @@ AIC(e.d,e.y,e.r,e.dy,e.dr,e.ry,e.dry)
 ```{r, Model summary tables, echo = FALSE, warning = FALSE, message = FALSE}
 candidates <- read_csv("data/area 6 chum candidate models.csv")
 
-rpscands <- candidates %>% filter(Response=="Log RPS")
+rpscands <- candidates %>% filter(Response=="log RPS")
 
 rpsaic <- AIC(d,y,r,dy,dr,ry,dry)
 rpsaic$link<-rownames(rpsaic)
 
 rps.cand.AIC<-merge(rpscands,rpsaic)%>%select(-link)%>%arrange(AIC)
 
-esccands <- candidates %>% filter(Response=="Log esc")
+esccands <- candidates %>% filter(Response=="log escapement")
 
 escaic <- AIC(e.d,e.y,e.r,e.dy,e.dr,e.ry,e.dry)
 escaic$link<-rownames(escaic)
@@ -945,14 +945,16 @@ esc.cand.AIC<-merge(esccands,escaic)%>%select(-link)%>%arrange(AIC)
 
 ```{r, Log RPS candidate models and AIC selection, echo = FALSE, warning = FALSE, message = FALSE}
 
-kable(rps.cand.AIC, format = "latex",caption="Candidate models for log RPS and distance from enhancement (dist), total releases (totrel), and year, with AIC scores.")
+kable(rps.cand.AIC, format = "latex",caption="Candidate models for log RPS and distance from enhancement (dist), total releases (totrel), and year, with AIC scores.")%>%
+ kable_styling(latex_options = "hold_position")
 
 ```
 
 
 ```{r, Log escapement candidate models and AIC selection, echo = FALSE, warning = FALSE, message = FALSE}
 
-kable(esc.cand.AIC, format = "latex",caption="Candidate models for log escapement and distance from enhancement (dist), total releases (totrel), and year, with AIC scores.")
+kable(esc.cand.AIC, format = "latex",caption="Candidate models for log escapement and distance from enhancement (dist), total releases (totrel), and year, with AIC scores.")%>%
+   kable_styling(latex_options = "hold_position")
 
 ```
 
