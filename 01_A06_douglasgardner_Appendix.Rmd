@@ -902,6 +902,70 @@ ggplot(dg,aes(x=period,y=cc,fill=period))+
 
 \newpage
 
+```{r, Correlation bubbleplot, echo = FALSE, message = FALSE, warning = FALSE, include = FALSE}
+inlets <- read_csv("data/douglas-gardner subinlets.csv")%>%select(SYS_NM,inlet)
+f<-escdata.filtered%>%select(Year,SYS_NM,z)
+g<-merge(f,inlets,by="SYS_NM")
+ggplot(g,aes(x=Year,y=SYS_NM,size=z,color=z))+
+  geom_point(alpha=1)+
+  labs(y="Escapement",x="Year",size="Z-score")+
+  theme_bw()+
+  theme(legend.position="bottom")+
+  scale_colour_gradient2(low = "red",mid = "white",high = "green",
+    midpoint = 0,
+    space = "Lab",
+    na.value = "grey50",
+    guide = "colourbar")+
+  #guides(colour = guide_legend(nrow = 4))+
+  guides(size = guide_legend(nrow = 4))+
+  theme(axis.text.y = element_text(size = 6))+
+  facet_grid(inlet~.,switch="y",space="free_y",scale="free_y")
+
+```
+
+```{r, Correlation plot by z-score distance, echo = FALSE, warning = FALSE, message = FALSE, include = FALSE}
+
+cordist <- as.data.frame(cor.z) %>%
+  select(`KITIMAT RIVER`)
+cordist$SYS_NM <- rownames(cordist)
+
+streamdist <- streaminlet
+colnames(streamdist) <- c("SYS_NM", "dist")
+
+cordist <- merge(streamdist, cordist, by = "SYS_NM")
+colnames(cordist) <- c("SYS_NM", "dist", "corcoef")
+
+saveRDS(cordist, "RDS/A06cordist.rds")
+
+ggplot(cordist, aes(x = dist, y = corcoef)) +
+  geom_point() +
+  ylab("Correlation coefficient") +
+  xlab("Distance from Kitimat enhancement (km)")+
+  geom_smooth()
+```
+
+```{r, Correlation plot by logrps distance, echo = FALSE, warning = FALSE, message = FALSE, include = FALSE}
+
+cordist <- as.data.frame(cor.rpslog) %>%
+  select(`KITIMAT RIVER`)
+cordist$SYS_NM <- rownames(cordist)
+
+streamdist <- streaminlet
+colnames(streamdist) <- c("SYS_NM", "dist")
+
+cordist <- merge(streamdist, cordist, by = "SYS_NM")
+colnames(cordist) <- c("SYS_NM", "dist", "corcoef")
+
+saveRDS(cordist, "RDS/A06cordist_logrps.rds")
+
+ggplot(cordist, aes(x = dist, y = corcoef)) +
+  geom_point() +
+  ylab("Correlation coefficient") +
+  xlab("Distance from Kitimat enhancement (km)")+
+  geom_smooth()
+```
+
+
 ```{r, Statistical models, echo = FALSE, message = FALSE, warning = FALSE, include = FALSE}
 
 rps.clean <- readRDS("RDS/douglas-gardner_cm_rpsclean.rds")
