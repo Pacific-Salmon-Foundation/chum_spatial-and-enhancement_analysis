@@ -393,6 +393,7 @@ dist.cor.rpslog<- dist(cor.rpslog)
 clust.dist.cor.rpslog <- hclust(dist.cor.rpslog)
 dendclust.rpslog <- dendro_data(clust.dist.cor.rpslog)
 
+
 ```
 
 
@@ -731,6 +732,42 @@ tanglegram(tangle.z, lab.cex = .8, margin_inner = 3, main = "Z-scores", main_lef
 
 \newpage
 
+```{r, compute boxplot zscores, message = FALSE, error = FALSE, echo = FALSE, include = FALSE}
+
+pre<-data.frame(cor.z.pre)
+pre$stream1<-rownames(pre)
+post<-data.frame(cor.z.post)
+post$stream1<-rownames(post)
+pre<-pre%>%pivot_longer(1:ncol(pre)-1,names_to="stream2",values_to="cc")%>%
+  mutate(cc=replace(cc,cc==1,NA),
+         area="DG",period="Pre")
+post<-post%>%pivot_longer(1:ncol(post)-1,names_to="stream2",values_to="cc")%>%
+  mutate(cc=replace(cc,cc==1,NA),
+         area="DG",period="Post")
+dg<-rbind(pre,post)
+u.pre<-mean(pre$cc,na.rm=TRUE)
+sd.pre<-sd(pre$cc,na.rm=TRUE)
+u.post<-mean(post$cc,na.rm=TRUE)
+sd.post<-sd(post$cc,na.rm=TRUE)
+u.pre;sd.pre
+u.post;sd.post
+precc<-pre$cc
+postcc<-post$cc
+t.test(pre$cc,post$cc)
+
+```
+
+```{r, Comparison of Z-score pre- and post-1980, message = FALSE, error = FALSE, echo = FALSE,fig.align = "center", fig.height = 8, fig.width = 7, fig.cap = "Boxplot comparing Z-score pre- and post-1980."}
+
+ggplot(dg,aes(x=period,y=cc,fill=period))+
+  geom_boxplot() +
+  xlab("Period") +
+  ylab("Correlation coefficient")
+
+```
+
+\newpage
+
 ```{r, Pre-1980 logrps, echo = FALSE, message = FALSE, warning = FALSE, fig.align = "center", fig.height = 8, fig.width = 6, fig.cap = "Cross correlation plots of Log RPS to compare pre- and post-enhancement."}
 
 cor.data.logrps <-rps.clean %>%
@@ -826,6 +863,44 @@ tanglegram(tangle.logrps, lab.cex = .8, margin_inner = 3, main = "Log RPS", main
 ```
 
 
+\newpage
+
+```{r, compute boxplot logrps, message = FALSE, error = FALSE, echo = FALSE, include = FALSE}
+
+pre<-data.frame(cor.logrps.pre)
+pre$stream1<-rownames(pre)
+post<-data.frame(cor.logrps.post)
+post$stream1<-rownames(post)
+pre<-pre%>%pivot_longer(1:ncol(pre)-1,names_to="stream2",values_to="cc")%>%
+  mutate(cc=replace(cc,cc==1,NA),
+         area="DG",period="Pre")
+post<-post%>%pivot_longer(1:ncol(post)-1,names_to="stream2",values_to="cc")%>%
+  mutate(cc=replace(cc,cc==1,NA),
+         area="DG",period="Post")
+dg<-rbind(pre,post)
+u.pre<-mean(pre$cc,na.rm=TRUE)
+sd.pre<-sd(pre$cc,na.rm=TRUE)
+u.post<-mean(post$cc,na.rm=TRUE)
+sd.post<-sd(post$cc,na.rm=TRUE)
+u.pre;sd.pre
+u.post;sd.post
+precc<-pre$cc
+postcc<-post$cc
+t.test(pre$cc,post$cc)
+
+```
+
+```{r, Comparison of log RPS pre- and post-1980, message = FALSE, error = FALSE, echo = FALSE,fig.align = "center", fig.height = 8, fig.width = 7, fig.cap = "Boxplot comparing log RPS pre- and post-1980."}
+
+ggplot(dg,aes(x=period,y=cc,fill=period))+
+  geom_boxplot() +
+  xlab("Period") +
+  ylab("Correlation coefficient")
+
+
+```
+
+\newpage
 
 ```{r, Statistical models, echo = FALSE, message = FALSE, warning = FALSE, include = FALSE}
 
