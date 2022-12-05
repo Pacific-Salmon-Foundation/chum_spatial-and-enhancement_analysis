@@ -34,6 +34,7 @@ a06_logrps <- ggplot(a06cordist_logrps, aes(x = dist, y = corcoef)) +
   geom_smooth()
 
 
+
 a25cordist_logrps <- readRDS("RDS/A25cordist_rpslog.rds")%>%filter(SYS_NM!="CONUMA RIVER")%>%
   mutate(area="Area 25",metric="log(RPS)")
 
