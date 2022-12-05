@@ -13,10 +13,17 @@ post<-post%>%pivot_longer(1:ncol(post)-1,names_to="stream2",values_to="cc")%>%
   mutate(cc=replace(cc,cc==1,NA),
          area="DG",period="Post")
 
-dg<-rbind(pre,post)
+dg<-rbind(pre,post)%>%mutate(posneg=ifelse(cc<0,"neg","pos"))
 
 ggplot(dg,aes(x=period,y=cc,fill=period))+
   geom_boxplot()
+
+hist(pre$cc)
+hist(post$cc)
+
+ggplot(dg,aes(x=cc,fill=posneg))+
+  geom_histogram(color="black",bins=50)+
+  facet_grid(period~.)
 
 
 u.pre<-mean(pre$cc,na.rm=TRUE)
