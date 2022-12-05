@@ -78,7 +78,7 @@ ggsave("figures/area 6 chum escapement data all.png",dpi=600,height=8,width=7)
 
 ## Plot of total releases to area
 
-```{r total releases for area 6 terminal not including mcloughlin bay, include = TRUE, echo = FALSE, warning = FALSE, message = FALSE, fig.align = "center", fig.height = 6, fig.width = 8, fig.cap = "Total releases for area 6 (not including McLoughlin Bay)"}
+```{r total releases, include = TRUE, echo = FALSE, warning = FALSE, message = FALSE, fig.align = "center", fig.height = 6, fig.width = 8, fig.cap = "Total releases in the Douglas Gardner CU."}
 
 #total releases for DG
 
@@ -90,14 +90,14 @@ totalrel.DG <- releases.DG %>%
   summarise(totreleases=sum(releases))%>%
   mutate(group="Douglas Gardner CU")
 
-write.csv(totalrel.DG,"data/releases area 6 chum total terminal releases.csv")
-saveRDS(totalrel.DG, "RDS/a06cm_totrel.rds")
+#write.csv(totalrel.DG,"data/releases area 6 chum total terminal releases.csv")
+#saveRDS(totalrel.DG, "RDS/a06cm_totrel.rds")
 
-ggplot(totalrel.DG,aes(x=RELEASE_YEAR,y=totreleases,color=group))+
-  geom_point()+geom_line()+
+ggplot(totalrel.DG,aes(x=RELEASE_YEAR,y=totreleases))+
+  geom_col(fill="steelblue",color="black")+
   theme_bw()+
-  geom_smooth() +
-  labs(x="Release Year",y="Total Releases",title="Area 6 Chum total terminal releases")
+  #geom_smooth(se=FALSE,color="black")+
+  labs(x="Release Year",y="Total Releases",title="Douglas Gardner Chum: Total Releases")
 
 #ggsave("figures/releases chum area 6 total terminal.png",dpi=600,height=6,width=6)
 
@@ -108,7 +108,7 @@ ggplot(totalrel.DG,aes(x=RELEASE_YEAR,y=totreleases,color=group))+
 
 ## Escapement by enhancement rank per system
 
-```{r metric plots,fig.align="center",fig.height=8,fig.width=6,fig.cap="Various plots for escapement and transformations.",echo=FALSE,warning=FALSE,message=FALSE}
+```{r metric plots,fig.align="center",fig.height=8,fig.width=10,fig.cap="Various plots for escapement and transformations.",echo=FALSE,warning=FALSE,message=FALSE}
 #plot streams by enhancement
 
 p1<-ggplot(escdata.filtered,aes(x=Year,y=escapement,color=Enhancement_Rank,group=SYS_NM))+
@@ -162,7 +162,7 @@ ggarrange(t1,t2,ncol=1,common.legend = TRUE,legend = "bottom",align='v')
 
 ## Escapement to streams by enhancement rank
 
-```{r, Facet plot of escapements by enhancement ranking, echo = FALSE, message = FALSE, warning = FALSE, fig.align = "center", fig.height = 7, fig.width = 8, fig.cap = "Facet plot of escapements by enhancement level"}
+```{r, Facet plot of escapements by enhancement ranking, echo = FALSE, message = FALSE, warning = FALSE, fig.align = "center", fig.height = 10, fig.width = 8, fig.cap = "Facet plot of escapements by enhancement level"}
 
 ggplot(escdata.filtered,aes(x=Year,y=escapement,color=Enhancement_Rank))+
   geom_point()+geom_line()+theme_bw()+
@@ -170,19 +170,18 @@ ggplot(escdata.filtered,aes(x=Year,y=escapement,color=Enhancement_Rank))+
   labs(y="Escapement",color="Enhancement Level",title="Area 6 Escapement (filtered streams)")+
   theme(legend.position="bottom")
 
-ggsave("figures/area 6 chum escapement filtered streams.png",dpi=600,height=8,width=7)
+#ggsave("figures/area 6 chum escapement filtered streams.png",dpi=600,height=8,width=7)
 
 ```
 
 \newpage
 
-## Facet plot of all releases in Area 6
+## Releases by release site for chum in the Douglas Gardner CU
 
-```{r, Facet plot of all releases in Area 6, echo = FALSE, message = FALSE, warning = FALSE, fig.align = "center", fig.height = 7, fig.width = 8, fig.cap = "Facet plot of all releases in area 6"}
+```{r, Facet plot of all releases in Area 6, echo = FALSE, message = FALSE, warning = FALSE, fig.align = "center", fig.height = 7, fig.width = 8, fig.cap = "Releases by release site for chum in the Douglas Gardner CU."}
 
 species="Chum"
 rel.cu.name= "Douglas Gardner CU"
-fy=1980
 
 ggplot(releases,aes(x=RELEASE_YEAR,y=releases,color=RELEASE_STAGE_NAME,group=grp))+
   geom_line()+geom_point()+
@@ -200,13 +199,13 @@ ggplot(releases,aes(x=RELEASE_YEAR,y=releases,color=RELEASE_STAGE_NAME,group=grp
 
 ## Recruits per spawner by system
 
-```{r, Plotting RPS by system, echo = FALSE, message = FALSE, warning = FALSE, fig.align = "center", fig.height = 7, fig.width = 8, fig.cap = "Recruits per spawner by system"}
+```{r, Plotting RPS by system, echo = FALSE, message = FALSE, warning = FALSE, fig.align = "center", fig.height = 10, fig.width = 8, fig.cap = "Douglas-Gardner chum: recruits per spawner by system."}
 
 # RPS by system
 
 ggplot(rps.clean,aes(x=Year,y=rps))+
   geom_line()+geom_point()+
-  geom_smooth(method='lm',se=TRUE)+
+  geom_smooth(method='lm',se=TRUE,size=.7)+
   facet_wrap(~SYS_NM,ncol=3,scale="free_y")+
   theme_bw()+
   geom_hline(yintercept=1)
@@ -217,7 +216,7 @@ ggplot(rps.clean,aes(x=Year,y=rps))+
 
 ## Log recruits per spawner by system
 
-```{r, Log recruits per spawner by system, echo = FALSE, message = FALSE, warning = FALSE, fig.align = "center", fig.height = 7, fig.width = 8, fig.cap = "Log recruits per spawner by system"}
+```{r, Log recruits per spawner by system, echo = FALSE, message = FALSE, warning = FALSE, fig.align = "center", fig.height = 10, fig.width = 8, fig.cap = "Douglas-Gardner chum: log recruits per spawner by system."}
 
 # Log RPS by system
 
@@ -239,7 +238,7 @@ ggplot(logrps,aes(x=Year,y=logrps,color=prepost,group=grp))+
   labs(x="Brood Year",y="log(Recruits per spawner)",color="Period",title="Area 6 Chum")+
   theme(legend.position="bottom")
 
-ggsave("figures/area 6 chum log rps pre vs post.png",dpi=600,height=8,width=7)
+#ggsave("figures/area 6 chum log rps pre vs post.png",dpi=600,height=8,width=7)
 
 ```
 
@@ -247,17 +246,17 @@ ggsave("figures/area 6 chum log rps pre vs post.png",dpi=600,height=8,width=7)
 
 ## Boxplot of log RPS by system
 
-```{r, Boxplot of log RPS by system, echo = FALSE, message = FALSE, warning = FALSE, fig.align = "center", fig.height = 7, fig.width = 8, fig.cap = "Boxplot of log recruits per spawner by system"}
+```{r, Boxplot of log RPS by system, echo = FALSE, message = FALSE, warning = FALSE, fig.align = "center", fig.height = 7, fig.width = 8, fig.cap = "Douglas-Gardner chum: boxplot of log recruits per spawner by system."}
 
 ggplot(logrps,aes( y = SYS_NM, x = logrps, fill = prepost))+
   geom_boxplot(notch=F)+
   scale_fill_brewer(palette="Set1")+
   geom_vline(xintercept=0)+
   theme_bw()+
-  labs(y="System Name",x="log(Recruits per spawner)",title="Area 6 Chum")+
+  labs(y="System Name",x="log(recruits per spawner)",title="Area 6 Chum",fill="Period")+
   theme(legend.position="bottom")
 
-ggsave("figures/area 6 chum log rps pre vs post boxplot.png",dpi=600,height=8,width=7)
+#ggsave("figures/area 6 chum log rps pre vs post boxplot.png",dpi=600,height=8,width=7)
 
 ```
 \newpage

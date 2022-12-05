@@ -51,13 +51,13 @@ rps.clean <- readRDS("RDS/douglas-gardner_cm_rpsclean.rds")
 
 \newpage
 
-# Summary statistics
+# Summary figures
 
-## Bubbleplot of escapement by enhancement rank
+## Douglas-Gardner chum: Escapement
 
-```{r, Bubble plot, fig.align = "center", fig.height = 7, fig.width = 6, fig.cap = "Escapement to area streams by enhancement rank.",echo = FALSE, warning = FALSE, message = FALSE}
+```{r, Bubble plot, fig.align = "center", fig.height = 8, fig.width = 6, fig.cap = "Escapement to all Douglas-Gardner chum streams in the PSE database, by enhancement rank.",echo = FALSE, warning = FALSE, message = FALSE}
 
-escdata.raw<-escdata %>% filter(SPP == "CM" & Area == 8)
+escdata.raw<-escdata %>% filter(SPP == "CM" & Area == 6)
 
 ggplot(escdata.raw,aes(x=Year,y=SYS_NM,color=Enhancement_Rank,size=escapement))+
   geom_point(alpha=.5)+
@@ -68,7 +68,7 @@ ggplot(escdata.raw,aes(x=Year,y=SYS_NM,color=Enhancement_Rank,size=escapement))+
   theme(legend.position="bottom")+
   guides(colour = guide_legend(nrow = 4))+
   guides(size = guide_legend(nrow = 4))+ 
-  theme(axis.text.x = element_text(size = 7))
+  theme(axis.text.x = element_text(size = 6))
 
 #unique(escdata.raw$SYS_NM)
 ggsave("figures/area 6 chum escapement data all.png",dpi=600,height=8,width=7)
@@ -76,7 +76,21 @@ ggsave("figures/area 6 chum escapement data all.png",dpi=600,height=8,width=7)
 
 \newpage
 
-## Plot of total releases to area
+```{r, Facet plot of escapements by enhancement ranking, echo = FALSE, message = FALSE, warning = FALSE, fig.align = "center", fig.height = 10, fig.width = 8, fig.cap = "Escapement to filtered in analysis streams for Douglas-Gardner chum. Colour shows the stream level enhancement level from the PSE database."}
+
+ggplot(escdata.filtered,aes(x=Year,y=escapement,color=Enhancement_Rank))+
+  geom_point()+geom_line()+theme_bw()+
+  facet_wrap(~SYS_NM,ncol=3,scale="free_y")+
+  labs(y="Escapement",color="Enhancement Level",title="Area 6 Escapement (filtered streams)")+
+  theme(legend.position="bottom")
+
+#ggsave("figures/area 6 chum escapement filtered streams.png",dpi=600,height=8,width=7)
+
+```
+
+\newpage
+
+## Douglas-Gardner chum: Hatchery Releases
 
 ```{r total releases, include = TRUE, echo = FALSE, warning = FALSE, message = FALSE, fig.align = "center", fig.height = 6, fig.width = 8, fig.cap = "Total releases in the Douglas Gardner CU."}
 
@@ -102,6 +116,25 @@ ggplot(totalrel.DG,aes(x=RELEASE_YEAR,y=totreleases))+
 #ggsave("figures/releases chum area 6 total terminal.png",dpi=600,height=6,width=6)
 
 #write.csv(totrel,"~/R/PSF hatchery review/analysis/spatial/outputs/Area 25 chum releases totals.csv")
+```
+
+\newpage
+
+```{r, Facet plot of all releases in Area 6, echo = FALSE, message = FALSE, warning = FALSE, fig.align = "center", fig.height = 7, fig.width = 8, fig.cap = "Releases by release site:origin stock for chum in the Douglas Gardner CU."}
+
+species="Chum"
+rel.cu.name= "Douglas Gardner CU"
+
+ggplot(releases,aes(x=RELEASE_YEAR,y=releases,color=RELEASE_STAGE_NAME,group=grp))+
+  geom_line()+geom_point()+
+  scale_color_brewer(palette="Set1")+
+  facet_wrap(~`site-stock`,ncol=4)+
+  theme_bw()+
+  labs(x="Release Year",y="Releases",color="Release Stage",
+       title=paste0(species,": ",paste0(rel.cu.name,collapse=" ")),subtitle="Release site:Origin stock")+
+  theme(legend.position = "bottom",
+        plot.title=element_text(size=8),strip.text=element_text(size=8))
+
 ```
 
 \newpage
@@ -154,44 +187,6 @@ t2<-ggplot(escdata.filtered,aes(x=Year,y=z,color=Enhancement_Rank,group=SYS_NM))
   labs(y="Z-score",title="Loess fit on Z-scores")
 
 ggarrange(t1,t2,ncol=1,common.legend = TRUE,legend = "bottom",align='v')
-
-```
-
-
-\newpage
-
-## Escapement to streams by enhancement rank
-
-```{r, Facet plot of escapements by enhancement ranking, echo = FALSE, message = FALSE, warning = FALSE, fig.align = "center", fig.height = 10, fig.width = 8, fig.cap = "Facet plot of escapements by enhancement level"}
-
-ggplot(escdata.filtered,aes(x=Year,y=escapement,color=Enhancement_Rank))+
-  geom_point()+geom_line()+theme_bw()+
-  facet_wrap(~SYS_NM,ncol=3,scale="free_y")+
-  labs(y="Escapement",color="Enhancement Level",title="Area 6 Escapement (filtered streams)")+
-  theme(legend.position="bottom")
-
-#ggsave("figures/area 6 chum escapement filtered streams.png",dpi=600,height=8,width=7)
-
-```
-
-\newpage
-
-## Releases by release site for chum in the Douglas Gardner CU
-
-```{r, Facet plot of all releases in Area 6, echo = FALSE, message = FALSE, warning = FALSE, fig.align = "center", fig.height = 7, fig.width = 8, fig.cap = "Releases by release site for chum in the Douglas Gardner CU."}
-
-species="Chum"
-rel.cu.name= "Douglas Gardner CU"
-
-ggplot(releases,aes(x=RELEASE_YEAR,y=releases,color=RELEASE_STAGE_NAME,group=grp))+
-  geom_line()+geom_point()+
-  scale_color_brewer(palette="Set1")+
-  facet_wrap(~`site-stock`,ncol=4)+
-  theme_bw()+
-  labs(x="Release Year",y="Releases",color="Release Stage",
-       title=paste0(species,": ",paste0(rel.cu.name,collapse=" ")),subtitle="Release site:Origin stock")+
-  theme(legend.position = "bottom",
-        plot.title=element_text(size=8),strip.text=element_text(size=8))
 
 ```
 
@@ -806,7 +801,7 @@ totrels <- totrels[1:32,]
 
 rps.clean <- merge(rps.clean, totrels, by = "Year", all = TRUE)
 rps.clean$totrel[is.na(rps.clean$totrel)] <- 0
-
+rps.clean$totrel.M<-rps.clean$totrel/10e6
 # RPS MODELS
 
 a <- glm(logrps ~ dist, 
@@ -832,6 +827,12 @@ summary(e)
 f <- glm(logrps ~ dist + totrel + Year,
          data = rps.clean)
 summary(f)
+
+g <- glm(logrps ~ dist + totrel.M + Year,
+         data = rps.clean)
+summary(g)
+
+plot_summs(g)
 
 AIC(a, b, c, d, e, f)
 
