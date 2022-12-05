@@ -935,6 +935,7 @@ esc.cand.AIC<-merge(esccands,escaic)%>%select(-link)%>%arrange(AIC)
 
 ```
 
+
 \clearpage
 
 # Statistical models
@@ -943,12 +944,14 @@ esc.cand.AIC<-merge(esccands,escaic)%>%select(-link)%>%arrange(AIC)
 
 
 ```{r, Log RPS candidate models and AIC selection, echo = FALSE, warning = FALSE, message = FALSE}
+
 kable(rps.cand.AIC, format = "latex",caption="Candidate models for log RPS and distance from enhancement (dist), total releases (totrel), and year, with AIC scores.")
 
 ```
 
 
 ```{r, Log escapement candidate models and AIC selection, echo = FALSE, warning = FALSE, message = FALSE}
+
 kable(esc.cand.AIC, format = "latex",caption="Candidate models for log escapement and distance from enhancement (dist), total releases (totrel), and year, with AIC scores.")
 
 ```
