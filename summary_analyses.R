@@ -17,7 +17,10 @@ a25 <- ggplot(a25cordist, aes(x = dist, y = corcoef)) +
   xlab("Distance from Conuma enhancement (km)")+
   geom_smooth()
 
+
+png(file = "figures/zscore_summary.png")
 ggarrange(nrow = 2, a06, a25)
+dev.off()
 
 a06cordist_logrps <- readRDS("RDS/A06cordist_logrps.rds")
 
@@ -36,4 +39,6 @@ a25_logrps <- ggplot(a25cordist_logrps, aes(x = dist, y = corcoef)) +
   xlab("Distance from Conuma enhancement (km)")+
   geom_smooth()
 
+png(file = "figures/logrps_summary.png")
 ggarrange(nrow = 2, a06_logrps, a25_logrps)
+dev.off()
