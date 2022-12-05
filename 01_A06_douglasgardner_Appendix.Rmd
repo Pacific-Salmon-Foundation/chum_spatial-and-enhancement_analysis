@@ -249,8 +249,8 @@ ggplot(rps.clean,aes(x=Year,y=rps))+
 
 ### Log recruits per spawner by system by period
 
-```{r, Log recruits per spawner by system, echo = FALSE, message = FALSE, warning = FALSE, fig.align = "center", fig.height = 8, fig.width = 8, fig.cap = "Douglas-Gardner chum: log recruits per spawner by system."}
-
+```{r, Log recruits per spawner by system, echo = FALSE, message = FALSE, warning = FALSE, fig.align = "center", fig.height = 8, fig.width = 8, fig.cap = "Douglas-Gardner chum: log recruits per spawner by system fitted with linear regression for the periods pre- and post-enhancement (Aaltanhash to Kildala)."}
+#nrow(logrps)
 # Log RPS by system
 fy=1980
 
@@ -259,9 +259,27 @@ logrps<-rps.clean%>%select(Year,prepost,logrps,SYS_NM)%>%arrange(SYS_NM,prepost,
 idx <- c(1, diff(logrps$Year))
 i2 <- c(1,which(idx != 1), nrow(logrps)+1)
 logrps$grp <- rep(1:length(diff(i2)), diff(i2))
-logrps <- logrps[1:930,]
 
-ggplot(logrps,aes(x=Year,y=logrps,color=prepost,group=grp))+
+#split into 2 batches
+logrps.1 <- logrps[1:930,]
+logrps.2 <- logrps[931:nrow(logrps),]
+
+ggplot(logrps.1,aes(x=Year,y=logrps,color=prepost,group=grp))+
+  geom_line(alpha=.5)+geom_point(alpha=.5)+
+  scale_color_brewer(palette="Set1")+
+  geom_smooth(method='lm',se=TRUE)+
+  facet_wrap(~SYS_NM,ncol=3,scale="free_y")+
+  theme_bw()+
+  geom_vline(xintercept=fy,color="seagreen")+
+  geom_hline(yintercept=0,linetype="dashed")+
+  labs(x="Brood Year",y="log(Recruits per spawner)",color="Period",title="Area 6 Chum")+
+  theme(legend.position="bottom")
+```
+
+
+```{r, Log recruits per spawner by system2, echo = FALSE, message = FALSE, warning = FALSE, fig.align = "center", fig.height = 8, fig.width = 8, fig.cap = "Douglas-Gardner chum: log recruits per spawner by system fitted with linear regression for the periods pre- and post-enhancement (Kiltuish to Weewanie)."}
+
+ggplot(logrps.2,aes(x=Year,y=logrps,color=prepost,group=grp))+
   geom_line(alpha=.5)+geom_point(alpha=.5)+
   scale_color_brewer(palette="Set1")+
   geom_smooth(method='lm',se=TRUE)+
