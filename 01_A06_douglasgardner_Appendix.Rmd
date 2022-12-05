@@ -31,6 +31,8 @@ library(corrplot)
 library(ggdendro)
 library(ggpubr)
 
+options(scipen=10000)
+
 # Load in objects from Area 6 data prep script
 
 releases <- readRDS("RDS/douglas-gardner_releases.rds")
@@ -53,7 +55,7 @@ rps.clean <- readRDS("RDS/douglas-gardner_cm_rpsclean.rds")
 
 # Summary figures
 
-## Douglas-Gardner chum: Escapement
+## Escapement: Raw and filtered stream list
 
 ```{r, Bubble plot, fig.align = "center", fig.height = 8, fig.width = 6, fig.cap = "Escapement to all Douglas-Gardner chum streams in the PSE database, by enhancement rank.",echo = FALSE, warning = FALSE, message = FALSE}
 
@@ -68,10 +70,10 @@ ggplot(escdata.raw,aes(x=Year,y=SYS_NM,color=Enhancement_Rank,size=escapement))+
   theme(legend.position="bottom")+
   guides(colour = guide_legend(nrow = 4))+
   guides(size = guide_legend(nrow = 4))+ 
-  theme(axis.text.x = element_text(size = 6))
+  theme(axis.text.y = element_text(size = 6))
 
 #unique(escdata.raw$SYS_NM)
-ggsave("figures/area 6 chum escapement data all.png",dpi=600,height=8,width=7)
+#ggsave("figures/area 6 chum escapement data all.png",dpi=600,height=8,width=7)
 ```
 
 \newpage
@@ -90,7 +92,7 @@ ggplot(escdata.filtered,aes(x=Year,y=escapement,color=Enhancement_Rank))+
 
 \newpage
 
-## Douglas-Gardner chum: Hatchery Releases
+## Hatchery Releases: Total and by release site
 
 ```{r total releases, include = TRUE, echo = FALSE, warning = FALSE, message = FALSE, fig.align = "center", fig.height = 6, fig.width = 8, fig.cap = "Total releases in the Douglas Gardner CU."}
 
@@ -139,9 +141,11 @@ ggplot(releases,aes(x=RELEASE_YEAR,y=releases,color=RELEASE_STAGE_NAME,group=grp
 
 \newpage
 
-## Escapement by enhancement rank per system
+## Metrics
 
-```{r metric plots,fig.align="center",fig.height=8,fig.width=10,fig.cap="Various plots for escapement and transformations.",echo=FALSE,warning=FALSE,message=FALSE}
+### Escapement, logged escapement, Z-scores, Pavg, and moving average
+
+```{r metric plots,fig.align="center",fig.height=9,fig.width=9,fig.cap="Various plots for escapement and transformations.",echo=FALSE,warning=FALSE,message=FALSE}
 #plot streams by enhancement
 
 p1<-ggplot(escdata.filtered,aes(x=Year,y=escapement,color=Enhancement_Rank,group=SYS_NM))+
@@ -171,10 +175,9 @@ ggarrange(p1,p2,p3,p4,ncol=1,common.legend = TRUE,align='v',legend="bottom")
 
 \newpage
 
-## Moving average and LOESSS fit on enhancement ranking of log escapements
+### Moving average and LOESS fits
 
 ```{r moving average and LOESS plots, echo=FALSE,warning=FALSE,message=FALSE,fig.align="center",fig.height=5,fig.width=6,fig.cap="Moving average and LOESS fits on logged escapement by enhancement ranking."}
-
 t1<-ggplot(escdata.filtered,aes(x=Year,y=m.ave,color=Enhancement_Rank,group=SYS_NM))+
   geom_line()+
   theme_bw()+
@@ -188,11 +191,29 @@ t2<-ggplot(escdata.filtered,aes(x=Year,y=z,color=Enhancement_Rank,group=SYS_NM))
 
 ggarrange(t1,t2,ncol=1,common.legend = TRUE,legend = "bottom",align='v')
 
+mean.z<-escdata.filtered%>%group_by(Enhancement_Rank,Year)%>%summarise(u=mean(z,na.rm=TRUE))
 ```
 
 \newpage
 
-## Recruits per spawner by system
+### Means trends by enhancement rank
+
+```{r means by enhancement rank, echo=FALSE,warning=FALSE,message=FALSE,fig.align="center",fig.height=4,fig.width=6,fig.cap="Douglas-Gardner chum: Mean Z-score for analsyis streams by enhancement rank."}
+ggplot(mean.z,aes(x=Year,y=u,color=Enhancement_Rank))+
+  geom_line(size=1.5,alpha=.7)+theme_bw()+
+  scale_color_brewer(palette = "Set1")+
+  labs(y="Mean Z-score")+
+  geom_hline(yintercept=0,linetype="dashed")+
+  geom_vline(xintercept=1980)
+  
+
+```
+
+\clearpage
+
+## Recruits per spawners
+
+### Recruits per spawner by system
 
 ```{r, Plotting RPS by system, echo = FALSE, message = FALSE, warning = FALSE, fig.align = "center", fig.height = 10, fig.width = 8, fig.cap = "Douglas-Gardner chum: recruits per spawner by system."}
 
@@ -209,7 +230,7 @@ ggplot(rps.clean,aes(x=Year,y=rps))+
 
 \newpage
 
-## Log recruits per spawner by system
+### Log recruits per spawner by system
 
 ```{r, Log recruits per spawner by system, echo = FALSE, message = FALSE, warning = FALSE, fig.align = "center", fig.height = 10, fig.width = 8, fig.cap = "Douglas-Gardner chum: log recruits per spawner by system."}
 
