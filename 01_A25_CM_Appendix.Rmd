@@ -107,7 +107,7 @@ ggplot(escdata.filt,aes(x=Year,y=escapement,color=Enhancement_Rank))+
 swvi.chum<-fread("data/swvi chum releases filtered.csv")
 
 ggdata.rel <- swvi.chum
-ggdata.rel <- ggdata.rel[,2:14]
+ggdata.rel <- ggdata.rel[,2:13]
 
 idx <- c(1, diff(ggdata.rel$RELEASE_YEAR))
 i2 <- c(1,which(idx != 1), nrow(ggdata.rel)+1)
@@ -836,6 +836,65 @@ corrplot(cor.m.post, diag = FALSE, order="hclust", method="square", tl.col="blac
 
 \newpage
 
+```{r, Pre-1980 logrps, echo = FALSE, message = FALSE, warning = FALSE, fig.align = "center", fig.height = 8, fig.width = 6, fig.cap = "Cross correlation plots of Log RPS to compare pre- and post-enhancement."}
+
+cor.data.logrps <-rps.clean %>%
+  select(SYS_NM,Year,logrps) %>%
+  pivot_wider(names_from="Year",values_from="logrps") %>%
+  data.frame()
+
+cor.data.logrps.pre<-cor.data.logrps[,1:27]
+rownames(cor.data.logrps.pre)<-cor.data.logrps.pre$SYS_NM
+cor.data.logrps.pre<-cor.data.logrps.pre%>%select(-SYS_NM)
+cor.logrps.pre<-cor(t(cor.data.logrps.pre),use="pairwise.complete.obs")
+
+cor.data.logrps.post<-cor.data.logrps[,c(1,28:63)]
+rownames(cor.data.logrps.post)<-cor.data.logrps.post$SYS_NM
+cor.data.logrps.post<-cor.data.logrps.post%>%select(-SYS_NM)
+cor.logrps.post<-cor(t(cor.data.logrps.post),use="pairwise.complete.obs")
+
+dist.cor.logrps.pre <- dist(cor.logrps.pre)
+clust.dist.cor.logrps.pre <- hclust(dist.cor.logrps.pre)
+tanglelabs.logrps.pre <- as.data.frame(clust.dist.cor.logrps.pre[["labels"]])
+colnames(tanglelabs.logrps.pre) <- "SYS_NM"
+tanglelabs.logrps.pre$shortnames <- str_to_sentence(word(tanglelabs.logrps.pre$SYS_NM))
+#colnames(nameslookup) <- "SYS_NM"
+clust.dist.cor.logrps.pre[["labels"]] <- tanglelabs.logrps.pre$shortnames
+dendlogrps.pre <- as.dendrogram(clust.dist.cor.logrps.pre)
+
+# Post-1980
+cor.data.logrps.post<-cor.data.logrps[,1:26]
+rownames(cor.data.logrps.post)<-cor.data.logrps.post$SYS_NM
+cor.data.logrps.post<-cor.data.logrps.post%>%select(-SYS_NM)
+cor.logrps.post<-cor(t(cor.data.logrps.post),use="pairwise.complete.obs")
+
+cor.data.logrps.post<-cor.data.logrps[,c(1,27:62)]
+rownames(cor.data.logrps.post)<-cor.data.logrps.post$SYS_NM
+cor.data.logrps.post<-cor.data.logrps.post%>%select(-SYS_NM)
+cor.logrps.post<-cor(t(cor.data.logrps.post),use="pairwise.complete.obs")
+
+dist.cor.logrps.post <- dist(cor.logrps.post)
+clust.dist.cor.logrps.post <- hclust(dist.cor.logrps.post)
+tanglelabs.logrps.post <- as.data.frame(clust.dist.cor.logrps.post[["labels"]])
+colnames(tanglelabs.logrps.post) <- "SYS_NM"
+tanglelabs.logrps.post$shortnames <- str_to_sentence(word(tanglelabs.logrps.post$SYS_NM))
+#colnames(nameslookup) <- "SYS_NM"
+clust.dist.cor.logrps.post[["labels"]] <- tanglelabs.logrps.post$shortnames
+dendlogrps.post <- as.dendrogram(clust.dist.cor.logrps.post)
+
+par(mfrow=c(2,1))
+corrplot(cor.logrps.pre, diag = FALSE, order="hclust", method="square", tl.col="black",
+         addrect = 6, tl.cex = 0.5, title = "Log RPS (Pre-1980)", cex.main = .7, mar=c(0,0,1,0))
+corrplot(cor.logrps.post, diag = FALSE, order="hclust", method="square", tl.col="black",
+         addrect = 6, tl.cex = 0.5, title = "Lof RPS (Post-1980)", cex.main = .7, mar=c(0,0,1,0))
+
+
+```
+
+
+
+\newpage
+
 ## Tanglegrams
 
 ```{r, z-score tanglegram, echo = FALSE, fig.align = "center", fig.height = 8, fig.width = 6, fig.cap = "Tanglegram comparing z-scores pre- and post-enhancement (1980)"}
@@ -943,6 +1002,119 @@ tanglegram(tangle.s, lab.cex = .8, margin_inner = 3, main = "Standardized escape
 #dev.off()
 
 ```
+
+\newpage
+
+```{r, Log RPS tanglegram, echo = FALSE, message = FALSE, warning = FALSE, fig.align = "center", fig.height = 8, fig.width = 6, fig.cap = "Tanglegram comparing Log RPS pre- and post-enhancement (1980)"}
+# Dendrogram, factored by inlet, by logrps-score
+
+#png(file = "figures/tanglegram_1980_logrps.png", width = 2000, height = 3000, pointsilogrpse = 48)
+
+par(mfrow=c(1,1))
+
+# Pre-1980
+dist.cor.logrps.pre <- dist(cor.logrps.pre)
+clust.dist.cor.logrps.pre <- hclust(dist.cor.logrps.pre)
+tanglelabs.logrps.pre <- as.data.frame(clust.dist.cor.logrps.pre[["labels"]])
+colnames(tanglelabs.logrps.pre) <- "SYS_NM"
+#tanglelabs.logrps.pre <- merge(tanglelabs.logrps.pre, nameslookup, on = "SYS_NM")
+tanglelabs.logrps.pre$shortnames <- str_to_sentence(word(tanglelabs.logrps.pre$SYS_NM))
+clust.dist.cor.logrps.pre[["labels"]] <- tanglelabs.logrps.pre$shortnames
+dendlogrps.pre <- as.dendrogram(clust.dist.cor.logrps.pre)
+
+# Post-1980
+dist.cor.logrps.post <- dist(cor.logrps.post)
+clust.dist.cor.logrps.post <- hclust(dist.cor.logrps.post)
+tanglelabs.logrps.post <- as.data.frame(clust.dist.cor.logrps.post[["labels"]])
+colnames(tanglelabs.logrps.post) <- "SYS_NM"
+#tanglelabs.logrps.post <- merge(tanglelabs.logrps.post, nameslookup, on = "SYS_NM")
+tanglelabs.logrps.post$shortnames <- str_to_sentence(word(tanglelabs.logrps.post$SYS_NM))
+clust.dist.cor.logrps.post[["labels"]] <- tanglelabs.logrps.post$shortnames
+dendlogrps.post <- as.dendrogram(clust.dist.cor.logrps.post)
+
+# Tanglegram
+tangle.logrps <- dendlist(dendlogrps.pre, dendlogrps.post)
+tanglegram(tangle.logrps, lab.cex = .8, margin_inner = 3, main = "Log RPS", main_left = "Pre-1980",
+           main_right = "Post-1980", cex_main = 1, highlight_distinct_edges = FALSE,
+           lwd = 2, edge.lwd = 1)
+
+#dev.off()
+
+```
+
+```{r, compute boxplot zscores, message = FALSE, error = FALSE, echo = FALSE, include = FALSE}
+
+pre<-data.frame(cor.z.pre)
+pre$stream1<-rownames(pre)
+post<-data.frame(cor.z.post)
+post$stream1<-rownames(post)
+pre<-pre%>%pivot_longer(1:ncol(pre)-1,names_to="stream2",values_to="cc")%>%
+  mutate(cc=replace(cc,cc==1,NA),
+         area="DG",period="Pre")
+post<-post%>%pivot_longer(1:ncol(post)-1,names_to="stream2",values_to="cc")%>%
+  mutate(cc=replace(cc,cc==1,NA),
+         area="DG",period="Post")
+dg<-rbind(pre,post)
+u.pre<-mean(pre$cc,na.rm=TRUE)
+sd.pre<-sd(pre$cc,na.rm=TRUE)
+u.post<-mean(post$cc,na.rm=TRUE)
+sd.post<-sd(post$cc,na.rm=TRUE)
+u.pre;sd.pre
+u.post;sd.post
+precc<-pre$cc
+postcc<-post$cc
+t.test(pre$cc,post$cc)
+
+```
+
+\newpage
+
+```{r, Comparison of Z-score pre- and post-1980, message = FALSE, warning = FALSE, error = FALSE, echo = FALSE,fig.align = "center", fig.height = 8, fig.width = 7, fig.cap = "Boxplot comparing Z-score pre- and post-1980."}
+
+ggplot(dg,aes(x=period,y=cc,fill=period))+
+  geom_boxplot() +
+  xlab("Period") +
+  ylab("Correlation coefficient")
+
+```
+
+```{r, compute boxplot logrps, message = FALSE, error = FALSE, echo = FALSE, include = FALSE}
+
+pre <- data.frame(cor.logrps.pre)
+pre$stream1<-rownames(pre)
+post<-data.frame(cor.logrps.post)
+post$stream1<-rownames(post)
+pre<-pre%>%pivot_longer(1:ncol(pre)-1,names_to="stream2",values_to="cc")%>%
+  mutate(cc=replace(cc,cc==1,NA),
+         area="DG",period="Pre")
+post<-post%>%pivot_longer(1:ncol(post)-1,names_to="stream2",values_to="cc")%>%
+  mutate(cc=replace(cc,cc==1,NA),
+         area="DG",period="Post")
+dg<-rbind(pre,post)
+u.pre<-mean(pre$cc,na.rm=TRUE)
+sd.pre<-sd(pre$cc,na.rm=TRUE)
+u.post<-mean(post$cc,na.rm=TRUE)
+sd.post<-sd(post$cc,na.rm=TRUE)
+u.pre;sd.pre
+u.post;sd.post
+precc<-pre$cc
+postcc<-post$cc
+t.test(pre$cc,post$cc)
+
+```
+
+\newpage
+
+```{r, Comparison of log RPS pre- and post-1980, message = FALSE, error = FALSE, warning = FALSE, echo = FALSE,fig.align = "center", fig.height = 8, fig.width = 7, fig.cap = "Boxplot comparing log RPS pre- and post-1980."}
+
+ggplot(dg,aes(x=period,y=cc,fill=period))+
+  geom_boxplot() +
+  xlab("Period") +
+  ylab("Correlation coefficient")
+
+
+```
+
 
 \newpage
 
