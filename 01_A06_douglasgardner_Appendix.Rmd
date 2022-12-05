@@ -923,7 +923,7 @@ ggplot(g,aes(x=Year,y=SYS_NM,size=z,color=z))+
 
 ```
 
-```{r, Correlation plot by distance, echo = FALSE, warning = FALSE, message = FALSE, include = FALSE}
+```{r, Correlation plot by z-score distance, echo = FALSE, warning = FALSE, message = FALSE, include = FALSE}
 
 cordist <- as.data.frame(cor.z) %>%
   select(`KITIMAT RIVER`)
@@ -936,6 +936,27 @@ cordist <- merge(streamdist, cordist, by = "SYS_NM")
 colnames(cordist) <- c("SYS_NM", "dist", "corcoef")
 
 saveRDS(cordist, "RDS/A06cordist.rds")
+
+ggplot(cordist, aes(x = dist, y = corcoef)) +
+  geom_point() +
+  ylab("Correlation coefficient") +
+  xlab("Distance from Kitimat enhancement (km)")+
+  geom_smooth()
+```
+
+```{r, Correlation plot by logrps distance, echo = FALSE, warning = FALSE, message = FALSE, include = FALSE}
+
+cordist <- as.data.frame(cor.rpslog) %>%
+  select(`KITIMAT RIVER`)
+cordist$SYS_NM <- rownames(cordist)
+
+streamdist <- streaminlet
+colnames(streamdist) <- c("SYS_NM", "dist")
+
+cordist <- merge(streamdist, cordist, by = "SYS_NM")
+colnames(cordist) <- c("SYS_NM", "dist", "corcoef")
+
+saveRDS(cordist, "RDS/A06cordist_logrps.rds")
 
 ggplot(cordist, aes(x = dist, y = corcoef)) +
   geom_point() +
