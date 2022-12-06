@@ -720,6 +720,8 @@ t.test(pre$cc,post$cc)
 
 ```{r, Comparison of Z-score pre- and post-1980, message = FALSE, error = FALSE, echo = FALSE,fig.align = "center", fig.height = 8, fig.width = 7, fig.cap = "Boxplot comparing Z-score pre- and post-1980."}
 
+saveRDS(dg, "RDS/a06_z_dg.rds")
+
 ggplot(dg,aes(x=period,y=cc,fill=period))+
   geom_boxplot() +
   xlab("Period") +
@@ -851,6 +853,8 @@ t.test(pre$cc,post$cc)
 ```
 
 ```{r, Comparison of log RPS pre- and post-1980, message = FALSE, error = FALSE, echo = FALSE,fig.align = "center", fig.height = 8, fig.width = 7, fig.cap = "Boxplot comparing log RPS pre- and post-1980."}
+
+saveRDS(dg, "RDS/a06_logrps_dg.rds")
 
 ggplot(dg,aes(x=period,y=cc,fill=period))+
   geom_boxplot() +
