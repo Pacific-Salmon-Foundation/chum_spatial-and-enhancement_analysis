@@ -54,20 +54,23 @@ f<-escdata.filtered%>%select(Year,SYS_NM,z)
 
 g<-merge(f,inlets,by="SYS_NM")
 
-ggplot(g,aes(x=Year,y=SYS_NM,size=z,color=z))+
+range(g$z,na.rm=TRUE)
+
+ggplot(g,aes(x=Year,y=SYS_NM,color=z,size=abs(z)))+
   geom_point(alpha=1)+
-  labs(y="Escapement",x="Year",size="Z-score")+
+  labs(y="Escapement",x="Year",color="Z-score")+
   theme_bw()+
   theme(legend.position="bottom")+
-  scale_colour_gradient2(low = "red",mid = "white",high = "green",
-    midpoint = 0,
-    space = "Lab",
-    na.value = "grey50",
-    guide = "colourbar")+
-  #guides(colour = guide_legend(nrow = 4))+
-  guides(size = guide_legend(nrow = 4))+ 
+  scale_colour_gradient2(low = "red",mid = "white",high = "blue",midpoint = 0,space = "Lab",
+    na.value = "white",guide = "colourbar")+
+  #scale_colour_gradient(low = "firebrick",high = "darkgreen",na.value = "grey50",guide = "colourbar")+
+    #guides(colour = guide_legend(nrow = 4))+
+  #guides(size = guide_legend(nrow = 4))+ 
+  guides(size=FALSE)+
   theme(axis.text.y = element_text(size = 6))+
   facet_grid(inlet~.,switch="y",space="free_y",scale="free_y")
+
+ggsave("figures/douglas gardner z scores bubble by inlet.png",dpi=600,height=7,width=6)
 
 merge(f,inlets,by="SYS_NM")
 

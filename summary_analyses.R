@@ -60,9 +60,6 @@ png(file = "figures/logrps_summary.png")
 ggarrange(nrow = 2, a06_logrps, a25_logrps)
 dev.off()
 
-
-rbind(a06,a25,a06_logrps, a25_logrps)
-
 all<-rbind(a06cordist,a25cordist,a06cordist_logrps,a25cordist_logrps)
 
 all.plot<-ggplot(all,aes(x=dist,y=corcoef))+
@@ -145,12 +142,14 @@ dg.rps<-a06_logrps_dg%>%mutate(metric="log(RPS)",area="Douglas-Gardner")
 all.bp<-rbind(a25.z,a8.z,dg.z,a25.rps,a08.rps,dg.rps)
 
 all.bp.plot <- ggplot(all.bp,aes(x=factor(period,levels=c("Pre","Post")),y=cc,fill=period))+
-  geom_boxplot() + scale_fill_brewer(palette="Set1")+
-  xlab("Period") +
-  ylab("Correlation coefficient")+labs(fill="Period",breaks=c("Pre","Post"),names=c("Pre","Post"))+
-  facet_grid(factor(metric,levels=c("Z-score","log(RPS)"))~area,switch="y")+theme_bw()
+  geom_boxplot() +
+  xlab("Period") + 
+  ylab("Correlation coefficient")+labs(fill="Period")+
+  facet_grid(factor(metric,levels=c("Z-score","log(RPS)"))~area,switch="y")+theme_bw()+
+  scale_fill_brewer(palette="Set1",breaks=c("Pre","Post"))
+  
 
-png(file = "figures/z and logrps_summary.png",res=600,height=6,width=6,units='in')
+png(file = "figures/z and logrps_summary boxplot corr coef.png",res=600,height=6,width=6,units='in')
 all.bp.plot
 dev.off()
 

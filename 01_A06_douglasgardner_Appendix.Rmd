@@ -298,7 +298,7 @@ ggplot(logrps.2,aes(x=Year,y=logrps,color=prepost,group=grp))+
 
 ### Log RPS comparison before and after enhancement
 
-```{r, Boxplot of log RPS by system, echo = FALSE, message = FALSE, warning = FALSE, fig.align = "center", fig.height = 7, fig.width = 8, fig.cap = "Douglas-Gardner chum: boxplot of log recruits per spawner by system."}
+```{r, echo = FALSE, message = FALSE, warning = FALSE, fig.align = "center", fig.height = 7, fig.width = 8, fig.cap = "Douglas-Gardner chum: boxplot of log recruits per spawner by system."}
 
 ggplot(logrps,aes( y = SYS_NM, x = logrps, fill = prepost))+
   geom_boxplot(notch=F)+
@@ -744,7 +744,7 @@ pre<-pre%>%pivot_longer(1:ncol(pre)-1,names_to="stream2",values_to="cc")%>%
 post<-post%>%pivot_longer(1:ncol(post)-1,names_to="stream2",values_to="cc")%>%
   mutate(cc=replace(cc,cc==1,NA),
          area="DG",period="Post")
-dg<-rbind(pre,post)
+dg.z<-rbind(pre,post)%>%mutate(metric="Z-score")
 u.pre<-mean(pre$cc,na.rm=TRUE)
 sd.pre<-sd(pre$cc,na.rm=TRUE)
 u.post<-mean(post$cc,na.rm=TRUE)
@@ -754,15 +754,6 @@ u.post;sd.post
 precc<-pre$cc
 postcc<-post$cc
 t.test(pre$cc,post$cc)
-
-```
-
-```{r, Comparison of Z-score pre- and post-1980, message = FALSE, error = FALSE, echo = FALSE,fig.align = "center", fig.height = 8, fig.width = 7, fig.cap = "Boxplot comparing Z-score pre- and post-1980."}
-
-ggplot(dg,aes(x=period,y=cc,fill=period))+
-  geom_boxplot() +
-  xlab("Period") +
-  ylab("Correlation coefficient")
 
 ```
 
@@ -877,7 +868,7 @@ pre<-pre%>%pivot_longer(1:ncol(pre)-1,names_to="stream2",values_to="cc")%>%
 post<-post%>%pivot_longer(1:ncol(post)-1,names_to="stream2",values_to="cc")%>%
   mutate(cc=replace(cc,cc==1,NA),
          area="DG",period="Post")
-dg<-rbind(pre,post)
+dg.rps<-rbind(pre,post)%>%mutate(metric="log(RPS)")
 u.pre<-mean(pre$cc,na.rm=TRUE)
 sd.pre<-sd(pre$cc,na.rm=TRUE)
 u.post<-mean(post$cc,na.rm=TRUE)
@@ -887,16 +878,6 @@ u.post;sd.post
 precc<-pre$cc
 postcc<-post$cc
 t.test(pre$cc,post$cc)
-
-```
-
-```{r, Comparison of log RPS pre- and post-1980, message = FALSE, error = FALSE, echo = FALSE,fig.align = "center", fig.height = 8, fig.width = 7, fig.cap = "Boxplot comparing log RPS pre- and post-1980."}
-
-ggplot(dg,aes(x=period,y=cc,fill=period))+
-  geom_boxplot() +
-  xlab("Period") +
-  ylab("Correlation coefficient")
-
 
 ```
 
@@ -965,7 +946,23 @@ ggplot(cordist, aes(x = dist, y = corcoef)) +
   geom_smooth()
 ```
 
+\newpage
 
+
+```{r, Comparison of Z-score pre- and post-1980, message = FALSE, error = FALSE, echo = FALSE,fig.align = "center", fig.height = 5, fig.width = 6, fig.cap = "Comparison between correlation coefficients for all pairwise combinations of streams using Z-score and log(RPS) over the pre- and post-1980 periods."}
+
+cc.all<-rbind(dg.z,dg.rps)
+
+ggplot(cc.all,aes(x=factor(period,levels=c("Pre","Post")),y=cc,fill=period))+
+  geom_boxplot()+
+  scale_fill_brewer(palette="Set1",breaks=c("Pre","Post"))+
+  xlab("Period")+theme_bw()+
+  ylab("Correlation coefficient")+labs(fill="Period")+
+  facet_grid(.~metric)
+
+```
+
+\newpage
 ```{r, Statistical models, echo = FALSE, message = FALSE, warning = FALSE, include = FALSE}
 
 rps.clean <- readRDS("RDS/douglas-gardner_cm_rpsclean.rds")

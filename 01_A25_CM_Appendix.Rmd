@@ -270,6 +270,8 @@ ggplot(gga25.logrps,aes(y=SYS_NM,x=logrps,fill=prepost))+
 
 ```
 
+\newpage
+
 ```{r correlations for all metrics, echo = FALSE, warning = FALSE, message = FALSE}
 
 #prep data for correlations
@@ -891,8 +893,6 @@ corrplot(cor.logrps.post, diag = FALSE, order="hclust", method="square", tl.col=
 
 ```
 
-
-
 \newpage
 
 ## Tanglegrams
@@ -1054,7 +1054,7 @@ pre<-pre%>%pivot_longer(1:ncol(pre)-1,names_to="stream2",values_to="cc")%>%
 post<-post%>%pivot_longer(1:ncol(post)-1,names_to="stream2",values_to="cc")%>%
   mutate(cc=replace(cc,cc==1,NA),
          area="DG",period="Post")
-dgz<-rbind(pre,post)
+dg.z<-rbind(pre,post)%>%mutate(metric="Z-score")
 
 u.pre<-mean(pre$cc,na.rm=TRUE)
 sd.pre<-sd(pre$cc,na.rm=TRUE)
@@ -1065,19 +1065,6 @@ u.post;sd.post
 precc<-pre$cc
 postcc<-post$cc
 t.test(pre$cc,post$cc)
-
-```
-
-\newpage
-
-```{r, Comparison of Z-score pre- and post-1980, message = FALSE, warning = FALSE, error = FALSE, echo = FALSE,fig.align = "center", fig.height = 8, fig.width = 7, fig.cap = "Boxplot comparing Z-score pre- and post-1980."}
-
-saveRDS(dgz, "RDS/a25_z_dg.rds")
-
-ggplot(dgz,aes(x=period,y=cc,fill=period))+
-  geom_boxplot() +
-  xlab("Period") +
-  ylab("Correlation coefficient")
 
 ```
 
@@ -1093,7 +1080,7 @@ pre<-pre%>%pivot_longer(1:ncol(pre)-1,names_to="stream2",values_to="cc")%>%
 post<-post%>%pivot_longer(1:ncol(post)-1,names_to="stream2",values_to="cc")%>%
   mutate(cc=replace(cc,cc==1,NA),
          area="DG",period="Post")
-dglog<-rbind(pre,post)
+dg.rps<-rbind(pre,post)%>%mutate(metric="log(RPS)")
 
 u.pre<-mean(pre$cc,na.rm=TRUE)
 sd.pre<-sd(pre$cc,na.rm=TRUE)
@@ -1104,20 +1091,6 @@ u.post;sd.post
 precc<-pre$cc
 postcc<-post$cc
 t.test(pre$cc,post$cc)
-
-```
-
-\newpage
-
-```{r, Comparison of log RPS pre- and post-1980, message = FALSE, error = FALSE, warning = FALSE, echo = FALSE,fig.align = "center", fig.height = 8, fig.width = 7, fig.cap = "Boxplot comparing log RPS pre- and post-1980."}
-
-saveRDS(dglog, "RDS/a25_logrps_dg.rds")
-
-ggplot(dglog,aes(x=period,y=cc,fill=period))+
-  geom_boxplot() +
-  xlab("Period") +
-  ylab("Correlation coefficient")
-
 
 ```
 
@@ -1203,6 +1176,21 @@ tanglegram(tangle.m, lab.cex = .8, margin_inner = 3, main = "Moving average ", m
 
 \newpage
 
+```{r, message = FALSE, error = FALSE, echo = FALSE,fig.align = "center", fig.height = 5, fig.width = 6, fig.cap = "Comparison between correlation coefficients for all pairwise combinations of streams using Z-score and log(RPS) over the pre- and post-1980 periods."}
+
+cc.all<-rbind(dg.z,dg.rps)
+
+ggplot(cc.all,aes(x=factor(period,levels=c("Pre","Post")),y=cc,fill=period))+
+  geom_boxplot()+
+  scale_fill_brewer(palette="Set1",breaks=c("Pre","Post"))+
+  xlab("Period")+theme_bw()+
+  ylab("Correlation coefficient")+labs(fill="Period")+
+  facet_grid(.~metric)
+
+```
+
+\newpage
+
 # Statistical models
 
 ## Table of Recruits per spawner candidate models
@@ -1239,7 +1227,22 @@ kable(esctab, format = "latex")
 
 \newpage
 
-## AIC Table for RPS candidate models
+```{r, Comparison of Z-score pre- and post-1980, message = FALSE, error = FALSE, echo = FALSE,fig.align = "center", fig.height = 5, fig.width = 6, fig.cap = "Comparison between correlation coefficients for all pairwise combinations of streams using Z-score and log(RPS) over the pre- and post-1980 periods."}
+
+cc.all<-rbind(dg.z,dg.rps)
+
+ggplot(cc.all,aes(x=factor(period,levels=c("Pre","Post")),y=cc,fill=period))+
+  geom_boxplot()+
+  scale_fill_brewer(palette="Set1",breaks=c("Pre","Post"))+
+  xlab("Period")+theme_bw()+
+  ylab("Correlation coefficient")+labs(fill="Period")+
+  facet_grid(.~metric)
+
+```
+
+\clearpage
+
+## AIC Tables for candidate models
 
 ```{r, AIC Table for RPS candidate models, echo = FALSE, message = FALSE, warning = FALSE}
 
@@ -1257,10 +1260,6 @@ kable(rpstab, format = "latex")
 
 ```
 
-\newpage
-
-## AIC Table for Escapement candidate models
-
 ```{r, AIC Table for Escapement candidate models, echo = FALSE, message = FALSE, warning = FALSE}
 
 escaic <- readRDS("RDS/escaic.rds")
@@ -1276,6 +1275,7 @@ kable(esctab, format = "latex")
   #kable_styling(latex_options = "HOLD_position")
 
 ```
+
 
 \newpage
 
