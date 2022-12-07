@@ -50,9 +50,9 @@ rps.clean <- readRDS("RDS/a08cm_rpsclean.rds")
 
 \newpage
 
-# Summary statistics
+# Summary figures
 
-## Bubbleplot of escapement by enhancement rank
+## Escapement: Raw and filtered stream list
 
 ```{r, Bubble plot, fig.align = "center", fig.height = 7, fig.width = 6, fig.cap = "Escapement to area streams by enhancement rank.",echo = FALSE, warning = FALSE, message = FALSE}
 
@@ -75,9 +75,43 @@ ggsave("figures/area 8 chum escapement all streams.png",dpi=600,height=8,width=7
 
 \newpage
 
-## Plot of total releases to area
+## Area 8 Escapement (filtered streams)
 
-```{r total releases for area 8 terminal not including mcloughlin bay, include = TRUE, echo = FALSE, warning = FALSE, message = FALSE, fig.align = "center", fig.height = 6, fig.width = 8, fig.cap = "Total releases for Area 8 (not including McLoughlin Bay)"}
+```{r, Facet plot of escapements by enhancement ranking, echo = FALSE, message = FALSE, warning = FALSE, fig.align = "center", fig.height = 7, fig.width = 8, fig.cap = "Escapement to filtered streams for Area 8 chum. Colour shows the stream enhancement level from the PSE database."}
+
+ggplot(escdata.filtered,aes(x=Year,y=escapement,color=Enhancement_Rank))+
+  geom_point()+geom_line()+theme_bw()+
+  facet_wrap(~SYS_NM,ncol=3,scale="free_y")+
+  labs(y="Escapement",color="Enhancement Level",title="Area 8 Escapement (filtered streams)")+
+  theme(legend.position="bottom")
+
+ggsave("figures/area 8 chum escapement filtered streams.png",dpi=600,height=8,width=7)
+
+```
+
+\newpage
+
+```{r, Kable of distances by inlet, echo = FALSE, warning = FALSE, message = FALSE, fig.align="center", fig.height = 7, fig.width = 7}
+
+streaminlet <- readRDS("RDS/a08cm_rpsclean.rds")
+streaminlet <- streaminlet %>%
+  select(SYS_NM, dist_km_bel, dist_km_mcl) %>%
+  arrange(dist_km_bel) %>%
+  unique() %>%
+  drop_na()
+
+colnames(streaminlet) <- c("Stream", "Dist. from Bella Coola (km)", "Dist. from McLoughlin (km)")
+
+kable(streaminlet, format = "latex",caption="Distance from enhanced systems (Bella Coola and McLaughlin") %>%
+  kable_styling(latex_options = "hold_position")
+
+```
+
+\newpage
+
+## Hatchery Releases: Total and by release site
+
+```{r total releases for area 8 terminal not including mcloughlin bay, include = TRUE, echo = FALSE, warning = FALSE, message = FALSE, fig.align = "center", fig.height = 6, fig.width = 8, fig.cap = "Total releases for Area 8"}
 
 #total releases for BC and MB
 releases.BCMB<-releases %>% 
@@ -112,11 +146,10 @@ totrelwide<-totrel%>%pivot_wider(names_from="group",values_from="totreleases")
 
 write.csv(totrelwide,"data/releases area 8 chum total terminal releases by group.csv")
 
-ggplot(totrel,aes(x=RELEASE_YEAR,y=totreleases,color=group))+
-  geom_point()+geom_line()+
+ggplot(totrel,aes(x=RELEASE_YEAR,y=totreleases, fill = group))+
+  geom_point()+geom_col(color = "black")+
   theme_bw()+
-  geom_smooth() +
-  labs(x="Release Year",y="Total Releases",title="Area 8 Chum total terminal releases (excludes Mcloughlin Bay)")
+  labs(x="Release Year",y="Total Releases",title="Area 8 Chum total terminal releases")
 
 #ggsave("figures/releases chum area 8 total terminal.png",dpi=600,height=6,width=6)
 
@@ -125,7 +158,29 @@ ggplot(totrel,aes(x=RELEASE_YEAR,y=totreleases,color=group))+
 
 \newpage
 
-## Escapement by enhancement rank per system
+```{r, Facet plot of all releases in Area 8, echo = FALSE, message = FALSE, warning = FALSE, fig.align = "center", fig.height = 7, fig.width = 8, fig.cap = "Facet plot of all releases in Area 8"}
+
+species="Chum"
+rel.cu.name=c("BELLA COOLA RIVER-LATE","BELLA COOLA-DEAN RIVERS","SPILLER-FITZ HUGH-BURKE")
+fy=1980
+
+ggplot(releases,aes(x=RELEASE_YEAR,y=releases,color=RELEASE_STAGE_NAME,group=grp))+
+  geom_line()+geom_point()+
+  scale_color_brewer(palette="Set1")+
+  facet_wrap(~`site-stock`,ncol=4)+
+  theme_bw()+
+  labs(x="Release Year",y="Releases",color="Release Stage",
+       title=paste0(species,": ",paste0(rel.cu.name,collapse=" ")),subtitle="Release site:Origin stock")+
+  theme(legend.position = "bottom",
+        plot.title=element_text(size=8),strip.text=element_text(size=8))
+
+```
+
+\newpage
+
+## Metrics
+
+### Escapement, logged escapement, Z-scores, Pavg, and moving average
 
 ```{r metric plots,fig.align="center",fig.height=8,fig.width=6,fig.cap="Various plots for escapement and transformations.",echo=FALSE,warning=FALSE,message=FALSE}
 #plot streams by enhancement
@@ -157,7 +212,7 @@ ggarrange(p1,p2,p3,p4,ncol=1,common.legend = TRUE,align='v',legend="bottom")
 
 \newpage
 
-## Moving average and LOESSS fit on enhancement ranking of log escapements
+### Moving average and LOESSS fit
 
 ```{r moving average and LOESS plots, echo=FALSE,warning=FALSE,message=FALSE,fig.align="center",fig.height=5,fig.width=6,fig.cap="Moving average and LOESS fits on logged escapement by enhancement ranking."}
 
@@ -176,48 +231,31 @@ ggarrange(t1,t2,ncol=1,common.legend = TRUE,legend = "bottom",align='v')
 
 ```
 
-
 \newpage
 
-## Escapement to streams by enhancement rank
+### Means trends by enhancement rank
 
-```{r, Facet plot of escapements by enhancement ranking, echo = FALSE, message = FALSE, warning = FALSE, fig.align = "center", fig.height = 7, fig.width = 8, fig.cap = "Facet plot of escapements by enhancement level"}
+```{r means by enhancement rank, echo=FALSE,warning=FALSE,message=FALSE,fig.align="center",fig.height=7,fig.width=6,fig.cap="Area 8 chum: Mean Z-score for analysis streams by enhancement rank. Linear regression over all years with SE are shown."}
 
-ggplot(escdata.filtered,aes(x=Year,y=escapement,color=Enhancement_Rank))+
-  geom_point()+geom_line()+theme_bw()+
-  facet_wrap(~SYS_NM,ncol=3,scale="free_y")+
-  labs(y="Escapement",color="Enhancement Level",title="Area 8 Escapement (filtered streams)")+
-  theme(legend.position="bottom")
+mean.z<-escdata.filtered%>%group_by(Enhancement_Rank,Year)%>%summarise(u=mean(z,na.rm=TRUE))
 
-ggsave("figures/area 8 chum escapement filtered streams.png",dpi=600,height=8,width=7)
-
+ggplot(mean.z,aes(x=Year,y=u,color=Enhancement_Rank))+
+  geom_line(size=1.5,alpha=.7)+theme_bw()+
+  scale_color_brewer(palette = "Set1")+
+  labs(y="Mean Z-score")+
+  geom_hline(yintercept=0,linetype="dashed")+
+  geom_vline(xintercept=1980)+
+  facet_wrap(~Enhancement_Rank,ncol=1)+
+  geom_smooth(method="lm",color="black")+
+  guides(color=FALSE)
+  
 ```
 
 \newpage
 
-## Facet plot of all releases in Area 8
+## Recruits per spawner
 
-```{r, Face plot of all releases in Area 8, echo = FALSE, message = FALSE, warning = FALSE, fig.align = "center", fig.height = 7, fig.width = 8, fig.cap = "Facet plot of all releases in Area 8"}
-
-species="Chum"
-rel.cu.name=c("BELLA COOLA RIVER-LATE","BELLA COOLA-DEAN RIVERS","SPILLER-FITZ HUGH-BURKE")
-fy=1980
-
-ggplot(releases,aes(x=RELEASE_YEAR,y=releases,color=RELEASE_STAGE_NAME,group=grp))+
-  geom_line()+geom_point()+
-  scale_color_brewer(palette="Set1")+
-  facet_wrap(~`site-stock`,ncol=4)+
-  theme_bw()+
-  labs(x="Release Year",y="Releases",color="Release Stage",
-       title=paste0(species,": ",paste0(rel.cu.name,collapse=" ")),subtitle="Release site:Origin stock")+
-  theme(legend.position = "bottom",
-        plot.title=element_text(size=8),strip.text=element_text(size=8))
-
-```
-
-\newpage
-
-## Recruits per spawner by system
+### Recruits per spawner by system
 
 ```{r, Plotting RPS by system, echo = FALSE, message = FALSE, warning = FALSE, fig.align = "center", fig.height = 7, fig.width = 8, fig.cap = "Recruits per spawner by system"}
 
@@ -236,9 +274,9 @@ ggplot(rps.clean,aes(x=Year,y=rps))+
 
 \newpage
 
-## Log recruits per spawner by system
+### Log recruits per spawner by system by period
 
-```{r, Log recruits per spawner by system, echo = FALSE, message = FALSE, warning = FALSE, fig.align = "center", fig.height = 7, fig.width = 8, fig.cap = "Log recruits per spawner by system"}
+```{r, Log recruits per spawner by period, echo = FALSE, message = FALSE, warning = FALSE, fig.align = "center", fig.height = 7, fig.width = 8, fig.cap = "Area 8 chum: log recruits per spawner by system fitted with linear regression for the periods pre- and post-enhancement."}
 
 # Log RPS by system
 
@@ -266,7 +304,7 @@ ggsave("figures/area 8 chum log rps pre vs post.png",dpi=600,height=8,width=7)
 
 \newpage
 
-## Boxplot of log RPS by system
+### Log RPS comparison before and after enhancement
 
 ```{r, Boxplot of log RPS by system, echo = FALSE, message = FALSE, warning = FALSE, fig.align = "center", fig.height = 7, fig.width = 8, fig.cap = "Boxplot of log recruits per spawner by system"}
 
@@ -284,7 +322,108 @@ ggsave("figures/area 8 chum log rps pre vs post boxplot.png",dpi=600,height=8,wi
 
 \newpage
 
-# Correlation analyses
+## Bubbleplots of metric by inlet
+
+```{r, Malick and Cox plot z-score, message = FALSE, warning = FALSE, echo = FALSE, fig.align = "center", fig.height = 8, fig.width = 6, fig.cap = "Escapement by inlet and z-score"}
+
+inlets <- read_csv("data/area 8 chum filtered stream list with inlets and distance.csv") %>%
+  select(SYS_NM, inlet)
+
+
+f<-escdata.filtered%>%select(Year,SYS_NM,z)
+
+g<-merge(f,inlets,by="SYS_NM")
+
+
+`Z-score` <- c(-3, -2, -1, 0, 1, 2, 3)
+shape <- c(21, 21, 21, 20, 19, 19, 19)
+cols <- c("red", "red", "red", "black", "blue", "blue", "blue")
+shapelkp <- tibble(`Z-score`, shape, cols)
+g$`Z-score` <- as.numeric(substr(g$z, 1, 2))
+g$size <- abs(g$z)
+g <- merge(shapelkp, g, by = "Z-score")
+g$`Z-score` <- as.factor(g$`Z-score`)
+
+ggplot(g, aes(x = Year, y = SYS_NM, shape = `Z-score`, size = `Z-score`, color = `Z-score`, fill = `Z-score`)) +
+  geom_point() +
+  scale_size_manual(values = c("-3" = 5, "-2" = 3, "-1" = 2, 
+                               "0" = 2, 
+                               "1" = 2, "2" = 3, "3" = 5))+
+  scale_shape_manual(values = c("-3" = 1, "-2" = 1, "-1" = 1, 
+                                "0" = 20, 
+                                "1" = 21, "2" = 21, "3" = 21)) +
+  scale_color_manual(values = c("-3" = "darkred", "-2" = "red4", "-1" = "red1", 
+                                "0" = "black", 
+                                "1" = "royalblue1", "2" = "royalblue4", "3" = "royalblue4"))+
+  scale_fill_manual(values = c("-3" = "darkred", "-2" = "red4", "-1" = "red1", 
+                                "0" = "black", 
+                                "1" = "royalblue1", "2" = "royalblue4", "3" = "royalblue4"))+
+  labs(y="Escapement",x="Year", legend = "Z-score")+
+  theme_bw()+
+  theme(legend.position="bottom")+
+  guides(size=FALSE)+
+  theme(axis.text.y = element_text(size = 6))+
+  guides(shape = guide_legend(ncol = 7))+ 
+  facet_grid(inlet~.,switch="y",space="free_y",scale="free_y")
+
+ggsave("figures/a8 z scores bubble by inlet.png",dpi=600,height=7,width=6)
+
+```
+
+\newpage
+
+```{r, Malick and Cox plot logRPS, message = FALSE, warning = FALSE, echo = FALSE, fig.align = "center", fig.height = 8, fig.width = 6, fig.cap = "Escapement by inlet and log RPS"}
+inlets <- read_csv("data/area 8 chum filtered stream list with inlets and distance.csv") %>%
+  select(SYS_NM, inlet)
+
+f<-rps.clean%>%select(Year,SYS_NM,logrps)
+
+g<-merge(f,inlets,by="SYS_NM")
+
+
+`log RPS` <- c(-5, -4, -3, -2, -1, 0, 1, 2, 3, 4, 5)
+shape <- c(21, 21, 21, 21, 21, 20, 19, 19, 19, 19, 19)
+cols <- c("red", "red", "red", "red", "red", "black", "blue", "blue", "blue", "blue", "blue")
+shapelkp <- tibble(`log RPS`, shape, cols)
+g$`log RPS` <- as.numeric(substr(g$logrps, 1, 2))
+g$size <- abs(g$`log RPS`)
+g <- merge(shapelkp, g, by = "log RPS")
+g$`log RPS` <- as.factor(g$`log RPS`)
+
+ggplot(g, aes(x = Year, y = SYS_NM, shape = `log RPS`, size = `log RPS`, color = `log RPS`, fill = `log RPS`)) +
+  geom_point() +
+  scale_size_manual(values = c("-5" = 5, "-4" = 4, "-3" = 3, "-2" = 2, "-1" = 1, 
+                               "0" = 1, 
+                               "1" = 1, "2" = 2, "3" = 3, "4" = 4, "5" = 5))+
+  scale_shape_manual(values = c("-5" = 1, "-4" = 1, "-3" = 1, "-2" = 1, "-1" = 1, 
+                                "0" = 20, 
+                                "1" = 21, "2" = 21, "3" = 21, "4" = 21, "5" = 21)) +
+  scale_color_manual(values = c("-5" = "darkred", "-4" = "darkred","-3" = "darkred",
+                                "-2" = "red4", "-1" = "red1", 
+                                "0" = "black", 
+                                "1" = "royalblue1", "2" = "royalblue2", "3" = "royalblue3",
+                                "4" = "royalblue4", "5" = "royalblue4"))+
+  scale_fill_manual(values = c("-5" = "darkred", "-4" = "darkred",
+                               "-3" = "darkred", "-2" = "red4", "-1" = "red1", 
+                                "0" = "black", 
+                                "1" = "royalblue1", "2" = "royalblue4", "3" = "royalblue4",
+                                "4" = "royalblue4", "5" = "royalblue4"))+
+  labs(y="Escapement",x="Year")+
+  theme_bw()+
+  theme(legend.position="bottom")+
+  guides(size=FALSE)+
+  theme(axis.text.y = element_text(size = 6))+
+  guides(shape = guide_legend(ncol = 11, nrow = 2))+ 
+  facet_grid(inlet~.,switch="y",space="free_y",scale="free_y")
+
+ggsave("figures/a8 log RPS bubble by inlet.png",dpi=600,height=7,width=6)
+
+```
+
+
+\newpage
+
+# Correlation analyses and Dendrograms
 
 ## Cross correlation plots
 ```{r, Correlation analyses, echo = FALSE, message = FALSE, warning = FALSE}
@@ -539,7 +678,7 @@ dendrpslog %>%
 
 \newpage
 
-## Tanglegrams
+## Tanglegrams to compare dendrograms
 
 ```{r, Tanglegrams z v log, echo = FALSE, message = FALSE, warning = FALSE, fig.align = "center", fig.height = 9.5, fig.width = 8.5, fig.cap = "Tanglegram of z-score vs. logged escapements"}
 
@@ -556,21 +695,6 @@ tanglegram(tangle1, lab.cex = .8, margin_inner = 3, main_left = "Z-score",
 
 #dev.off()
 
-```
-
-\newpage
-
-```{r, Tanglegrams z vs std. esc, echo = FALSE, message = FALSE, warning = FALSE, fig.align = "center", fig.height = 9.5, fig.width = 8.5, fig.cap = "Tanglegram of z-score vs. standardized escapements"}
-
-#png(file = "figures/a06cm_tanglegram_z_v_stdesc.png", width = 2000, height = 3000, pointsize = 36)
-
-tangle2 <- dendlist(dendz, dends)
-                                                                                                            
-tanglegram(tangle2, lab.cex = .8, margin_inner = 3, main_left = "Z-score",
-           main_right = "Standardized escapement", cex_main = 1, highlight_distinct_edges = FALSE,
-           lwd = 2, edge.lwd = 1)
-
-#dev.off()
 ```
 
 \newpage
@@ -699,8 +823,6 @@ tanglegram(tangle.z, lab.cex = .8, margin_inner = 3, main = "Z-scores", main_lef
 
 ```
 
-\newpage
-
 ```{r, compute boxplot zscores, message = FALSE, error = FALSE, echo = FALSE, include = FALSE}
 
 pre<-data.frame(cor.z.pre)
@@ -714,7 +836,7 @@ post<-post%>%pivot_longer(1:ncol(post)-1,names_to="stream2",values_to="cc")%>%
   mutate(cc=replace(cc,cc==1,NA),
          area="DG",period="Post")
 dg<-rbind(pre,post)
-
+dg.z <- dg
 u.pre<-mean(pre$cc,na.rm=TRUE)
 sd.pre<-sd(pre$cc,na.rm=TRUE)
 u.post<-mean(post$cc,na.rm=TRUE)
@@ -727,7 +849,7 @@ t.test(pre$cc,post$cc)
 
 ```
 
-```{r, Comparison of Z-score pre- and post-1980, message = FALSE, error = FALSE, echo = FALSE,fig.align = "center", fig.height = 8, fig.width = 7, fig.cap = "Boxplot comparing Z-score pre- and post-1980."}
+```{r, Comparison of Z-score pre- and post-1980 NOT INCLUDED, message = FALSE, error = FALSE,include = FALSE, echo = FALSE,fig.align = "center", fig.height = 8, fig.width = 7, fig.cap = "Boxplot comparing Z-score pre- and post-1980."}
 
 saveRDS(dg, "RDS/a08_z_dg.rds")
 
@@ -869,9 +991,10 @@ t.test(pre$cc,post$cc)
 
 ```
 
-```{r, Comparison of log RPS pre- and post-1980, message = FALSE, error = FALSE, echo = FALSE,fig.align = "center", fig.height = 8, fig.width = 7, fig.cap = "Boxplot comparing log RPS pre- and post-1980."}
+```{r, Comparison of log RPS pre- and post-1980, message = FALSE, include = FALSE, error = FALSE, echo = FALSE,fig.align = "center", fig.height = 8, fig.width = 7, fig.cap = "Boxplot comparing log RPS pre- and post-1980."}
 
 saveRDS(dg, "RDS/a08_logrps_dg.rds")
+dg.rps <- dg
 
 ggplot(dg,aes(x=period,y=cc,fill=period))+
   geom_boxplot() +
@@ -881,7 +1004,22 @@ ggplot(dg,aes(x=period,y=cc,fill=period))+
 
 ```
 
-\newpage
+```{r, Comparison of Z-score pre- and post-1980, message = FALSE, error = FALSE, echo = FALSE,fig.align = "center", fig.height = 5, fig.width = 6, fig.cap = "Comparison between correlation coefficients for all pairwise combinations of streams using Z-score and log(RPS) over the pre- and post-1980 periods."}
+
+dg.z$metric <- "Z-score"
+dg.rps$metric <- "log(RPS)"
+
+cc.all<-rbind(dg.z,dg.rps)
+
+
+ggplot(cc.all,aes(x=factor(period,levels=c("Pre","Post")),y=cc,fill=period))+
+  geom_boxplot()+
+  scale_fill_brewer(palette="Set1",breaks=c("Pre","Post"))+
+  xlab("Period")+theme_bw()+
+  ylab("Correlation coefficient")+labs(fill="Period")+
+  facet_grid(.~metric)
+
+```
 
 # Statistical models
 
@@ -1019,19 +1157,23 @@ esccands <- esccands %>%
 
 ```
 
-## Table of log RPS candidate models and AIC selection
+\newpage
+
+## Candidate Models with AIC scores for log RPS and log escapement
+
 
 ```{r, Log RPS candidate models and AIC selection, echo = FALSE, warning = FALSE, message = FALSE}
-kable(rpscands, format = "latex")
+
+kable(rpscands, format = "latex",caption="Candidate models for log RPS and distance from enhancement (dist), total releases (totrel), and year, with AIC scores.")%>%
+ kable_styling(latex_options = "hold_position")
 
 ```
 
-\newpage
-
-## Table of log escapement candidate models and AIC selection
 
 ```{r, Log escapement candidate models and AIC selection, echo = FALSE, warning = FALSE, message = FALSE}
-kable(esccands, format = "latex")
+
+kable(esccands, format = "latex",caption="Candidate models for log escapement and distance from enhancement (dist), total releases (totrel), and year, with AIC scores.")%>%
+   kable_styling(latex_options = "hold_position")
 
 ```
 
