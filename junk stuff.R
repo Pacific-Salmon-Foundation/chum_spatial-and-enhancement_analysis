@@ -56,9 +56,20 @@ g<-merge(f,inlets,by="SYS_NM")
 
 range(g$z,na.rm=TRUE)
 
-ggplot(g,aes(x=Year,y=SYS_NM,color=z,size=abs(z)))+
+`Z-score` <- c(-3, -2, -1, 0, 1, 2, 3)
+shape <- c(21, 21, 21, 20, 19, 19, 19)
+cols <- c("red", "red", "red", "black", "blue", "blue", "blue")
+shapelkp <- tibble(`Z-score`, shape, cols)
+g$`Z-score` <- as.numeric(substr(g$z, 1, 2))
+g$size <- abs(g$z)
+g <- merge(shapelkp, g, by = "Z-score")
+g$`Z-score` <- as.factor(g$`Z-score`)
+
+ggplot(g,aes(x=Year, y=SYS_NM, shape = `Z-score`, size = as.numeric(`Z-score`),color = as.numeric(`Z-score`)))+
   geom_point(alpha=1)+
-  labs(y="Escapement",x="Year",color="Z-score")+
+  scale_shape_manual(values = c("-3" = 1, "-2" = 1, "-1" = 1, "0" = 20, "1" = 21, "2" = 21, "3" = 21)) +
+  scale_color_manual(values = c("-3" = "darkred", "-2" = "red4", "-1" = "red1", "0" = "black", "1" = "lightskyblue1", "2" = "royalblue1", "3" = "royalblue4")) +
+  labs(y="Escapement",x="Year")+
   theme_bw()+
   theme(legend.position="bottom")+
   scale_colour_gradient2(low = "red",mid = "white",high = "blue",midpoint = 0,space = "Lab",
@@ -68,6 +79,29 @@ ggplot(g,aes(x=Year,y=SYS_NM,color=z,size=abs(z)))+
   #guides(size = guide_legend(nrow = 4))+ 
   guides(size=FALSE)+
   theme(axis.text.y = element_text(size = 6))+
+  guides(shape = guide_legend(ncol = 7))+ 
+  facet_grid(inlet~.,switch="y",space="free_y",scale="free_y")
+
+ggplot(g, aes(x = Year, y = SYS_NM, shape = `Z-score`, size = `Z-score`, color = `Z-score`, fill = `Z-score`)) +
+  geom_point() +
+  scale_size_manual(values = c("-3" = 5, "-2" = 3, "-1" = 2, 
+                               "0" = 2, 
+                               "1" = 2, "2" = 3, "3" = 5))+
+  scale_shape_manual(values = c("-3" = 1, "-2" = 1, "-1" = 1, 
+                                "0" = 20, 
+                                "1" = 21, "2" = 21, "3" = 21)) +
+  scale_color_manual(values = c("-3" = "darkred", "-2" = "red4", "-1" = "red1", 
+                                "0" = "black", 
+                                "1" = "royalblue1", "2" = "royalblue4", "3" = "royalblue4"))+
+  scale_fill_manual(values = c("-3" = "darkred", "-2" = "red4", "-1" = "red1", 
+                                "0" = "black", 
+                                "1" = "royalblue1", "2" = "royalblue4", "3" = "royalblue4"))+
+  labs(y="Escapement",x="Year", legend = "Z-score")+
+  theme_bw()+
+  theme(legend.position="bottom")+
+  guides(size=FALSE)+
+  theme(axis.text.y = element_text(size = 6))+
+  guides(shape = guide_legend(ncol = 7))+ 
   facet_grid(inlet~.,switch="y",space="free_y",scale="free_y")
 
 ggsave("figures/douglas gardner z scores bubble by inlet.png",dpi=600,height=7,width=6)
