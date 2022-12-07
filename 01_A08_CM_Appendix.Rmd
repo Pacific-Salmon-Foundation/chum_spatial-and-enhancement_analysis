@@ -237,7 +237,7 @@ ggarrange(t1,t2,ncol=1,common.legend = TRUE,legend = "bottom",align='v')
 
 ```{r means by enhancement rank, echo=FALSE,warning=FALSE,message=FALSE,fig.align="center",fig.height=7,fig.width=6,fig.cap="Area 8 chum: Mean Z-score for analysis streams by enhancement rank. Linear regression over all years with SE are shown."}
 
-mean.z<-escdata.filtered%>%group_by(Enhancement_Rank,Year)%>%summarise(u=mean(z,na.rm=TRUE))
+mean.z<-escdata.filtered%>%group_by(Enhancement_Rank,Year) %>% summarise(u=mean(z,na.rm=TRUE))
 
 ggplot(mean.z,aes(x=Year,y=u,color=Enhancement_Rank))+
   geom_line(size=1.5,alpha=.7)+theme_bw()+
@@ -1157,7 +1157,6 @@ esccands <- esccands %>%
 
 ```
 
-\newpage
 
 ## Candidate Models with AIC scores for log RPS and log escapement
 
