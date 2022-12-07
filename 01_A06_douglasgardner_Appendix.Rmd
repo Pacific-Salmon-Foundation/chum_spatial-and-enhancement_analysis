@@ -1171,10 +1171,9 @@ kable(esc.cand.AIC, format = "latex",caption="Candidate models for log escapemen
 
 ```
 
+\newpage
 
-\clearpage
-
-## Effects plots for top model for log RPS
+## Effects plots for top models for log RPS
 
 ```{r, Effects plot of log RPS against releases to area, message = FALSE, echo = FALSE, warning = FALSE}
 
