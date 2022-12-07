@@ -78,7 +78,7 @@ ggplot(escdata.raw,aes(x=Year,y=SYS_NM,color=Enhancement_Rank,size=escapement))+
 
 \newpage
 
-```{r, Facet plot of escapements by enhancement ranking, echo = FALSE, message = FALSE, warning = FALSE, fig.align = "center", fig.height = 10, fig.width = 8, fig.cap = "Escapement to filtered in analysis streams for Douglas-Gardner chum. Colour shows the stream level enhancement level from the PSE database."}
+```{r, Facet plot of escapements by enhancement ranking, echo = FALSE, message = FALSE, warning = FALSE, fig.align = "center", fig.height = 10, fig.width = 8, fig.cap = "Escapement to filtered streams for Douglas-Gardner chum. Colour shows the stream enhancement level from the PSE database."}
 
 ggplot(escdata.filtered,aes(x=Year,y=escapement,color=Enhancement_Rank))+
   geom_point()+geom_line()+theme_bw()+
@@ -91,8 +91,6 @@ ggplot(escdata.filtered,aes(x=Year,y=escapement,color=Enhancement_Rank))+
 ```
 
 \clearpage
-
-## Douglas Gardner chum: distance from the Kitimat River by system
 
 ```{r, Kable of distances by inlet, echo = FALSE, warning = FALSE, message = FALSE, fig.align="center", fig.height = 7, fig.width = 7}
 
@@ -226,7 +224,7 @@ ggplot(mean.z,aes(x=Year,y=u,color=Enhancement_Rank))+
   
 ```
 
-\clearpage
+\newpage
 
 ## Recruits per spawners
 
@@ -276,6 +274,7 @@ ggplot(logrps.1,aes(x=Year,y=logrps,color=prepost,group=grp))+
   theme(legend.position="bottom")
 ```
 
+\newpage
 
 ```{r, Log recruits per spawner by system2, echo = FALSE, message = FALSE, warning = FALSE, fig.align = "center", fig.height = 8, fig.width = 8, fig.cap = "Douglas-Gardner chum: log recruits per spawner by system fitted with linear regression for the periods pre- and post-enhancement (Kiltuish to Weewanie)."}
 
@@ -314,7 +313,7 @@ ggplot(logrps,aes( y = SYS_NM, x = logrps, fill = prepost))+
 
 \newpage
 
-## Bubbleplots of metric by inlet
+### Bubbleplots of metric by inlet
 
 ```{r, Malick and Cox plot z-score, message = FALSE, warning = FALSE, echo = FALSE, fig.align = "center", fig.height = 8, fig.width = 6, fig.cap = "Escapement by inlet and z-score"}
 inlets <- read_csv("data/douglas-gardner subinlets.csv")%>%select(SYS_NM,inlet)
@@ -323,7 +322,6 @@ f<-escdata.filtered%>%select(Year,SYS_NM,z)
 
 g<-merge(f,inlets,by="SYS_NM")
 
-range(g$z,na.rm=TRUE)
 
 `Z-score` <- c(-3, -2, -1, 0, 1, 2, 3)
 shape <- c(21, 21, 21, 20, 19, 19, 19)
@@ -369,7 +367,6 @@ f<-rps.clean%>%select(Year,SYS_NM,logrps)
 
 g<-merge(f,inlets,by="SYS_NM")
 
-range(g$logrps,na.rm=TRUE)
 
 `log RPS` <- c(-5, -4, -3, -2, -1, 0, 1, 2, 3, 4, 5)
 shape <- c(21, 21, 21, 21, 21, 20, 19, 19, 19, 19, 19)
@@ -410,7 +407,7 @@ ggsave("figures/douglas gardner log RPS bubble by inlet.png",dpi=600,height=7,wi
 
 ```
 
-\clearpage
+\newpage
 
 # Correlation analyses and Dendrograms
 
@@ -687,20 +684,6 @@ tanglegram(tangle1, lab.cex = .8, margin_inner = 3, main_left = "Z-score",
 
 ```
 
-\newpage
-
-```{r, Tanglegrams z vs std. esc, echo = FALSE, message = FALSE, warning = FALSE, fig.align = "center", fig.height = 9.5, fig.width = 8.5, fig.cap = "Tanglegram of z-score vs. standardized escapements"}
-
-#png(file = "figures/a06cm_tanglegram_z_v_stdesc.png", width = 2000, height = 3000, pointsize = 36)
-
-tangle2 <- dendlist(dendz, dends)
-                                                                                                            
-tanglegram(tangle2, lab.cex = .8, margin_inner = 3, main_left = "Z-score",
-           main_right = "Standardized escapement", cex_main = 1, highlight_distinct_edges = FALSE,
-           lwd = 2, edge.lwd = 1)
-
-#dev.off()
-```
 
 \newpage
 
@@ -828,7 +811,6 @@ tanglegram(tangle.z, lab.cex = .8, margin_inner = 3, main = "Z-scores", main_lef
 
 ```
 
-\newpage
 
 ```{r, compute boxplot zscores, message = FALSE, error = FALSE, echo = FALSE, include = FALSE}
 
@@ -952,8 +934,6 @@ tanglegram(tangle.logrps, lab.cex = .8, margin_inner = 3, main = "Log RPS", main
 ```
 
 
-\newpage
-
 ```{r, compute boxplot logrps, message = FALSE, error = FALSE, echo = FALSE, include = FALSE}
 
 pre<-data.frame(cor.logrps.pre)
@@ -979,7 +959,6 @@ t.test(pre$cc,post$cc)
 
 ```
 
-\newpage
 
 ```{r, Correlation bubbleplot, echo = FALSE, message = FALSE, warning = FALSE, include = FALSE}
 inlets <- read_csv("data/douglas-gardner subinlets.csv")%>%select(SYS_NM,inlet)
