@@ -68,7 +68,7 @@ escdata.filt<-fread("data/area 25 escapement data filtered.csv")%>%select(-V1)
 
 ## Bubbleplot of escapement by enhancement rank
 
-```{r escapement bubble plot, fig.align="center",fig.height=8,fig.width=6,fig.cap="Escapement to area streams by enhancement rank.",echo=FALSE,warning=FALSE,message=FALSE}
+```{r escapement bubble plot, fig.align="center",fig.height=8,fig.width=6,fig.cap="Escapement to all Area 8 chum streams in the PSE database.",echo=FALSE,warning=FALSE,message=FALSE}
 
 par(mfrow = c(1, 1))
 #bubbleplot of escapements for whole area
@@ -85,18 +85,63 @@ ggplot(escdata.raw,aes(x=Year,y=SYS_NM,color=Enhancement_Rank,size=escapement))+
 
 ```
 
-\newpage
+\newpage 
 
-```{r escapement filtered streams only, fig.align="center",fig.height=8,fig.width=7,fig.cap="Escapement to area streams by enhancement rank.",echo=FALSE,warning=FALSE,message=FALSE}
+```{r escapement filtered streams only, fig.align="center",fig.height=8,fig.width=7,fig.cap="Escapement to all streams for Area 25 chum. Colour shows the stream enhancement level from the PSE database.",echo=FALSE,warning=FALSE,message=FALSE}
 
 ggplot(escdata.filt,aes(x=Year,y=escapement,color=Enhancement_Rank))+
   geom_point()+geom_line()+theme_bw()+
   facet_wrap(~SYS_NM,ncol=3,scale="free_y")+
-  labs(y="Escapement",color="Enhancement Level")+
+  labs(y="Escapement",color="Enhancement Level", title = "Area 25 Escapement")+
   theme(legend.position="bottom")
 
 ```
 
+
+
+\newpage
+
+
+```{r, Kable of distances by inlet, echo = FALSE, warning = FALSE, message = FALSE, fig.align="center", fig.height = 7, fig.width = 7}
+
+streaminlet <- fread("data/CM A25 filtered stream list_with inlets.csv")
+
+
+streaminlet <- read_csv("data/CM A25 filtered stream list_with inlets.csv")
+streaminlet <- streaminlet[,c(1,5)]
+
+colnames(streaminlet) <- c("Stream", "Dist. from enhancement")
+
+kable(streaminlet, format = "latex",caption="Distance from Conuma River (major enhancement location for chum systems included in analysis)")%>%
+      kable_styling(latex_options = "hold_position")
+
+
+#colnames(streaminlet) <- c("System name", "NOTNAS", "Inlet", "Subinlet", "Dist. from enhancement")
+#colaligns <- c("l", "c", "l", "l", "r")
+#streaminlet$`System name` <- str_to_title(streaminlet$`System name`)
+#streaminlet$Inlet <- str_to_sentence(streaminlet$Inlet)
+#streaminlet$Subinlet <- str_to_sentence(streaminlet$Subinlet)
+
+#streaminlet %>%
+#  kbl(align = colaligns, format.args = list(big.mark = ",")) %>%
+#  kable_paper(full_width = F, html_font = "Courier New") %>%
+#  kable_styling(latex_options = "HOLD_position")
+
+```
+
+\newpage
+
+## Hatchery releases to area
+```{r releases for area 25, fig.align="center", fig.height=5, fig.width=8, fig.cap="Total hatchery chum salmon releases in Area 25",echo=FALSE,warning=FALSE,message=FALSE}
+
+releases.raw <- read_csv("data/Area 25 chum releases totals.csv")
+
+ggplot(releases.raw, aes(x = RELEASE_YEAR, y = totreleases/1000000)) + 
+  geom_point() +
+  geom_col(fill="steelblue",color="black") +
+  labs(x="Release Year",y="Total Releases (millions)",title="Area 8 Chum total terminal releases")+
+  theme_bw()
+```
 
 \newpage
 
@@ -126,47 +171,9 @@ ggplot(ggdata.rel,aes(x=RELEASE_YEAR,y=releases,color=RELEASE_STAGE_NAME,group=g
 
 \newpage
 
-## Table of A25 streams by inlet and distance from Conuma enhancement
+## Metrics
 
-
-```{r, Kable of distances by inlet, echo = FALSE, warning = FALSE, message = FALSE, fig.align="center", fig.height = 7, fig.width = 7}
-
-streaminlet <- fread("data/CM A25 filtered stream list_with inlets.csv")
-
-colnames(streaminlet) <- c("System name", "NOTNAS", "Inlet", "Subinlet", "Dist. from enhancement")
-colaligns <- c("l", "c", "l", "l", "r")
-streaminlet$`System name` <- str_to_title(streaminlet$`System name`)
-streaminlet$Inlet <- str_to_sentence(streaminlet$Inlet)
-streaminlet$Subinlet <- str_to_sentence(streaminlet$Subinlet)
-
-streaminlet %>%
-  kbl(align = colaligns, format.args = list(big.mark = ",")) %>%
-  kable_paper(full_width = F, html_font = "Courier New") %>%
-  kable_styling(latex_options = "HOLD_position")
-
-```
-
-\newpage
-
-## Hatchery releases to area
-```{r releases for area 25, fig.align="center", fig.height=5, fig.width=8, fig.cap="Total hatchery chum salmon releases in Area 25",echo=FALSE,warning=FALSE,message=FALSE}
-
-releases.raw <- read_csv("data/Area 25 chum releases totals.csv")
-
-ggplot(releases.raw, aes(x = RELEASE_YEAR, y = totreleases/1000000)) + 
-  geom_point() +
-  geom_line() + 
-  geom_smooth() + 
-  xlab("Year") + 
-  ylab("Total A25 chum salmon releases (millions)") +
-  theme_bw() +
-  scale_fill_grey()
-
-```
-
-\newpage
-
-## Escapement by enhancement rank per system
+### Escapement, logged escapement, Z-scores, Pavg, and moving average
 
 ```{r metric plots,fig.align="center",fig.height=8,fig.width=6,fig.cap="Various plots for escapement and transformations.",echo=FALSE,warning=FALSE,message=FALSE}
 #plot streams by enhancement
@@ -198,7 +205,7 @@ ggarrange(p1,p2,p3,p4,ncol=1,common.legend = TRUE,align='v',legend="bottom")
 
 \newpage
 
-## Moving average and LOESSS fit on enhancement ranking of log escapements
+### Moving average and LOESSS fits
 
 ```{r moving average and LOESS plots, echo=FALSE,warning=FALSE,message=FALSE,fig.align="center",fig.height=5,fig.width=6,fig.cap="Moving average and LOESS fits on logged escapement by enhancement ranking."}
 
@@ -219,21 +226,46 @@ ggarrange(t1,t2,ncol=1,common.legend = TRUE,legend = "bottom",align='v')
 
 \newpage
 
-## Z-scores pre- and post-enhancement
+### Means trends by enhancement rank
 
-```{r prepost boxplot,echo=FALSE,warning=FALSE,message=FALSE,fig.align="center",fig.height=7,fig.width=6,fig.cap="Z-scores pre- and post-enhancement."}
-ggplot(escdata.filt,aes(y=SYS_NM,x=z,fill=prepost))+
-  geom_boxplot()+
-  geom_vline(xintercept=0)+
-  theme_bw()+
-  labs(y="System Name",x="Z-score")
+```{r means by enhancement rank, echo=FALSE,warning=FALSE,message=FALSE,fig.align="center",fig.height=7,fig.width=6,fig.cap="Area 25 chum: Mean Z-score for analysis streams by enhancement rank. Linear regression over all years with SE are shown."}
+
+mean.z<-escdata.filt%>%group_by(Enhancement_Rank,Year) %>% summarise(u=mean(z,na.rm=TRUE))
+
+ggplot(mean.z,aes(x=Year,y=u,color=Enhancement_Rank))+
+  geom_line(size=1.5,alpha=.7)+theme_bw()+
+  scale_color_brewer(palette = "Set1")+
+  labs(y="Mean Z-score")+
+  geom_hline(yintercept=0,linetype="dashed")+
+  geom_vline(xintercept=1980)+
+  facet_wrap(~Enhancement_Rank,ncol=1)+
+  geom_smooth(method="lm",color="black")+
+  guides(color=FALSE)
+  
 ```
 
 \newpage
 
-## Log RPS by stream
+### Recruits per spawner by system
 
-```{r rps figure pre post with lm, echo=FALSE, warning=FALSE, message=FALSE ,fig.align="center", fig.height=7, fig.width=6 ,fig.cap="Log RPS by stream with linear regression fits pre- and post-first year of enhancement."}
+```{r, Plotting RPS by system, echo = FALSE, message = FALSE, warning = FALSE, fig.align = "center", fig.height = 8, fig.width = 7, fig.cap = "Area 25 chum: recruits per spawner by system."}
+
+# RPS by system
+
+ggplot(rps.clean,aes(x=Year,y=rps))+
+  geom_line()+geom_point()+
+  geom_smooth(method='lm',se=TRUE,size=.7)+
+  facet_wrap(~SYS_NM,ncol=3,scale="free_y")+
+  theme_bw()+
+  geom_hline(yintercept=1)
+
+```
+
+\newpage
+
+### Log recruits per spawner by system by period
+
+```{r rps figure pre post with lm, echo=FALSE, warning=FALSE, message=FALSE ,fig.align="center", fig.height=7, fig.width=6 ,fig.cap="Area 25 chum: log recruits per spawner by system fitted with linear regression for the periods pre- and post-enhancement."}
 
 a25.rps<-fread("data/area 25 chum rps.csv")
 
@@ -254,11 +286,12 @@ ggplot(gga25.logrps,aes(x=Year,y=logrps,color=prepost,group=grp))+
   theme(legend.position="bottom")
 ```
 
+
 \newpage
 
-## Log RPS by stream boxplot
+### Log RPS comparison before and after enhancement
 
-```{r rps figure boxplot,echo=FALSE,warning=FALSE,message=FALSE,fig.align="center",fig.height=7,fig.width=6,fig.cap="Log RPS by stream boxplot for pre- and post-start of enhancement period."}
+```{r rps figure boxplot,echo=FALSE,warning=FALSE,message=FALSE,fig.align="center",fig.height=7,fig.width=6,fig.cap="Area 25 chum: Boxplots of log recruits per spawner by system."}
 
 ggplot(gga25.logrps,aes(y=SYS_NM,x=logrps,fill=prepost))+
   geom_boxplot(notch=F)+
@@ -269,6 +302,106 @@ ggplot(gga25.logrps,aes(y=SYS_NM,x=logrps,fill=prepost))+
   theme(legend.position="bottom")
 
 ```
+
+\newpage
+
+### Bubbleplots of metric by inlet
+
+```{r, Malick and Cox plot z-score, message = FALSE, warning = FALSE, echo = FALSE, fig.align = "center", fig.height = 8, fig.width = 6, fig.cap = "Escapement by inlet and z-score"}
+
+inlets <- read_csv("data/CM A25 filtered stream list_with inlets.csv")  %>%
+  select(SYS_NM, inlet)
+
+f<-escdata.filt%>%select(Year,SYS_NM,z)
+
+g<-merge(f,inlets,by="SYS_NM")
+
+
+`Z-score` <- c(-3, -2, -1, 0, 1, 2, 3)
+shape <- c(21, 21, 21, 20, 19, 19, 19)
+cols <- c("red", "red", "red", "black", "blue", "blue", "blue")
+shapelkp <- tibble(`Z-score`, shape, cols)
+g$`Z-score` <- as.numeric(substr(g$z, 1, 2))
+g$size <- abs(g$z)
+g <- merge(shapelkp, g, by = "Z-score")
+g$`Z-score` <- as.factor(g$`Z-score`)
+
+ggplot(g, aes(x = Year, y = SYS_NM, shape = `Z-score`, size = `Z-score`, color = `Z-score`, fill = `Z-score`)) +
+  geom_point() +
+  scale_size_manual(values = c("-3" = 5, "-2" = 3, "-1" = 2, 
+                               "0" = 2, 
+                               "1" = 2, "2" = 3, "3" = 5))+
+  scale_shape_manual(values = c("-3" = 1, "-2" = 1, "-1" = 1, 
+                                "0" = 20, 
+                                "1" = 21, "2" = 21, "3" = 21)) +
+  scale_color_manual(values = c("-3" = "darkred", "-2" = "red4", "-1" = "red1", 
+                                "0" = "black", 
+                                "1" = "royalblue1", "2" = "royalblue4", "3" = "royalblue4"))+
+  scale_fill_manual(values = c("-3" = "darkred", "-2" = "red4", "-1" = "red1", 
+                                "0" = "black", 
+                                "1" = "royalblue1", "2" = "royalblue4", "3" = "royalblue4"))+
+  labs(y="Escapement",x="Year", legend = "Z-score")+
+  theme_bw()+
+  theme(legend.position="bottom")+
+  guides(size=FALSE)+
+  theme(axis.text.y = element_text(size = 6))+
+  guides(shape = guide_legend(ncol = 7))+ 
+  facet_grid(inlet~.,switch="y",space="free_y",scale="free_y")
+
+ggsave("figures/a25 z scores bubble by inlet.png",dpi=600,height=7,width=6)
+
+```
+
+\newpage
+
+```{r, Malick and Cox plot logRPS, message = FALSE, warning = FALSE, echo = FALSE, fig.align = "center", fig.height = 8, fig.width = 6, fig.cap = "Escapement by inlet and log RPS"}
+inlets <- read_csv("data/CM A25 filtered stream list_with inlets.csv")  %>%
+  select(SYS_NM, inlet)
+
+f<-rps.clean%>%select(Year,SYS_NM,logrps)
+
+g<-merge(f,inlets,by="SYS_NM")
+
+
+`log RPS` <- c(-5, -4, -3, -2, -1, 0, 1, 2, 3, 4, 5)
+shape <- c(21, 21, 21, 21, 21, 20, 19, 19, 19, 19, 19)
+cols <- c("red", "red", "red", "red", "red", "black", "blue", "blue", "blue", "blue", "blue")
+shapelkp <- tibble(`log RPS`, shape, cols)
+g$`log RPS` <- as.numeric(substr(g$logrps, 1, 2))
+g$size <- abs(g$`log RPS`)
+g <- merge(shapelkp, g, by = "log RPS")
+g$`log RPS` <- as.factor(g$`log RPS`)
+
+ggplot(g, aes(x = Year, y = SYS_NM, shape = `log RPS`, size = `log RPS`, color = `log RPS`, fill = `log RPS`)) +
+  geom_point() +
+  scale_size_manual(values = c("-5" = 5, "-4" = 4, "-3" = 3, "-2" = 2, "-1" = 1, 
+                               "0" = 1, 
+                               "1" = 1, "2" = 2, "3" = 3, "4" = 4, "5" = 5))+
+  scale_shape_manual(values = c("-5" = 1, "-4" = 1, "-3" = 1, "-2" = 1, "-1" = 1, 
+                                "0" = 20, 
+                                "1" = 21, "2" = 21, "3" = 21, "4" = 21, "5" = 21)) +
+  scale_color_manual(values = c("-5" = "darkred", "-4" = "darkred","-3" = "darkred",
+                                "-2" = "red4", "-1" = "red1", 
+                                "0" = "black", 
+                                "1" = "royalblue1", "2" = "royalblue2", "3" = "royalblue3",
+                                "4" = "royalblue4", "5" = "royalblue4"))+
+  scale_fill_manual(values = c("-5" = "darkred", "-4" = "darkred",
+                               "-3" = "darkred", "-2" = "red4", "-1" = "red1", 
+                                "0" = "black", 
+                                "1" = "royalblue1", "2" = "royalblue4", "3" = "royalblue4",
+                                "4" = "royalblue4", "5" = "royalblue4"))+
+  labs(y="Escapement",x="Year")+
+  theme_bw()+
+  theme(legend.position="bottom")+
+  guides(size=FALSE)+
+  theme(axis.text.y = element_text(size = 6))+
+  guides(shape = guide_legend(ncol = 11, nrow = 2))+ 
+  facet_grid(inlet~.,switch="y",space="free_y",scale="free_y")
+
+ggsave("figures/a25 log RPS bubble by inlet.png",dpi=600,height=7,width=6)
+
+```
+
 
 \newpage
 
@@ -471,9 +604,9 @@ dendclust.rpslog <- dendro_data(clust.dist.cor.rpslog)
 
 \newpage
 
-# Correlation analyses
+# Correlation analyses and Dendrograms
 
-## Correlation plots by metric
+## Cross correlation plots
 
 ```{r correlation plots, echo=FALSE,warning=FALSE,message=FALSE,fig.align="center",fig.height=9.5,fig.width=8.5,fig.cap="Cross correlation plots to compare metrics."}
 
@@ -670,18 +803,7 @@ tanglegram(tangle1, lab.cex = .8, margin_inner = 3, main_left = "Z-score",
 #dev.off()
 
 ```
-\newpage
-```{r tanglegram z vs standardized esc, echo = FALSE, warning = FALSE, message = FALSE,  fig.align = "center", fig.height = 8, fig.width = 6, fig.cap = "Tanglegram comparing the use of z-score against the use of standardized escapements on cluster analysis outputs."}
 
-#png(file = "figures/tanglegram_z_v_stdesc.png", width = 2000, height = 3000, pointsize = 36)
-
-tangle2 <- dendlist(dendz, dends)
-tanglegram(tangle2, lab.cex = .8, margin_inner = 3, main_left = "Z-score",
-           main_right = "Standardized escapement", cex_main = 1, highlight_distinct_edges = FALSE,
-           lwd = 2, edge.lwd = 1)
-#dev.off()
-
-```
 \newpage
 ```{r tanglegram a vs m.ave, echo = FALSE, warning = FALSE, message = FALSE,  fig.align = "center", fig.height = 8, fig.width = 6, fig.cap = "Tanglegram comparing the use of z-score against the use of moving average on cluster analysis outputs."}
 
@@ -713,8 +835,7 @@ tanglegram(tangle4, lab.cex = .8, margin_inner = 3, main_left = "Z-score",
 
 \newpage
 
-# Analyses by pre- and post-enhancement
-## Correlation plots
+# Pre- and post-enhancement correlation analyses
 
 ```{r Corr plots for z-score, pre- and post-1980, echo=FALSE, warning=FALSE, message=FALSE, fig.align = "center", fig.height = 8, fig.width = 6, fig.cap = "Cross correlation plots of z-scores to compare pre- and post-enhancement."}
 #prep data for correlations
@@ -747,93 +868,39 @@ corrplot(cor.z.post, diag = FALSE, order="hclust", method="square", tl.col="blac
 
 \newpage
 
-```{r, Corr plots for log escapement, pre- and post-1980, echo = FALSE, fig.align = "center", fig.height = 8, fig.width = 6, fig.cap = "Cross correlation plots to compare log escapements pre- and post-enhancement."}
+```{r, z-score tanglegram, echo = FALSE, fig.align = "center", fig.height = 8, fig.width = 6, fig.cap = "Tanglegram comparing z-scores pre- and post-enhancement (1980)"}
+# Dendrogram, factored by inlet, by z-score
 
-# Log escapements 
+#png(file = "figures/tanglegram_1980_z.png", width = 2000, height = 3000, pointsize = 48)
 
-cor.data.e<-escdata.filt%>%select(SYS_NM,Year,esc.log)%>%
-  pivot_wider(names_from="Year",values_from="esc.log")%>%data.frame()
+par(mfrow=c(1,1))
 
-cor.data.e.pre<-cor.data.e[,1:31]
-rownames(cor.data.e.pre)<-cor.data.e.pre$SYS_NM
-cor.data.e.pre<-cor.data.e.pre%>%select(-SYS_NM)
-cor.e.pre<-cor(t(cor.data.e.pre),use="pairwise.complete.obs")
+# Pre-1980
+dist.cor.z.pre <- dist(cor.z.pre)
+clust.dist.cor.z.pre <- hclust(dist.cor.z.pre)
+tanglelabs.z.pre <- as.data.frame(clust.dist.cor.z.pre[["labels"]])
+colnames(tanglelabs.z.pre) <- "SYS_NM"
+tanglelabs.z.pre <- merge(tanglelabs.z.pre, nameslookup, on = "SYS_NM")
+clust.dist.cor.z.pre[["labels"]] <- tanglelabs.z.pre$shortnames
+dendz.pre <- as.dendrogram(clust.dist.cor.z.pre)
 
-cor.data.e.post<-cor.data.e[,c(1,32:70)]
-rownames(cor.data.e.post)<-cor.data.e.post$SYS_NM
-cor.data.e.post<-cor.data.e.post%>%select(-SYS_NM)
-cor.e.post<-cor(t(cor.data.e.post),use="pairwise.complete.obs")
+# Post-1980
+dist.cor.z.post <- dist(cor.z.post)
+clust.dist.cor.z.post <- hclust(dist.cor.z.post)
+tanglelabs.z.post <- as.data.frame(clust.dist.cor.z.post[["labels"]])
+colnames(tanglelabs.z.post) <- "SYS_NM"
+tanglelabs.z.post <- merge(tanglelabs.z.post, nameslookup, on = "SYS_NM")
+clust.dist.cor.z.post[["labels"]] <- tanglelabs.z.post$shortnames
+dendz.post <- as.dendrogram(clust.dist.cor.z.post)
 
-#png(file = "figures/corrplot_1980_log.png", width = 2000, height = 3000, pointsize = 48)
-
-par(mfrow=c(2,1))
-corrplot(cor.e.pre, diag = FALSE, order="hclust", method="square", tl.col="black",
-         addrect = 6, tl.cex = 0.5, title = "Log escapement (Pre-1980)", cex.main = .7, mar=c(0,0,1,0))
-corrplot(cor.e.post, diag = FALSE, order="hclust", method="square", tl.col="black",
-         addrect = 6, tl.cex = 0.5, title = "Log escapement (Post-1980)", cex.main = .7, mar=c(0,0,1,0))
-#dev.off()
-
-```
-
-\newpage
-
-```{r, Corr plots for standardized escapements, pre- and post-1980, echo = FALSE, fig.align = "center", fig.height = 8, fig.width = 6, fig.cap = "Cross correlation plots to compare standardized escapements pre- and post-enhancement."}
-
-# Standardized escapements
-
-cor.data.s<-escdata.filt%>%select(SYS_NM,Year,esc.stand)%>%
-  pivot_wider(names_from="Year",values_from="esc.stand")%>%data.frame()
-
-cor.data.s.pre<-cor.data.s[,1:31]
-rownames(cor.data.s.pre)<-cor.data.s.pre$SYS_NM
-cor.data.s.pre<-cor.data.s.pre%>%select(-SYS_NM)
-cor.s.pre<-cor(t(cor.data.s.pre),use="pairwise.complete.obs")
-
-cor.data.s.post<-cor.data.s[,c(1,32:70)]
-rownames(cor.data.s.post)<-cor.data.s.post$SYS_NM
-cor.data.s.post<-cor.data.s.post%>%select(-SYS_NM)
-cor.s.post<-cor(t(cor.data.s.post),use="pairwise.complete.obs")
-
-#png(file = "figures/corrplot_1980_stdesc.png", width = 2000, height = 3000, pointsize = 48)
-
-par(mfrow=c(2,1))
-corrplot(cor.s.pre, diag = FALSE, order="hclust", method="square", tl.col="black",
-         addrect = 6, tl.cex = 0.5, title = "Standardized escapement (Pre-1980)", cex.main = .7, mar=c(0,0,1,0))
-corrplot(cor.s.post, diag = FALSE, order="hclust", method="square", tl.col="black",
-         addrect = 6, tl.cex = 0.5, title = "Standardized escapement (Post-1980)", cex.main = .7, mar=c(0,0,1,0))
+# Tanglegram
+tangle.z <- dendlist(dendz.pre, dendz.post)
+tanglegram(tangle.z, lab.cex = .8, margin_inner = 3, main = "Z-scores", main_left = "Pre-1980",
+           main_right = "Post-1980", cex_main = 1, highlight_distinct_edges = FALSE,
+           lwd = 2, edge.lwd = 1)
 
 #dev.off()
 
-```
-
-\newpage
-
-```{r, Corr plots for moving average, pre- and post-1980, echo = FALSE, fig.align = "center", fig.height = 8, fig.width = 6, fig.cap = "Cross correlation plots to compare moving average pre- and post-enhancement."}
-
-# Moving average
-
-cor.data.m<-escdata.filt%>%select(SYS_NM,Year,m.ave)%>%
-  pivot_wider(names_from="Year",values_from="m.ave")%>%data.frame()
-
-cor.data.m.pre<-cor.data.m[,1:31]
-rownames(cor.data.m.pre)<-cor.data.m.pre$SYS_NM
-cor.data.m.pre<-cor.data.m.pre%>%select(-SYS_NM)
-cor.m.pre<-cor(t(cor.data.m.pre),use="pairwise.complete.obs")
-
-cor.data.m.post<-cor.data.m[,c(1,32:70)]
-rownames(cor.data.m.post)<-cor.data.m.post$SYS_NM
-cor.data.m.post<-cor.data.m.post%>%select(-SYS_NM)
-cor.m.post<-cor(t(cor.data.m.post),use="pairwise.complete.obs")
-
-#png(file = "figures/corrplot_1980_mave.png", width = 2000, height = 3000, pointsize = 48)
-
-par(mfrow=c(2,1))
-corrplot(cor.m.pre, diag = FALSE, order="hclust", method="square", tl.col="black",
-         addrect = 6, tl.cex = 0.5, title = "Moving average (Pre-1980)", cex.main = .7, mar=c(0,0,1,0))
-corrplot(cor.m.post, diag = FALSE, order="hclust", method="square", tl.col="black",
-         addrect = 6, tl.cex = 0.5, title = "Moving average (Post-1980)", cex.main = .7, mar=c(0,0,1,0))
-
-#dev.off()
 ```
 
 \newpage
@@ -895,116 +962,6 @@ corrplot(cor.logrps.post, diag = FALSE, order="hclust", method="square", tl.col=
 
 \newpage
 
-## Tanglegrams
-
-```{r, z-score tanglegram, echo = FALSE, fig.align = "center", fig.height = 8, fig.width = 6, fig.cap = "Tanglegram comparing z-scores pre- and post-enhancement (1980)"}
-# Dendrogram, factored by inlet, by z-score
-
-#png(file = "figures/tanglegram_1980_z.png", width = 2000, height = 3000, pointsize = 48)
-
-par(mfrow=c(1,1))
-
-# Pre-1980
-dist.cor.z.pre <- dist(cor.z.pre)
-clust.dist.cor.z.pre <- hclust(dist.cor.z.pre)
-tanglelabs.z.pre <- as.data.frame(clust.dist.cor.z.pre[["labels"]])
-colnames(tanglelabs.z.pre) <- "SYS_NM"
-tanglelabs.z.pre <- merge(tanglelabs.z.pre, nameslookup, on = "SYS_NM")
-clust.dist.cor.z.pre[["labels"]] <- tanglelabs.z.pre$shortnames
-dendz.pre <- as.dendrogram(clust.dist.cor.z.pre)
-
-# Post-1980
-dist.cor.z.post <- dist(cor.z.post)
-clust.dist.cor.z.post <- hclust(dist.cor.z.post)
-tanglelabs.z.post <- as.data.frame(clust.dist.cor.z.post[["labels"]])
-colnames(tanglelabs.z.post) <- "SYS_NM"
-tanglelabs.z.post <- merge(tanglelabs.z.post, nameslookup, on = "SYS_NM")
-clust.dist.cor.z.post[["labels"]] <- tanglelabs.z.post$shortnames
-dendz.post <- as.dendrogram(clust.dist.cor.z.post)
-
-# Tanglegram
-tangle.z <- dendlist(dendz.pre, dendz.post)
-tanglegram(tangle.z, lab.cex = .8, margin_inner = 3, main = "Z-scores", main_left = "Pre-1980",
-           main_right = "Post-1980", cex_main = 1, highlight_distinct_edges = FALSE,
-           lwd = 2, edge.lwd = 1)
-
-#dev.off()
-
-```
-
-\newpage
-
-```{r, Log escapements tanglegram, echo = FALSE, fig.align = "center", fig.height = 8, fig.width = 6, fig.cap = "Tanglegram comparing log escapements pre- and post-enhancement (1980)"}
-
-#png(file = "figures/tanglegram_1980_log.png", width = 2000, height = 3000, pointsize = 48)
-
-par(mfrow=c(1,1))
-
-# Pre-1980
-dist.cor.e.pre <- dist(cor.e.pre)
-clust.dist.cor.e.pre <- hclust(dist.cor.e.pre)
-tanglelabs.e.pre <- as.data.frame(clust.dist.cor.e.pre[["labels"]])
-colnames(tanglelabs.e.pre) <- "SYS_NM"
-tanglelabs.e.pre <- merge(tanglelabs.e.pre, nameslookup, on = "SYS_NM")
-clust.dist.cor.e.pre[["labels"]] <- tanglelabs.e.pre$shortnames
-dende.pre <- as.dendrogram(clust.dist.cor.e.pre)
-
-# Post-1980
-dist.cor.e.post <- dist(cor.e.post)
-clust.dist.cor.e.post <- hclust(dist.cor.e.post)
-tanglelabs.e.post <- as.data.frame(clust.dist.cor.e.post[["labels"]])
-colnames(tanglelabs.e.post) <- "SYS_NM"
-tanglelabs.e.post <- merge(tanglelabs.e.post, nameslookup, on = "SYS_NM")
-clust.dist.cor.e.post[["labels"]] <- tanglelabs.e.post$shortnames
-dende.post <- as.dendrogram(clust.dist.cor.e.post)
-
-# Tanglegram
-tangle.e <- dendlist(dende.pre, dende.post)
-tanglegram(tangle.e, lab.cex = .8, margin_inner = 3, main = "Log escapements", main_left = "Pre-1980",
-           main_right = "Post-1980", cex_main = 1, highlight_distinct_edges = FALSE,
-           lwd = 2, edge.lwd = 1)
-#dev.off()
-
-```
-
-\newpage
-
-```{r, Standardized escapements tanglegram, echo = FALSE, fig.align = "center", fig.height = 8, fig.width = 6, fig.cap = "Tanglegram comparing log escapements pre- and post-enhancement (1980)"}
-
-#png(file = "figures/tanglegram_1980_stdesc.png", width = 2000, height = 3000, pointsize = 48)
-
-par(mfrow=c(1,1))
-
-# Pre-1980
-dist.cor.s.pre <- dist(cor.s.pre)
-clust.dist.cor.s.pre <- hclust(dist.cor.s.pre)
-tanglelabs.s.pre <- as.data.frame(clust.dist.cor.s.pre[["labels"]])
-colnames(tanglelabs.s.pre) <- "SYS_NM"
-tanglelabs.s.pre <- merge(tanglelabs.s.pre, nameslookup, on = "SYS_NM")
-clust.dist.cor.s.pre[["labels"]] <- tanglelabs.s.pre$shortnames
-dends.pre <- as.dendrogram(clust.dist.cor.s.pre)
-
-# Post-1980
-dist.cor.s.post <- dist(cor.s.post)
-clust.dist.cor.s.post <- hclust(dist.cor.s.post)
-tanglelabs.s.post <- as.data.frame(clust.dist.cor.s.post[["labels"]])
-colnames(tanglelabs.s.post) <- "SYS_NM"
-tanglelabs.s.post <- merge(tanglelabs.s.post, nameslookup, on = "SYS_NM")
-clust.dist.cor.s.post[["labels"]] <- tanglelabs.s.post$shortnames
-dends.post <- as.dendrogram(clust.dist.cor.s.post)
-
-# Tanglegram
-tangle.s <- dendlist(dends.pre, dends.post)
-tanglegram(tangle.s, lab.cex = .8, margin_inner = 3, main = "Standardized escapements", main_left = "Pre-1980",
-           main_right = "Post-1980", cex_main = 1, highlight_distinct_edges = FALSE,
-           lwd = 2, edge.lwd = 1)
-
-#dev.off()
-
-```
-
-\newpage
-
 ```{r, Log RPS tanglegram, echo = FALSE, message = FALSE, warning = FALSE, fig.align = "center", fig.height = 8, fig.width = 6, fig.cap = "Tanglegram comparing Log RPS pre- and post-enhancement (1980)"}
 # Dendrogram, factored by inlet, by logrps-score
 
@@ -1043,7 +1000,6 @@ tanglegram(tangle.logrps, lab.cex = .8, margin_inner = 3, main = "Log RPS", main
 ```
 
 ```{r, compute boxplot zscores, message = FALSE, error = FALSE, echo = FALSE, include = FALSE}
-
 pre<-data.frame(cor.z.pre)
 pre$stream1<-rownames(pre)
 post<-data.frame(cor.z.post)
@@ -1055,21 +1011,18 @@ post<-post%>%pivot_longer(1:ncol(post)-1,names_to="stream2",values_to="cc")%>%
   mutate(cc=replace(cc,cc==1,NA),
          area="DG",period="Post")
 dg.z<-rbind(pre,post)%>%mutate(metric="Z-score")
-
 u.pre<-mean(pre$cc,na.rm=TRUE)
 sd.pre<-sd(pre$cc,na.rm=TRUE)
 u.post<-mean(post$cc,na.rm=TRUE)
 sd.post<-sd(post$cc,na.rm=TRUE)
-u.pre;sd.pre
-u.post;sd.post
+#u.pre;sd.pre
+#u.post;sd.post
 precc<-pre$cc
 postcc<-post$cc
 t.test(pre$cc,post$cc)
-
 ```
 
 ```{r, compute boxplot logrps, message = FALSE, error = FALSE, echo = FALSE, include = FALSE}
-
 pre <- data.frame(cor.logrps.pre)
 pre$stream1<-rownames(pre)
 post<-data.frame(cor.logrps.post)
@@ -1081,102 +1034,21 @@ post<-post%>%pivot_longer(1:ncol(post)-1,names_to="stream2",values_to="cc")%>%
   mutate(cc=replace(cc,cc==1,NA),
          area="DG",period="Post")
 dg.rps<-rbind(pre,post)%>%mutate(metric="log(RPS)")
-
 u.pre<-mean(pre$cc,na.rm=TRUE)
 sd.pre<-sd(pre$cc,na.rm=TRUE)
 u.post<-mean(post$cc,na.rm=TRUE)
 sd.post<-sd(post$cc,na.rm=TRUE)
-u.pre;sd.pre
-u.post;sd.post
+#u.pre;sd.pre
+#u.post;sd.post
 precc<-pre$cc
 postcc<-post$cc
 t.test(pre$cc,post$cc)
-
-```
-
-```{r, Correlation plot by z-score distance, echo = FALSE, warning = FALSE, message = FALSE, include = FALSE}
-
-cordist <- as.data.frame(cor.z) %>%
-  select(`CONUMA RIVER`)
-cordist$SYS_NM <- rownames(cordist)
-
-streamdist <- streaminlet %>%
-  select(SYS_NM, distancefromconuma)
-colnames(streamdist) <- c("SYS_NM", "dist")
-streamdist$dist <- streamdist$dist/1000
-cordist <- merge(streamdist, cordist, by = "SYS_NM")
-colnames(cordist) <- c("SYS_NM", "dist", "corcoef")
-
-saveRDS(cordist, "RDS/A25cordist.rds")
-
-ggplot(cordist, aes(x = dist, y = corcoef)) +
-  geom_point() +
-  ylab("Correlation coefficient") +
-  xlab("Distance from Conuma enhancement (km)")+
-  geom_smooth()
-```
-
-```{r, Correlation plot by logrps distance, echo = FALSE, warning = FALSE, message = FALSE, include = FALSE}
-
-cordist <- as.data.frame(cor.rpslog) %>%
-  select(`CONUMA RIVER`)
-cordist$SYS_NM <- rownames(cordist)
-
-streamdist <- streaminlet %>%
-  select(SYS_NM, distancefromconuma)
-colnames(streamdist) <- c("SYS_NM", "dist")
-streamdist$dist <- streamdist$dist/1000
-cordist <- merge(streamdist, cordist, by = "SYS_NM")
-colnames(cordist) <- c("SYS_NM", "dist", "corcoef")
-
-saveRDS(cordist, "RDS/A25cordist_rpslog.rds")
-
-ggplot(cordist, aes(x = dist, y = corcoef)) +
-  geom_point() +
-  ylab("Correlation coefficient") +
-  xlab("Distance from Conuma enhancement (km)")+
-  geom_smooth()
 ```
 
 
 \newpage
 
-```{r, Moving averages tanglegram, echo = FALSE, fig.align = "center", fig.height = 8, fig.width = 6, fig.cap = "Tanglegram comparing moving averages pre- and post-enhancement (1980)"}
-
-#png(file = "figures/tanglegram_1980_mave.png", width = 2000, height = 3000, pointsize = 48)
-
-par(mfrow=c(1,1))
-# Pre-1980
-dist.cor.m.pre <- dist(cor.m.pre)
-clust.dist.cor.m.pre <- hclust(dist.cor.m.pre)
-tanglelabs.m.pre <- as.data.frame(clust.dist.cor.m.pre[["labels"]])
-colnames(tanglelabs.m.pre) <- "SYS_NM"
-tanglelabs.m.pre <- merge(tanglelabs.m.pre, nameslookup, on = "SYS_NM")
-clust.dist.cor.m.pre[["labels"]] <- tanglelabs.m.pre$shortnames
-dendm.pre <- as.dendrogram(clust.dist.cor.m.pre)
-
-# Post-1980
-dist.cor.m.post <- dist(cor.m.post)
-clust.dist.cor.m.post <- hclust(dist.cor.m.post)
-tanglelabs.m.post <- as.data.frame(clust.dist.cor.m.post[["labels"]])
-colnames(tanglelabs.m.post) <- "SYS_NM"
-tanglelabs.m.post <- merge(tanglelabs.m.post, nameslookup, on = "SYS_NM")
-clust.dist.cor.m.post[["labels"]] <- tanglelabs.m.post$shortnames
-dendm.post <- as.dendrogram(clust.dist.cor.m.post)
-
-# Tanglegram
-tangle.m <- dendlist(dendm.pre, dendm.post)
-tanglegram(tangle.m, lab.cex = .8, margin_inner = 3, main = "Moving average ", main_left = "Pre-1980",
-           main_right = "Post-1980", cex_main = 1, highlight_distinct_edges = FALSE,
-           lwd = 2, edge.lwd = 1)
-
-#dev.off()
-
-```
-
-\newpage
-
-```{r, message = FALSE, error = FALSE, echo = FALSE,fig.align = "center", fig.height = 5, fig.width = 6, fig.cap = "Comparison between correlation coefficients for all pairwise combinations of streams using Z-score and log(RPS) over the pre- and post-1980 periods."}
+```{r, message = FALSE, error = FALSE, warning = FALSE, echo = FALSE,fig.align = "center", fig.height = 5, fig.width = 6, fig.cap = "Comparison between correlation coefficients for all pairwise combinations of streams using Z-score and log(RPS) over the pre- and post-1980 periods."}
 
 cc.all<-rbind(dg.z,dg.rps)
 
@@ -1193,65 +1065,22 @@ ggplot(cc.all,aes(x=factor(period,levels=c("Pre","Post")),y=cc,fill=period))+
 
 # Statistical models
 
-## Table of Recruits per spawner candidate models
-
-```{r, Table of RPS candidate models, echo = FALSE, message = FALSE, warning = FALSE}
-
-rpstab <- read_csv("data/rpsmodels.csv")
-
-kable(rpstab, format = "latex")
-
-#rpstab %>%
-#  kbl(align = colaligns, format.args = list(big.mark = ",")) %>%
-#  kable_paper(full_width = F, html_font = "Courier New") %>%
-#  kable_styling(latex_options = "HOLD_position")
-
-```
-
-\newpage
-
-## Table of Escapement candidate models
-
-```{r, Table of Escapement candidate models, echo = FALSE, message = FALSE, warning = FALSE}
-
-esctab <- read_csv("data/escapementmodels.csv")
-
-kable(esctab, format = "latex")
-
-#esctab %>%
-#  #kbl(align = colaligns, format.args = list(big.mark = ",")) %>%
-#  kable_paper(full_width = F, html_font = "Courier New") %>%
-#  kable_styling(latex_options = "HOLD_position")
-
-```
-
-\newpage
-
-```{r, Comparison of Z-score pre- and post-1980, message = FALSE, error = FALSE, echo = FALSE,fig.align = "center", fig.height = 5, fig.width = 6, fig.cap = "Comparison between correlation coefficients for all pairwise combinations of streams using Z-score and log(RPS) over the pre- and post-1980 periods."}
-
-cc.all<-rbind(dg.z,dg.rps)
-
-ggplot(cc.all,aes(x=factor(period,levels=c("Pre","Post")),y=cc,fill=period))+
-  geom_boxplot()+
-  scale_fill_brewer(palette="Set1",breaks=c("Pre","Post"))+
-  xlab("Period")+theme_bw()+
-  ylab("Correlation coefficient")+labs(fill="Period")+
-  facet_grid(.~metric)
-
-```
-
-\clearpage
-
-## AIC Tables for candidate models
+## Candidate Models with AIC scores for log RPS and log escapement
 
 ```{r, AIC Table for RPS candidate models, echo = FALSE, message = FALSE, warning = FALSE}
 
 rpsaic <- readRDS("RDS/rpsaic.rds")
+rpstab <- readRDS("RDS/rpstab.rds")
 
 rpstab$`Degrees of freedom` <- rpsaic$df
 rpstab$AIC <- rpsaic$AIC
 
-kable(rpstab, format = "latex")
+rpstab <- rpstab %>%
+  arrange(AIC)
+
+kable(rpstab, format = "latex",caption="Candidate models for log RPS and distance from enhancement (dist), total releases (totrel), and year, with AIC scores.")%>%
+ kable_styling(latex_options = "hold_position")
+
 
 #rpstab %>%
 #  kbl(align = colaligns) %>%
@@ -1263,11 +1092,16 @@ kable(rpstab, format = "latex")
 ```{r, AIC Table for Escapement candidate models, echo = FALSE, message = FALSE, warning = FALSE}
 
 escaic <- readRDS("RDS/escaic.rds")
+esctab <- readRDS("RDS/esctab.rds")
 
 esctab$`Degrees of freedom` <- escaic$df
-esctab$AIC <- escaic$AIC
+esctab$AIC <- escaic$AIC 
 
-kable(esctab, format = "latex")
+esctab <- esctab %>%
+  arrange(AIC)
+
+kable(esctab, format = "latex",caption="Candidate models for log escapement and distance from enhancement (dist), total releases (totrel), and year, with AIC scores.")%>%
+   kable_styling(latex_options = "hold_position")
 
 #esctab %>%
 #  kbl(align = colaligns) %>%
@@ -1279,7 +1113,7 @@ kable(esctab, format = "latex")
 
 \newpage
 
-## Effects plot of log RPS by year
+## Effects plots for top models 
 
 ```{r, Effects plot log rps by year, echo = FALSE, message = FALSE, warning = FALSE, fig.align = "center", fig.height = 5, fig.width = 8, fig.cap = "Effects plots of Recruits per spawner by year"}
 
@@ -1290,10 +1124,6 @@ plot(EPC_RPS_YEAR)
 
 ```
 
-\newpage
-
-## Effects plot of log RPS by total releases
-
 ```{r, Effects plots log rps by totrel, echo = FALSE, message = FALSE, warning = FALSE, fig.align = "center", fig.height = 5, fig.width = 8, fig.cap = "Effects plots of Recruits per spawner by total releases"}
 
 par(mfrow=c(1,1))
@@ -1302,10 +1132,6 @@ EPC_RPS_TOTREL <- readRDS("RDS/EPC_RPS_TOTREL.rds")
 plot(EPC_RPS_TOTREL)
 ```
 
-\newpage
-
-## Effects plot of escapement by correlation coefficient
-
 ```{r, Effects plots escapement x corcoef, echo = FALSE, message = FALSE, warning = FALSE, fig.align = "center", fig.height = 5, fig.width = 8, fig.cap = "Effects plots of Escapement by correlation coefficient"}
 
 EP_ESC_COR <- readRDS("RDS/EP_ESC_COR.rds")
@@ -1313,24 +1139,12 @@ plot(EP_ESC_COR)
 
 ```
 
-\newpage
-
-## Effects plot of escapement by distance from enhancement
-
 ```{r, Effects plots escapement x dist, echo = FALSE, message = FALSE, warning = FALSE, fig.align = "center", fig.height = 5, fig.width = 8, fig.cap = "Effects plots of Escapement by distance from enhancement"}
-
 EP_ESC_DIST <- readRDS("RDS/EP_ESC_DIST.rds")
 plot(EP_ESC_DIST)
-
 ```
 
-\newpage
-
-## Effects plot of escapement by total hatchery releases
-
 ```{r, Effects plots escapement esc x totrel, echo = FALSE, message = FALSE, warning = FALSE, fig.align = "center", fig.height = 5, fig.width = 8, fig.cap = "Effects plots of Escapement by correlation coefficient"}
-
 EP_ESC_TOTREL <- readRDS("RDS/EP_ESC_TOTREL.rds")
 plot(EP_ESC_TOTREL)
-
 ```
