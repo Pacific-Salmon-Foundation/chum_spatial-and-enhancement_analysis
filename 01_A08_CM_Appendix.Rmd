@@ -1021,6 +1021,8 @@ ggplot(cc.all,aes(x=factor(period,levels=c("Pre","Post")),y=cc,fill=period))+
 
 ```
 
+\newpage
+
 # Statistical models
 
 ```{r, Statistical models, echo = FALSE, message = FALSE, warning = FALSE, include = FALSE}
