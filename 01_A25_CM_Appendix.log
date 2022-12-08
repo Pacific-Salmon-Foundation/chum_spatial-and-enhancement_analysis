@@ -1,4 +1,4 @@
-This is pdfTeX, Version 3.141592653-2.6-1.40.24 (MiKTeX 22.3) (preloaded format=pdflatex 2022.4.29)  3 DEC 2022 20:07
+This is pdfTeX, Version 3.141592653-2.6-1.40.24 (MiKTeX 22.3) (preloaded format=pdflatex 2022.4.29)  8 DEC 2022 11:46
 entering extended mode
  restricted \write18 enabled.
  %&-line parsing enabled.
@@ -628,14 +628,14 @@ LaTeX Font Info:    External font `lmex10' loaded for size
 [1
 
 {C:/Users/andy1/AppData/Local/MiKTeX/fonts/map/pdftex/pdftex.map}]
-<figures/area 25 chum stream distances.png, id=70, 844.8363pt x 597.432pt>
+<figures/area 25 chum stream distances.png, id=56, 844.8363pt x 597.432pt>
 File: figures/area 25 chum stream distances.png Graphic file (type png)
 <use figures/area 25 chum stream distances.png>
 Package pdftex.def Info: figures/area 25 chum stream distances.png  used on inp
 ut line 107.
 (pdftex.def)             Requested size: 514.71773pt x 363.9863pt.
 [2 <./figures/area 25 chum stream distances.png>]
-<01_A25_CM_Appendix_files/figure-latex/escapement bubble plot-1.pdf, id=79, 433
+<01_A25_CM_Appendix_files/figure-latex/escapement bubble plot-1.pdf, id=65, 433
 .62pt x 578.16pt>
 File: 01_A25_CM_Appendix_files/figure-latex/escapement bubble plot-1.pdf Graphi
 c file (type pdf)
@@ -652,7 +652,7 @@ l.127 \newpage
                <./01_A25_CM_Appendix_files/figure-latex/escapement bubble plot-
 1.pdf>]
 <01_A25_CM_Appendix_files/figure-latex/escapement filtered streams only-1.pdf, 
-id=96, 505.89pt x 578.16pt>
+id=82, 505.89pt x 578.16pt>
 File: 01_A25_CM_Appendix_files/figure-latex/escapement filtered streams only-1.
 pdf Graphic file (type pdf)
 <use 01_A25_CM_Appendix_files/figure-latex/escapement filtered streams only-1.p
@@ -667,452 +667,456 @@ s been already used, duplicate ignored
                                                   \__shipout_drop_firstpage_...
 l.138 \newpage
                <./01_A25_CM_Appendix_files/figure-latex/escapement filtered str
-eams only-1.pdf>]
-<01_A25_CM_Appendix_files/figure-latex/unnamed-chunk-1-1.pdf, id=107, 505.89pt 
+eams only-1.pdf>] [5
+pdfTeX warning (ext4): destination with the same identifier (name{table.1}) has
+ been already used, duplicate ignored
+<argument> ...shipout:D \box_use:N \l_shipout_box 
+                                                  \__shipout_drop_firstpage_...
+l.199 \newpage
+              ]
+<01_A25_CM_Appendix_files/figure-latex/releases for area 25-1.pdf, id=98, 578.1
+6pt x 361.35pt>
+File: 01_A25_CM_Appendix_files/figure-latex/releases for area 25-1.pdf Graphic 
+file (type pdf)
+<use 01_A25_CM_Appendix_files/figure-latex/releases for area 25-1.pdf>
+Package pdftex.def Info: 01_A25_CM_Appendix_files/figure-latex/releases for are
+a 25-1.pdf  used on input line 206.
+(pdftex.def)             Requested size: 514.73721pt x 321.71077pt.
+[6
+pdfTeX warning (ext4): destination with the same identifier (name{figure.3}) ha
+s been already used, duplicate ignored
+<argument> ...shipout:D \box_use:N \l_shipout_box 
+                                                  \__shipout_drop_firstpage_...
+l.213 \newpage
+               <./01_A25_CM_Appendix_files/figure-latex/releases for area 25-1.
+pdf>]
+<01_A25_CM_Appendix_files/figure-latex/unnamed-chunk-1-1.pdf, id=110, 505.89pt 
 x 505.89pt>
 File: 01_A25_CM_Appendix_files/figure-latex/unnamed-chunk-1-1.pdf Graphic file 
 (type pdf)
 <use 01_A25_CM_Appendix_files/figure-latex/unnamed-chunk-1-1.pdf>
 Package pdftex.def Info: 01_A25_CM_Appendix_files/figure-latex/unnamed-chunk-1-
-1.pdf  used on input line 145.
+1.pdf  used on input line 220.
 (pdftex.def)             Requested size: 505.89645pt x 505.89645pt.
-[5
-pdfTeX warning (ext4): destination with the same identifier (name{figure.3}) ha
-s been already used, duplicate ignored
-<argument> ...shipout:D \box_use:N \l_shipout_box 
-                                                  \__shipout_drop_firstpage_...
-l.149 \newpage
-               <./01_A25_CM_Appendix_files/figure-latex/unnamed-chunk-1-1.pdf>]
-[6]
-<01_A25_CM_Appendix_files/figure-latex/releases for area 25-1.pdf, id=124, 578.
-16pt x 361.35pt>
-File: 01_A25_CM_Appendix_files/figure-latex/releases for area 25-1.pdf Graphic 
-file (type pdf)
-<use 01_A25_CM_Appendix_files/figure-latex/releases for area 25-1.pdf>
-Package pdftex.def Info: 01_A25_CM_Appendix_files/figure-latex/releases for are
-a 25-1.pdf  used on input line 219.
-(pdftex.def)             Requested size: 514.73721pt x 321.71077pt.
 [7
 pdfTeX warning (ext4): destination with the same identifier (name{figure.4}) ha
 s been already used, duplicate ignored
 <argument> ...shipout:D \box_use:N \l_shipout_box 
                                                   \__shipout_drop_firstpage_...
-l.226 \newpage
-               <./01_A25_CM_Appendix_files/figure-latex/releases for area 25-1.
-pdf>]
-<01_A25_CM_Appendix_files/figure-latex/metric plots-1.pdf, id=140, 433.62pt x 5
+l.224 \newpage
+               <./01_A25_CM_Appendix_files/figure-latex/unnamed-chunk-1-1.pdf>]
+<01_A25_CM_Appendix_files/figure-latex/metric plots-1.pdf, id=123, 433.62pt x 5
 78.16pt>
 File: 01_A25_CM_Appendix_files/figure-latex/metric plots-1.pdf Graphic file (ty
 pe pdf)
 <use 01_A25_CM_Appendix_files/figure-latex/metric plots-1.pdf>
 Package pdftex.def Info: 01_A25_CM_Appendix_files/figure-latex/metric plots-1.p
-df  used on input line 234.
+df  used on input line 235.
 (pdftex.def)             Requested size: 433.63878pt x 578.18504pt.
 [8
 pdfTeX warning (ext4): destination with the same identifier (name{figure.5}) ha
 s been already used, duplicate ignored
 <argument> ...shipout:D \box_use:N \l_shipout_box 
                                                   \__shipout_drop_firstpage_...
-l.241 \newpage
+l.242 \newpage
                <./01_A25_CM_Appendix_files/figure-latex/metric plots-1.pdf>]
 <01_A25_CM_Appendix_files/figure-latex/moving average and LOESS plots-1.pdf, id
-=152, 433.62pt x 361.35pt>
+=136, 433.62pt x 361.35pt>
 File: 01_A25_CM_Appendix_files/figure-latex/moving average and LOESS plots-1.pd
 f Graphic file (type pdf)
 <use 01_A25_CM_Appendix_files/figure-latex/moving average and LOESS plots-1.pdf
 >
 Package pdftex.def Info: 01_A25_CM_Appendix_files/figure-latex/moving average a
-nd LOESS plots-1.pdf  used on input line 249.
+nd LOESS plots-1.pdf  used on input line 250.
 (pdftex.def)             Requested size: 433.61894pt x 361.34912pt.
 [9
 pdfTeX warning (ext4): destination with the same identifier (name{figure.6}) ha
 s been already used, duplicate ignored
 <argument> ...shipout:D \box_use:N \l_shipout_box 
                                                   \__shipout_drop_firstpage_...
-l.256 \newpage
+l.257 \newpage
                <./01_A25_CM_Appendix_files/figure-latex/moving average and LOES
 S plots-1.pdf>]
-<01_A25_CM_Appendix_files/figure-latex/prepost boxplot-1.pdf, id=164, 433.62pt 
-x 505.89pt>
-File: 01_A25_CM_Appendix_files/figure-latex/prepost boxplot-1.pdf Graphic file 
-(type pdf)
-<use 01_A25_CM_Appendix_files/figure-latex/prepost boxplot-1.pdf>
-Package pdftex.def Info: 01_A25_CM_Appendix_files/figure-latex/prepost boxplot-
-1.pdf  used on input line 264.
+<01_A25_CM_Appendix_files/figure-latex/means by enhancement rank-1.pdf, id=148,
+ 433.62pt x 505.89pt>
+File: 01_A25_CM_Appendix_files/figure-latex/means by enhancement rank-1.pdf Gra
+phic file (type pdf)
+<use 01_A25_CM_Appendix_files/figure-latex/means by enhancement rank-1.pdf>
+Package pdftex.def Info: 01_A25_CM_Appendix_files/figure-latex/means by enhance
+ment rank-1.pdf  used on input line 265.
 (pdftex.def)             Requested size: 433.62555pt x 505.89645pt.
 [10
 pdfTeX warning (ext4): destination with the same identifier (name{figure.7}) ha
 s been already used, duplicate ignored
 <argument> ...shipout:D \box_use:N \l_shipout_box 
                                                   \__shipout_drop_firstpage_...
-l.271 \newpage
-               <./01_A25_CM_Appendix_files/figure-latex/prepost boxplot-1.pdf>]
-<01_A25_CM_Appendix_files/figure-latex/rps figure pre post with lm-1.pdf, id=17
-6, 433.62pt x 505.89pt>
-File: 01_A25_CM_Appendix_files/figure-latex/rps figure pre post with lm-1.pdf G
-raphic file (type pdf)
-<use 01_A25_CM_Appendix_files/figure-latex/rps figure pre post with lm-1.pdf>
-Package pdftex.def Info: 01_A25_CM_Appendix_files/figure-latex/rps figure pre p
-ost with lm-1.pdf  used on input line 278.
-(pdftex.def)             Requested size: 433.62555pt x 505.89645pt.
+l.272 \newpage
+               <./01_A25_CM_Appendix_files/figure-latex/means by enhancement ra
+nk-1.pdf>]
+<01_A25_CM_Appendix_files/figure-latex/Plotting RPS by system-1.pdf, id=164, 50
+5.89pt x 578.16pt>
+File: 01_A25_CM_Appendix_files/figure-latex/Plotting RPS by system-1.pdf Graphi
+c file (type pdf)
+<use 01_A25_CM_Appendix_files/figure-latex/Plotting RPS by system-1.pdf>
+Package pdftex.def Info: 01_A25_CM_Appendix_files/figure-latex/Plotting RPS by 
+system-1.pdf  used on input line 280.
+(pdftex.def)             Requested size: 505.89645pt x 578.1674pt.
 [11
 pdfTeX warning (ext4): destination with the same identifier (name{figure.8}) ha
 s been already used, duplicate ignored
 <argument> ...shipout:D \box_use:N \l_shipout_box 
                                                   \__shipout_drop_firstpage_...
-l.285 \newpage
-               <./01_A25_CM_Appendix_files/figure-latex/rps figure pre post wit
-h lm-1.pdf>]
-<01_A25_CM_Appendix_files/figure-latex/rps figure boxplot-1.pdf, id=193, 433.62
-pt x 505.89pt>
-File: 01_A25_CM_Appendix_files/figure-latex/rps figure boxplot-1.pdf Graphic fi
-le (type pdf)
-<use 01_A25_CM_Appendix_files/figure-latex/rps figure boxplot-1.pdf>
-Package pdftex.def Info: 01_A25_CM_Appendix_files/figure-latex/rps figure boxpl
-ot-1.pdf  used on input line 292.
+l.287 \newpage
+               <./01_A25_CM_Appendix_files/figure-latex/Plotting RPS by system-
+1.pdf>]
+<01_A25_CM_Appendix_files/figure-latex/rps figure pre post with lm-1.pdf, id=17
+9, 433.62pt x 505.89pt>
+File: 01_A25_CM_Appendix_files/figure-latex/rps figure pre post with lm-1.pdf G
+raphic file (type pdf)
+<use 01_A25_CM_Appendix_files/figure-latex/rps figure pre post with lm-1.pdf>
+Package pdftex.def Info: 01_A25_CM_Appendix_files/figure-latex/rps figure pre p
+ost with lm-1.pdf  used on input line 295.
 (pdftex.def)             Requested size: 433.62555pt x 505.89645pt.
 [12
 pdfTeX warning (ext4): destination with the same identifier (name{figure.9}) ha
 s been already used, duplicate ignored
 <argument> ...shipout:D \box_use:N \l_shipout_box 
                                                   \__shipout_drop_firstpage_...
-l.299 \newpage
-               <./01_A25_CM_Appendix_files/figure-latex/rps figure boxplot-1.pd
-f>]
-<01_A25_CM_Appendix_files/figure-latex/correlation plots-1.pdf, id=205, 614.295
-pt x 686.565pt>
-File: 01_A25_CM_Appendix_files/figure-latex/correlation plots-1.pdf Graphic fil
-e (type pdf)
-<use 01_A25_CM_Appendix_files/figure-latex/correlation plots-1.pdf>
-Package pdftex.def Info: 01_A25_CM_Appendix_files/figure-latex/correlation plot
-s-1.pdf  used on input line 310.
-(pdftex.def)             Requested size: 514.73886pt x 575.29639pt.
+l.302 \newpage
+               <./01_A25_CM_Appendix_files/figure-latex/rps figure pre post wit
+h lm-1.pdf>]
+<01_A25_CM_Appendix_files/figure-latex/rps figure boxplot-1.pdf, id=196, 433.62
+pt x 505.89pt>
+File: 01_A25_CM_Appendix_files/figure-latex/rps figure boxplot-1.pdf Graphic fi
+le (type pdf)
+<use 01_A25_CM_Appendix_files/figure-latex/rps figure boxplot-1.pdf>
+Package pdftex.def Info: 01_A25_CM_Appendix_files/figure-latex/rps figure boxpl
+ot-1.pdf  used on input line 310.
+(pdftex.def)             Requested size: 433.62555pt x 505.89645pt.
 [13
 pdfTeX warning (ext4): destination with the same identifier (name{figure.10}) h
 as been already used, duplicate ignored
 <argument> ...shipout:D \box_use:N \l_shipout_box 
                                                   \__shipout_drop_firstpage_...
 l.317 \newpage
-               <./01_A25_CM_Appendix_files/figure-latex/correlation plots-1.pdf
->]
-<01_A25_CM_Appendix_files/figure-latex/Dendrogram plots-1.pdf, id=220, 614.295p
-t x 686.565pt>
-File: 01_A25_CM_Appendix_files/figure-latex/Dendrogram plots-1.pdf Graphic file
- (type pdf)
-<use 01_A25_CM_Appendix_files/figure-latex/Dendrogram plots-1.pdf>
-Package pdftex.def Info: 01_A25_CM_Appendix_files/figure-latex/Dendrogram plots
--1.pdf  used on input line 321.
-(pdftex.def)             Requested size: 514.73886pt x 575.29639pt.
+               <./01_A25_CM_Appendix_files/figure-latex/rps figure boxplot-1.pd
+f>]
+<01_A25_CM_Appendix_files/figure-latex/Malick and Cox plot z-score-1.pdf, id=20
+9, 505.89pt x 578.16pt>
+File: 01_A25_CM_Appendix_files/figure-latex/Malick and Cox plot z-score-1.pdf G
+raphic file (type pdf)
+<use 01_A25_CM_Appendix_files/figure-latex/Malick and Cox plot z-score-1.pdf>
+Package pdftex.def Info: 01_A25_CM_Appendix_files/figure-latex/Malick and Cox p
+lot z-score-1.pdf  used on input line 325.
+(pdftex.def)             Requested size: 505.89645pt x 578.1674pt.
 [14
 pdfTeX warning (ext4): destination with the same identifier (name{figure.11}) h
 as been already used, duplicate ignored
 <argument> ...shipout:D \box_use:N \l_shipout_box 
                                                   \__shipout_drop_firstpage_...
-l.328 \newpage
-               <./01_A25_CM_Appendix_files/figure-latex/Dendrogram plots-1.pdf>
-]
-<01_A25_CM_Appendix_files/figure-latex/tanglegram z vs log-1.pdf, id=232, 433.6
-2pt x 578.16pt>
-File: 01_A25_CM_Appendix_files/figure-latex/tanglegram z vs log-1.pdf Graphic f
-ile (type pdf)
-<use 01_A25_CM_Appendix_files/figure-latex/tanglegram z vs log-1.pdf>
-Package pdftex.def Info: 01_A25_CM_Appendix_files/figure-latex/tanglegram z vs 
-log-1.pdf  used on input line 336.
-(pdftex.def)             Requested size: 433.63878pt x 578.18504pt.
+l.332 \newpage
+               <./01_A25_CM_Appendix_files/figure-latex/Malick and Cox plot z-s
+core-1.pdf>]
+<01_A25_CM_Appendix_files/figure-latex/Malick and Cox plot logRPS-1.pdf, id=221
+, 505.89pt x 578.16pt>
+File: 01_A25_CM_Appendix_files/figure-latex/Malick and Cox plot logRPS-1.pdf Gr
+aphic file (type pdf)
+<use 01_A25_CM_Appendix_files/figure-latex/Malick and Cox plot logRPS-1.pdf>
+Package pdftex.def Info: 01_A25_CM_Appendix_files/figure-latex/Malick and Cox p
+lot logRPS-1.pdf  used on input line 336.
+(pdftex.def)             Requested size: 505.89645pt x 578.1674pt.
 [15
 pdfTeX warning (ext4): destination with the same identifier (name{figure.12}) h
 as been already used, duplicate ignored
 <argument> ...shipout:D \box_use:N \l_shipout_box 
                                                   \__shipout_drop_firstpage_...
-l.342 \newpage
-               <./01_A25_CM_Appendix_files/figure-latex/tanglegram z vs log-1.p
-df>]
-<01_A25_CM_Appendix_files/figure-latex/tanglegram z vs standardized esc-1.pdf, 
-id=245, 433.62pt x 578.16pt>
-File: 01_A25_CM_Appendix_files/figure-latex/tanglegram z vs standardized esc-1.
-pdf Graphic file (type pdf)
-<use 01_A25_CM_Appendix_files/figure-latex/tanglegram z vs standardized esc-1.p
-df>
-Package pdftex.def Info: 01_A25_CM_Appendix_files/figure-latex/tanglegram z vs 
-standardized esc-1.pdf  used on input line 345.
-(pdftex.def)             Requested size: 433.63878pt x 578.18504pt.
+l.343 \newpage
+               <./01_A25_CM_Appendix_files/figure-latex/Malick and Cox plot log
+RPS-1.pdf>]
+<01_A25_CM_Appendix_files/figure-latex/correlation plots-1.pdf, id=232, 614.295
+pt x 686.565pt>
+File: 01_A25_CM_Appendix_files/figure-latex/correlation plots-1.pdf Graphic fil
+e (type pdf)
+<use 01_A25_CM_Appendix_files/figure-latex/correlation plots-1.pdf>
+Package pdftex.def Info: 01_A25_CM_Appendix_files/figure-latex/correlation plot
+s-1.pdf  used on input line 356.
+(pdftex.def)             Requested size: 514.73886pt x 575.29639pt.
 [16
 pdfTeX warning (ext4): destination with the same identifier (name{figure.13}) h
 as been already used, duplicate ignored
 <argument> ...shipout:D \box_use:N \l_shipout_box 
                                                   \__shipout_drop_firstpage_...
-l.351 \newpage
-               <./01_A25_CM_Appendix_files/figure-latex/tanglegram z vs standar
-dized esc-1.pdf>]
-<01_A25_CM_Appendix_files/figure-latex/tanglegram a vs m.ave-1.pdf, id=257, 433
-.62pt x 578.16pt>
-File: 01_A25_CM_Appendix_files/figure-latex/tanglegram a vs m.ave-1.pdf Graphic
- file (type pdf)
-<use 01_A25_CM_Appendix_files/figure-latex/tanglegram a vs m.ave-1.pdf>
-Package pdftex.def Info: 01_A25_CM_Appendix_files/figure-latex/tanglegram a vs 
-m.ave-1.pdf  used on input line 354.
-(pdftex.def)             Requested size: 433.63878pt x 578.18504pt.
+l.363 \newpage
+               <./01_A25_CM_Appendix_files/figure-latex/correlation plots-1.pdf
+>]
+<01_A25_CM_Appendix_files/figure-latex/Dendrogram plots-1.pdf, id=246, 614.295p
+t x 686.565pt>
+File: 01_A25_CM_Appendix_files/figure-latex/Dendrogram plots-1.pdf Graphic file
+ (type pdf)
+<use 01_A25_CM_Appendix_files/figure-latex/Dendrogram plots-1.pdf>
+Package pdftex.def Info: 01_A25_CM_Appendix_files/figure-latex/Dendrogram plots
+-1.pdf  used on input line 367.
+(pdftex.def)             Requested size: 514.73886pt x 575.29639pt.
 [17
 pdfTeX warning (ext4): destination with the same identifier (name{figure.14}) h
 as been already used, duplicate ignored
 <argument> ...shipout:D \box_use:N \l_shipout_box 
                                                   \__shipout_drop_firstpage_...
-l.361 \newpage
-               <./01_A25_CM_Appendix_files/figure-latex/tanglegram a vs m.ave-1
-.pdf>]
-<01_A25_CM_Appendix_files/figure-latex/Tanglegrams z vs logRPS-1.pdf, id=269, 6
-14.295pt x 686.565pt>
-File: 01_A25_CM_Appendix_files/figure-latex/Tanglegrams z vs logRPS-1.pdf Graph
-ic file (type pdf)
-<use 01_A25_CM_Appendix_files/figure-latex/Tanglegrams z vs logRPS-1.pdf>
-Package pdftex.def Info: 01_A25_CM_Appendix_files/figure-latex/Tanglegrams z vs
- logRPS-1.pdf  used on input line 365.
-(pdftex.def)             Requested size: 514.73886pt x 575.29639pt.
+l.374 \newpage
+               <./01_A25_CM_Appendix_files/figure-latex/Dendrogram plots-1.pdf>
+]
+<01_A25_CM_Appendix_files/figure-latex/tanglegram z vs log-1.pdf, id=258, 433.6
+2pt x 578.16pt>
+File: 01_A25_CM_Appendix_files/figure-latex/tanglegram z vs log-1.pdf Graphic f
+ile (type pdf)
+<use 01_A25_CM_Appendix_files/figure-latex/tanglegram z vs log-1.pdf>
+Package pdftex.def Info: 01_A25_CM_Appendix_files/figure-latex/tanglegram z vs 
+log-1.pdf  used on input line 382.
+(pdftex.def)             Requested size: 433.63878pt x 578.18504pt.
 [18
 pdfTeX warning (ext4): destination with the same identifier (name{figure.15}) h
 as been already used, duplicate ignored
 <argument> ...shipout:D \box_use:N \l_shipout_box 
                                                   \__shipout_drop_firstpage_...
-l.372 \newpage
-               <./01_A25_CM_Appendix_files/figure-latex/Tanglegrams z vs logRPS
--1.pdf>]
-<01_A25_CM_Appendix_files/figure-latex/Corr plots for z-score, pre- and post-19
-80-1.pdf, id=281, 433.62pt x 578.16pt>
-File: 01_A25_CM_Appendix_files/figure-latex/Corr plots for z-score, pre- and po
-st-1980-1.pdf Graphic file (type pdf)
-<use 01_A25_CM_Appendix_files/figure-latex/Corr plots for z-score, pre- and pos
-t-1980-1.pdf>
-Package pdftex.def Info: 01_A25_CM_Appendix_files/figure-latex/Corr plots for z
--score, pre- and post-1980-1.pdf  used on input line 383.
+l.389 \newpage
+               <./01_A25_CM_Appendix_files/figure-latex/tanglegram z vs log-1.p
+df>]
+<01_A25_CM_Appendix_files/figure-latex/tanglegram a vs m.ave-1.pdf, id=271, 433
+.62pt x 578.16pt>
+File: 01_A25_CM_Appendix_files/figure-latex/tanglegram a vs m.ave-1.pdf Graphic
+ file (type pdf)
+<use 01_A25_CM_Appendix_files/figure-latex/tanglegram a vs m.ave-1.pdf>
+Package pdftex.def Info: 01_A25_CM_Appendix_files/figure-latex/tanglegram a vs 
+m.ave-1.pdf  used on input line 392.
 (pdftex.def)             Requested size: 433.63878pt x 578.18504pt.
 [19
 pdfTeX warning (ext4): destination with the same identifier (name{figure.16}) h
 as been already used, duplicate ignored
 <argument> ...shipout:D \box_use:N \l_shipout_box 
                                                   \__shipout_drop_firstpage_...
-l.390 \newpage
-               <./01_A25_CM_Appendix_files/figure-latex/Corr plots for z-score,
- pre- and post-1980-1.pdf>]
-<01_A25_CM_Appendix_files/figure-latex/Corr plots for log escapement, pre- and 
-post-1980-1.pdf, id=296, 433.62pt x 578.16pt>
-File: 01_A25_CM_Appendix_files/figure-latex/Corr plots for log escapement, pre-
- and post-1980-1.pdf Graphic file (type pdf)
-<use 01_A25_CM_Appendix_files/figure-latex/Corr plots for log escapement, pre- 
-and post-1980-1.pdf>
-Package pdftex.def Info: 01_A25_CM_Appendix_files/figure-latex/Corr plots for l
-og escapement, pre- and post-1980-1.pdf  used on input line 394.
-(pdftex.def)             Requested size: 433.63878pt x 578.18504pt.
+l.399 \newpage
+               <./01_A25_CM_Appendix_files/figure-latex/tanglegram a vs m.ave-1
+.pdf>]
+<01_A25_CM_Appendix_files/figure-latex/Tanglegrams z vs logRPS-1.pdf, id=284, 6
+14.295pt x 686.565pt>
+File: 01_A25_CM_Appendix_files/figure-latex/Tanglegrams z vs logRPS-1.pdf Graph
+ic file (type pdf)
+<use 01_A25_CM_Appendix_files/figure-latex/Tanglegrams z vs logRPS-1.pdf>
+Package pdftex.def Info: 01_A25_CM_Appendix_files/figure-latex/Tanglegrams z vs
+ logRPS-1.pdf  used on input line 403.
+(pdftex.def)             Requested size: 514.73886pt x 575.29639pt.
 [20
 pdfTeX warning (ext4): destination with the same identifier (name{figure.17}) h
 as been already used, duplicate ignored
 <argument> ...shipout:D \box_use:N \l_shipout_box 
                                                   \__shipout_drop_firstpage_...
-l.401 \newpage
-               <./01_A25_CM_Appendix_files/figure-latex/Corr plots for log esca
-pement, pre- and post-1980-1.pdf>]
-<01_A25_CM_Appendix_files/figure-latex/Corr plots for standardized escapements,
- pre- and post-1980-1.pdf, id=308, 433.62pt x 578.16pt>
-File: 01_A25_CM_Appendix_files/figure-latex/Corr plots for standardized escapem
-ents, pre- and post-1980-1.pdf Graphic file (type pdf)
-<use 01_A25_CM_Appendix_files/figure-latex/Corr plots for standardized escapeme
-nts, pre- and post-1980-1.pdf>
-Package pdftex.def Info: 01_A25_CM_Appendix_files/figure-latex/Corr plots for s
-tandardized escapements, pre- and post-1980-1.pdf  used on input line 405.
+l.410 \newpage
+               <./01_A25_CM_Appendix_files/figure-latex/Tanglegrams z vs logRPS
+-1.pdf>]
+<01_A25_CM_Appendix_files/figure-latex/Corr plots for z-score, pre- and post-19
+80-1.pdf, id=296, 433.62pt x 578.16pt>
+File: 01_A25_CM_Appendix_files/figure-latex/Corr plots for z-score, pre- and po
+st-1980-1.pdf Graphic file (type pdf)
+<use 01_A25_CM_Appendix_files/figure-latex/Corr plots for z-score, pre- and pos
+t-1980-1.pdf>
+Package pdftex.def Info: 01_A25_CM_Appendix_files/figure-latex/Corr plots for z
+-score, pre- and post-1980-1.pdf  used on input line 418.
 (pdftex.def)             Requested size: 433.63878pt x 578.18504pt.
 [21
 pdfTeX warning (ext4): destination with the same identifier (name{figure.18}) h
 as been already used, duplicate ignored
 <argument> ...shipout:D \box_use:N \l_shipout_box 
                                                   \__shipout_drop_firstpage_...
-l.412 \newpage
-               <./01_A25_CM_Appendix_files/figure-latex/Corr plots for standard
-ized escapements, pre- and post-1980-1.pdf>]
-<01_A25_CM_Appendix_files/figure-latex/Corr plots for moving average, pre- and 
-post-1980-1.pdf, id=320, 433.62pt x 578.16pt>
-File: 01_A25_CM_Appendix_files/figure-latex/Corr plots for moving average, pre-
- and post-1980-1.pdf Graphic file (type pdf)
-<use 01_A25_CM_Appendix_files/figure-latex/Corr plots for moving average, pre- 
-and post-1980-1.pdf>
-Package pdftex.def Info: 01_A25_CM_Appendix_files/figure-latex/Corr plots for m
-oving average, pre- and post-1980-1.pdf  used on input line 416.
+l.425 \newpage
+               <./01_A25_CM_Appendix_files/figure-latex/Corr plots for z-score,
+ pre- and post-1980-1.pdf>]
+<01_A25_CM_Appendix_files/figure-latex/z-score tanglegram-1.pdf, id=309, 433.62
+pt x 578.16pt>
+File: 01_A25_CM_Appendix_files/figure-latex/z-score tanglegram-1.pdf Graphic fi
+le (type pdf)
+<use 01_A25_CM_Appendix_files/figure-latex/z-score tanglegram-1.pdf>
+Package pdftex.def Info: 01_A25_CM_Appendix_files/figure-latex/z-score tanglegr
+am-1.pdf  used on input line 429.
 (pdftex.def)             Requested size: 433.63878pt x 578.18504pt.
 [22
 pdfTeX warning (ext4): destination with the same identifier (name{figure.19}) h
 as been already used, duplicate ignored
 <argument> ...shipout:D \box_use:N \l_shipout_box 
                                                   \__shipout_drop_firstpage_...
-l.423 \newpage
-               <./01_A25_CM_Appendix_files/figure-latex/Corr plots for moving a
-verage, pre- and post-1980-1.pdf>]
-<01_A25_CM_Appendix_files/figure-latex/z-score tanglegram-1.pdf, id=332, 433.62
-pt x 578.16pt>
-File: 01_A25_CM_Appendix_files/figure-latex/z-score tanglegram-1.pdf Graphic fi
-le (type pdf)
-<use 01_A25_CM_Appendix_files/figure-latex/z-score tanglegram-1.pdf>
-Package pdftex.def Info: 01_A25_CM_Appendix_files/figure-latex/z-score tanglegr
-am-1.pdf  used on input line 430.
+l.436 \newpage
+               <./01_A25_CM_Appendix_files/figure-latex/z-score tanglegram-1.pd
+f>]
+<01_A25_CM_Appendix_files/figure-latex/Pre-1980 logrps-1.pdf, id=321, 433.62pt 
+x 578.16pt>
+File: 01_A25_CM_Appendix_files/figure-latex/Pre-1980 logrps-1.pdf Graphic file 
+(type pdf)
+<use 01_A25_CM_Appendix_files/figure-latex/Pre-1980 logrps-1.pdf>
+Package pdftex.def Info: 01_A25_CM_Appendix_files/figure-latex/Pre-1980 logrps-
+1.pdf  used on input line 440.
 (pdftex.def)             Requested size: 433.63878pt x 578.18504pt.
 [23
 pdfTeX warning (ext4): destination with the same identifier (name{figure.20}) h
 as been already used, duplicate ignored
 <argument> ...shipout:D \box_use:N \l_shipout_box 
                                                   \__shipout_drop_firstpage_...
-l.437 \newpage
-               <./01_A25_CM_Appendix_files/figure-latex/z-score tanglegram-1.pd
-f>]
-<01_A25_CM_Appendix_files/figure-latex/Log escapements tanglegram-1.pdf, id=345
-, 433.62pt x 578.16pt>
-File: 01_A25_CM_Appendix_files/figure-latex/Log escapements tanglegram-1.pdf Gr
-aphic file (type pdf)
-<use 01_A25_CM_Appendix_files/figure-latex/Log escapements tanglegram-1.pdf>
-Package pdftex.def Info: 01_A25_CM_Appendix_files/figure-latex/Log escapements 
-tanglegram-1.pdf  used on input line 441.
+l.447 \newpage
+               <./01_A25_CM_Appendix_files/figure-latex/Pre-1980 logrps-1.pdf>]
+<01_A25_CM_Appendix_files/figure-latex/Log RPS tanglegram-1.pdf, id=333, 433.62
+pt x 578.16pt>
+File: 01_A25_CM_Appendix_files/figure-latex/Log RPS tanglegram-1.pdf Graphic fi
+le (type pdf)
+<use 01_A25_CM_Appendix_files/figure-latex/Log RPS tanglegram-1.pdf>
+Package pdftex.def Info: 01_A25_CM_Appendix_files/figure-latex/Log RPS tanglegr
+am-1.pdf  used on input line 451.
 (pdftex.def)             Requested size: 433.63878pt x 578.18504pt.
 [24
 pdfTeX warning (ext4): destination with the same identifier (name{figure.21}) h
 as been already used, duplicate ignored
 <argument> ...shipout:D \box_use:N \l_shipout_box 
                                                   \__shipout_drop_firstpage_...
-l.448 \newpage
-               <./01_A25_CM_Appendix_files/figure-latex/Log escapements tangleg
-ram-1.pdf>]
-<01_A25_CM_Appendix_files/figure-latex/Standardized escapements tanglegram-1.pd
-f, id=357, 433.62pt x 578.16pt>
-File: 01_A25_CM_Appendix_files/figure-latex/Standardized escapements tanglegram
--1.pdf Graphic file (type pdf)
-<use 01_A25_CM_Appendix_files/figure-latex/Standardized escapements tanglegram-
-1.pdf>
-Package pdftex.def Info: 01_A25_CM_Appendix_files/figure-latex/Standardized esc
-apements tanglegram-1.pdf  used on input line 452.
-(pdftex.def)             Requested size: 433.63878pt x 578.18504pt.
+l.458 \newpage
+               <./01_A25_CM_Appendix_files/figure-latex/Log RPS tanglegram-1.pd
+f>]
+<01_A25_CM_Appendix_files/figure-latex/unnamed-chunk-2-1.pdf, id=345, 433.62pt 
+x 361.35pt>
+File: 01_A25_CM_Appendix_files/figure-latex/unnamed-chunk-2-1.pdf Graphic file 
+(type pdf)
+<use 01_A25_CM_Appendix_files/figure-latex/unnamed-chunk-2-1.pdf>
+Package pdftex.def Info: 01_A25_CM_Appendix_files/figure-latex/unnamed-chunk-2-
+1.pdf  used on input line 462.
+(pdftex.def)             Requested size: 433.61894pt x 361.34912pt.
 [25
 pdfTeX warning (ext4): destination with the same identifier (name{figure.22}) h
 as been already used, duplicate ignored
 <argument> ...shipout:D \box_use:N \l_shipout_box 
                                                   \__shipout_drop_firstpage_...
-l.459 \newpage
-               <./01_A25_CM_Appendix_files/figure-latex/Standardized escapement
-s tanglegram-1.pdf>]
-<01_A25_CM_Appendix_files/figure-latex/Moving averages tanglegram-1.pdf, id=370
-, 433.62pt x 578.16pt>
-File: 01_A25_CM_Appendix_files/figure-latex/Moving averages tanglegram-1.pdf Gr
-aphic file (type pdf)
-<use 01_A25_CM_Appendix_files/figure-latex/Moving averages tanglegram-1.pdf>
-Package pdftex.def Info: 01_A25_CM_Appendix_files/figure-latex/Moving averages 
-tanglegram-1.pdf  used on input line 463.
-(pdftex.def)             Requested size: 433.63878pt x 578.18504pt.
-[26
-pdfTeX warning (ext4): destination with the same identifier (name{figure.23}) h
-as been already used, duplicate ignored
-<argument> ...shipout:D \box_use:N \l_shipout_box 
-                                                  \__shipout_drop_firstpage_...
-l.470 \newpage
-               <./01_A25_CM_Appendix_files/figure-latex/Moving averages tangleg
-ram-1.pdf>] [27] [28] [29]
-Overfull \hbox (52.97916pt too wide) in paragraph at lines 567--584
-[] 
+l.469 \newpage
+               <./01_A25_CM_Appendix_files/figure-latex/unnamed-chunk-2-1.pdf>]
+
+Overfull \hbox (52.97916pt too wide) in paragraph at lines 513--530
+ [][] 
  []
 
-[30]
-<01_A25_CM_Appendix_files/figure-latex/Effects plot log rps by year-1.pdf, id=4
-03, 578.16pt x 361.35pt>
+[26
+pdfTeX warning (ext4): destination with the same identifier (name{table.2}) has
+ been already used, duplicate ignored
+<argument> ...shipout:D \box_use:N \l_shipout_box 
+                                                  \__shipout_drop_firstpage_...
+l.532 \newpage
+              
+pdfTeX warning (ext4): destination with the same identifier (name{table.3}) has
+ been already used, duplicate ignored
+<argument> ...shipout:D \box_use:N \l_shipout_box 
+                                                  \__shipout_drop_firstpage_...
+l.532 \newpage
+              ]
+<01_A25_CM_Appendix_files/figure-latex/Effects plot log rps by year-1.pdf, id=3
+65, 578.16pt x 361.35pt>
 File: 01_A25_CM_Appendix_files/figure-latex/Effects plot log rps by year-1.pdf 
 Graphic file (type pdf)
 <use 01_A25_CM_Appendix_files/figure-latex/Effects plot log rps by year-1.pdf>
 Package pdftex.def Info: 01_A25_CM_Appendix_files/figure-latex/Effects plot log
- rps by year-1.pdf  used on input line 593.
+ rps by year-1.pdf  used on input line 540.
 (pdftex.def)             Requested size: 514.73721pt x 321.71077pt.
-[31
-pdfTeX warning (ext4): destination with the same identifier (name{figure.24}) h
-as been already used, duplicate ignored
-<argument> ...shipout:D \box_use:N \l_shipout_box 
-                                                  \__shipout_drop_firstpage_...
-l.600 \newpage
-               <./01_A25_CM_Appendix_files/figure-latex/Effects plot log rps by
- year-1.pdf>]
 <01_A25_CM_Appendix_files/figure-latex/Effects plots log rps by totrel-1.pdf, i
-d=422, 578.16pt x 361.35pt>
+d=366, 578.16pt x 361.35pt>
 File: 01_A25_CM_Appendix_files/figure-latex/Effects plots log rps by totrel-1.p
 df Graphic file (type pdf)
 <use 01_A25_CM_Appendix_files/figure-latex/Effects plots log rps by totrel-1.pd
 f>
 Package pdftex.def Info: 01_A25_CM_Appendix_files/figure-latex/Effects plots lo
-g rps by totrel-1.pdf  used on input line 608.
+g rps by totrel-1.pdf  used on input line 549.
 (pdftex.def)             Requested size: 514.73721pt x 321.71077pt.
-[32
-pdfTeX warning (ext4): destination with the same identifier (name{figure.25}) h
-as been already used, duplicate ignored
-<argument> ...shipout:D \box_use:N \l_shipout_box 
-                                                  \__shipout_drop_firstpage_...
-l.615 \newpage
-               <./01_A25_CM_Appendix_files/figure-latex/Effects plots log rps b
-y totrel-1.pdf>]
+
+LaTeX Warning: `!h' float specifier changed to `!ht'.
+
 <01_A25_CM_Appendix_files/figure-latex/Effects plots escapement x corcoef-1.pdf
-, id=440, 578.16pt x 361.35pt>
+, id=367, 578.16pt x 361.35pt>
 File: 01_A25_CM_Appendix_files/figure-latex/Effects plots escapement x corcoef-
 1.pdf Graphic file (type pdf)
 <use 01_A25_CM_Appendix_files/figure-latex/Effects plots escapement x corcoef-1
 .pdf>
 Package pdftex.def Info: 01_A25_CM_Appendix_files/figure-latex/Effects plots es
-capement x corcoef-1.pdf  used on input line 623.
+capement x corcoef-1.pdf  used on input line 558.
 (pdftex.def)             Requested size: 514.73721pt x 321.71077pt.
-[33
-pdfTeX warning (ext4): destination with the same identifier (name{figure.26}) h
-as been already used, duplicate ignored
-<argument> ...shipout:D \box_use:N \l_shipout_box 
-                                                  \__shipout_drop_firstpage_...
-l.630 \newpage
-               <./01_A25_CM_Appendix_files/figure-latex/Effects plots escapemen
-t x corcoef-1.pdf>]
+
+LaTeX Warning: `!h' float specifier changed to `!ht'.
+
 <01_A25_CM_Appendix_files/figure-latex/Effects plots escapement x dist-1.pdf, i
-d=458, 578.16pt x 361.35pt>
+d=368, 578.16pt x 361.35pt>
 File: 01_A25_CM_Appendix_files/figure-latex/Effects plots escapement x dist-1.p
 df Graphic file (type pdf)
 <use 01_A25_CM_Appendix_files/figure-latex/Effects plots escapement x dist-1.pd
 f>
 Package pdftex.def Info: 01_A25_CM_Appendix_files/figure-latex/Effects plots es
-capement x dist-1.pdf  used on input line 638.
+capement x dist-1.pdf  used on input line 567.
 (pdftex.def)             Requested size: 514.73721pt x 321.71077pt.
-[34
-pdfTeX warning (ext4): destination with the same identifier (name{figure.27}) h
-as been already used, duplicate ignored
-<argument> ...shipout:D \box_use:N \l_shipout_box 
-                                                  \__shipout_drop_firstpage_...
-l.645 \newpage
-               <./01_A25_CM_Appendix_files/figure-latex/Effects plots escapemen
-t x dist-1.pdf>]
+
+LaTeX Warning: `!h' float specifier changed to `!ht'.
+
 <01_A25_CM_Appendix_files/figure-latex/Effects plots escapement esc x totrel-1.
-pdf, id=476, 578.16pt x 361.35pt>
+pdf, id=369, 578.16pt x 361.35pt>
 File: 01_A25_CM_Appendix_files/figure-latex/Effects plots escapement esc x totr
 el-1.pdf Graphic file (type pdf)
 <use 01_A25_CM_Appendix_files/figure-latex/Effects plots escapement esc x totre
 l-1.pdf>
 Package pdftex.def Info: 01_A25_CM_Appendix_files/figure-latex/Effects plots es
-capement esc x totrel-1.pdf  used on input line 653.
+capement esc x totrel-1.pdf  used on input line 576.
 (pdftex.def)             Requested size: 514.73721pt x 321.71077pt.
-[35
-pdfTeX warning (ext4): destination with the same identifier (name{figure.28}) h
+
+LaTeX Warning: `!h' float specifier changed to `!ht'.
+
+[27
+pdfTeX warning (ext4): destination with the same identifier (name{figure.23}) h
 as been already used, duplicate ignored
 <argument> ...shipout:D \box_use:N \l_shipout_box 
                                                   \__shipout_drop_firstpage_...
-l.660 \end{document}
+l.583 \end{document}
+                     <./01_A25_CM_Appendix_files/figure-latex/Effects plot log 
+rps by year-1.pdf>] [28
+pdfTeX warning (ext4): destination with the same identifier (name{figure.24}) h
+as been already used, duplicate ignored
+<argument> ...shipout:D \box_use:N \l_shipout_box 
+                                                  \__shipout_drop_firstpage_...
+l.583 \end{document}
+                     <./01_A25_CM_Appendix_files/figure-latex/Effects plots log
+ rps by totrel-1.pdf>] [29
+pdfTeX warning (ext4): destination with the same identifier (name{figure.25}) h
+as been already used, duplicate ignored
+<argument> ...shipout:D \box_use:N \l_shipout_box 
+                                                  \__shipout_drop_firstpage_...
+l.583 \end{document}
+                     <./01_A25_CM_Appendix_files/figure-latex/Effects plots esc
+apement x corcoef-1.pdf>] [30
+pdfTeX warning (ext4): destination with the same identifier (name{figure.26}) h
+as been already used, duplicate ignored
+<argument> ...shipout:D \box_use:N \l_shipout_box 
+                                                  \__shipout_drop_firstpage_...
+l.583 \end{document}
+                     <./01_A25_CM_Appendix_files/figure-latex/Effects plots esc
+apement x dist-1.pdf>] [31
+pdfTeX warning (ext4): destination with the same identifier (name{figure.27}) h
+as been already used, duplicate ignored
+<argument> ...shipout:D \box_use:N \l_shipout_box 
+                                                  \__shipout_drop_firstpage_...
+l.583 \end{document}
                      <./01_A25_CM_Appendix_files/figure-latex/Effects plots esc
 apement esc x totrel-1.pdf>] (01_A25_CM_Appendix.aux) ) 
 Here is how much of TeX's memory you used:
- 15321 strings out of 478547
- 254486 string characters out of 2858250
- 579785 words of memory out of 3000000
- 33064 multiletter control sequences out of 15000+600000
- 516981 words of font info for 94 fonts, out of 8000000 for 9000
+ 15290 strings out of 478547
+ 252109 string characters out of 2858250
+ 576078 words of memory out of 3000000
+ 33044 multiletter control sequences out of 15000+600000
+ 517230 words of font info for 97 fonts, out of 8000000 for 9000
  1141 hyphenation exceptions out of 8191
- 74i,9n,77p,1017b,335s stack positions out of 10000i,1000n,20000p,200000b,80000s
+ 74i,9n,77p,1017b,339s stack positions out of 10000i,1000n,20000p,200000b,80000s
 {C:/MiKTeX/fonts/enc/dvi
 ps/lm/lm-ec.enc}<C:/MiKTeX/fonts/type1/public/lm/lmbx10.pfb><C:/MiKTeX/fonts/ty
 pe1/public/lm/lmbx12.pfb><C:/MiKTeX/fonts/type1/public/lm/lmr10.pfb><C:/MiKTeX/
 fonts/type1/public/lm/lmr12.pfb><C:/MiKTeX/fonts/type1/public/lm/lmr17.pfb>
-Output written on 01_A25_CM_Appendix.pdf (35 pages, 1677426 bytes).
+Output written on 01_A25_CM_Appendix.pdf (31 pages, 1834648 bytes).
 PDF statistics:
- 629 PDF objects out of 1000 (max. 8388607)
- 121 named destinations out of 1000 (max. 500000)
- 26994 words of extra memory for PDF output out of 29859 (max. 10000000)
+ 562 PDF objects out of 1000 (max. 8388607)
+ 105 named destinations out of 1000 (max. 500000)
+ 26933 words of extra memory for PDF output out of 29859 (max. 10000000)
 

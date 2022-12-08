@@ -1,4 +1,4 @@
-This is pdfTeX, Version 3.141592653-2.6-1.40.24 (MiKTeX 22.3) (preloaded format=pdflatex 2022.4.29)  5 DEC 2022 22:59
+This is pdfTeX, Version 3.141592653-2.6-1.40.24 (MiKTeX 22.3) (preloaded format=pdflatex 2022.4.29)  8 DEC 2022 10:16
 entering extended mode
  restricted \write18 enabled.
  %&-line parsing enabled.
@@ -672,312 +672,303 @@ pdfTeX warning (ext4): destination with the same identifier (name{table.1}) has
  been already used, duplicate ignored
 <argument> ...shipout:D \box_use:N \l_shipout_box 
                                                   \__shipout_drop_firstpage_...
-l.201 \clearpage
-                
-
-]
-<01_A06_douglasgardner_Appendix_files/figure-latex/total releases-1.pdf, id=103
+l.197 \clearpage
+                ]
+<01_A06_douglasgardner_Appendix_files/figure-latex/total releases-1.pdf, id=102
 , 578.16pt x 433.62pt>
 File: 01_A06_douglasgardner_Appendix_files/figure-latex/total releases-1.pdf Gr
 aphic file (type pdf)
 <use 01_A06_douglasgardner_Appendix_files/figure-latex/total releases-1.pdf>
 Package pdftex.def Info: 01_A06_douglasgardner_Appendix_files/figure-latex/tota
-l releases-1.pdf  used on input line 209.
+l releases-1.pdf  used on input line 205.
 (pdftex.def)             Requested size: 514.73721pt x 386.05292pt.
 [6
+
 
 
 pdfTeX warning (ext4): destination with the same identifier (name{figure.3}) ha
 s been already used, duplicate ignored
 <argument> ...shipout:D \box_use:N \l_shipout_box 
                                                   \__shipout_drop_firstpage_...
-l.216 \newpage
+l.212 \newpage
                <./01_A06_douglasgardner_Appendix_files/figure-latex/total relea
 ses-1.pdf>]
 <01_A06_douglasgardner_Appendix_files/figure-latex/Facet plot of all releases i
-n Area 6-1.pdf, id=115, 578.16pt x 505.89pt>
+n Area 6-1.pdf, id=114, 578.16pt x 505.89pt>
 File: 01_A06_douglasgardner_Appendix_files/figure-latex/Facet plot of all relea
 ses in Area 6-1.pdf Graphic file (type pdf)
 <use 01_A06_douglasgardner_Appendix_files/figure-latex/Facet plot of all releas
 es in Area 6-1.pdf>
 Package pdftex.def Info: 01_A06_douglasgardner_Appendix_files/figure-latex/Face
-t plot of all releases in Area 6-1.pdf  used on input line 220.
+t plot of all releases in Area 6-1.pdf  used on input line 216.
 (pdftex.def)             Requested size: 514.73721pt x 450.39505pt.
 [7
 pdfTeX warning (ext4): destination with the same identifier (name{figure.4}) ha
 s been already used, duplicate ignored
 <argument> ...shipout:D \box_use:N \l_shipout_box 
                                                   \__shipout_drop_firstpage_...
-l.227 \newpage
+l.223 \newpage
                <./01_A06_douglasgardner_Appendix_files/figure-latex/Facet plot 
 of all releases in Area 6-1.pdf>]
-<01_A06_douglasgardner_Appendix_files/figure-latex/metric plots-1.pdf, id=127, 
+<01_A06_douglasgardner_Appendix_files/figure-latex/metric plots-1.pdf, id=126, 
 650.43pt x 650.43pt>
 File: 01_A06_douglasgardner_Appendix_files/figure-latex/metric plots-1.pdf Grap
 hic file (type pdf)
 <use 01_A06_douglasgardner_Appendix_files/figure-latex/metric plots-1.pdf>
 Package pdftex.def Info: 01_A06_douglasgardner_Appendix_files/figure-latex/metr
-ic plots-1.pdf  used on input line 238.
+ic plots-1.pdf  used on input line 234.
 (pdftex.def)             Requested size: 514.74715pt x 514.74715pt.
 [8
 pdfTeX warning (ext4): destination with the same identifier (name{figure.5}) ha
 s been already used, duplicate ignored
 <argument> ...shipout:D \box_use:N \l_shipout_box 
                                                   \__shipout_drop_firstpage_...
-l.245 \newpage
+l.241 \newpage
                <./01_A06_douglasgardner_Appendix_files/figure-latex/metric plot
 s-1.pdf>]
 <01_A06_douglasgardner_Appendix_files/figure-latex/moving average and LOESS plo
-ts-1.pdf, id=140, 433.62pt x 361.35pt>
+ts-1.pdf, id=139, 433.62pt x 361.35pt>
 File: 01_A06_douglasgardner_Appendix_files/figure-latex/moving average and LOES
 S plots-1.pdf Graphic file (type pdf)
 <use 01_A06_douglasgardner_Appendix_files/figure-latex/moving average and LOESS
  plots-1.pdf>
 Package pdftex.def Info: 01_A06_douglasgardner_Appendix_files/figure-latex/movi
-ng average and LOESS plots-1.pdf  used on input line 253.
+ng average and LOESS plots-1.pdf  used on input line 249.
 (pdftex.def)             Requested size: 433.61894pt x 361.34912pt.
 [9
 pdfTeX warning (ext4): destination with the same identifier (name{figure.6}) ha
 s been already used, duplicate ignored
 <argument> ...shipout:D \box_use:N \l_shipout_box 
                                                   \__shipout_drop_firstpage_...
-l.260 \newpage
+l.256 \newpage
                <./01_A06_douglasgardner_Appendix_files/figure-latex/moving aver
 age and LOESS plots-1.pdf>]
 <01_A06_douglasgardner_Appendix_files/figure-latex/means by enhancement rank-1.
-pdf, id=152, 433.62pt x 505.89pt>
+pdf, id=151, 433.62pt x 505.89pt>
 File: 01_A06_douglasgardner_Appendix_files/figure-latex/means by enhancement ra
 nk-1.pdf Graphic file (type pdf)
 <use 01_A06_douglasgardner_Appendix_files/figure-latex/means by enhancement ran
 k-1.pdf>
 Package pdftex.def Info: 01_A06_douglasgardner_Appendix_files/figure-latex/mean
-s by enhancement rank-1.pdf  used on input line 268.
+s by enhancement rank-1.pdf  used on input line 264.
 (pdftex.def)             Requested size: 433.62555pt x 505.89645pt.
 [10
 pdfTeX warning (ext4): destination with the same identifier (name{figure.7}) ha
 s been already used, duplicate ignored
 <argument> ...shipout:D \box_use:N \l_shipout_box 
                                                   \__shipout_drop_firstpage_...
-l.275 \clearpage
-                 <./01_A06_douglasgardner_Appendix_files/figure-latex/means by 
-enhancement rank-1.pdf>]
+l.271 \newpage
+               <./01_A06_douglasgardner_Appendix_files/figure-latex/means by en
+hancement rank-1.pdf>]
 <01_A06_douglasgardner_Appendix_files/figure-latex/Plotting RPS by system-1.pdf
-, id=168, 505.89pt x 578.16pt>
+, id=167, 505.89pt x 578.16pt>
 File: 01_A06_douglasgardner_Appendix_files/figure-latex/Plotting RPS by system-
 1.pdf Graphic file (type pdf)
 <use 01_A06_douglasgardner_Appendix_files/figure-latex/Plotting RPS by system-1
 .pdf>
 Package pdftex.def Info: 01_A06_douglasgardner_Appendix_files/figure-latex/Plot
-ting RPS by system-1.pdf  used on input line 286.
+ting RPS by system-1.pdf  used on input line 282.
 (pdftex.def)             Requested size: 505.89645pt x 578.1674pt.
 [11
-
-
 pdfTeX warning (ext4): destination with the same identifier (name{figure.8}) ha
 s been already used, duplicate ignored
 <argument> ...shipout:D \box_use:N \l_shipout_box 
                                                   \__shipout_drop_firstpage_...
-l.293 \newpage
+l.289 \newpage
                <./01_A06_douglasgardner_Appendix_files/figure-latex/Plotting RP
 S by system-1.pdf>]
 <01_A06_douglasgardner_Appendix_files/figure-latex/Log recruits per spawner by 
-system-1.pdf, id=184, 578.16pt x 578.16pt>
+system-1.pdf, id=183, 578.16pt x 578.16pt>
 File: 01_A06_douglasgardner_Appendix_files/figure-latex/Log recruits per spawne
 r by system-1.pdf Graphic file (type pdf)
 <use 01_A06_douglasgardner_Appendix_files/figure-latex/Log recruits per spawner
  by system-1.pdf>
 Package pdftex.def Info: 01_A06_douglasgardner_Appendix_files/figure-latex/Log 
-recruits per spawner by system-1.pdf  used on input line 301.
+recruits per spawner by system-1.pdf  used on input line 297.
 (pdftex.def)             Requested size: 514.73721pt x 514.73721pt.
-<01_A06_douglasgardner_Appendix_files/figure-latex/Log recruits per spawner by 
-system2-1.pdf, id=185, 578.16pt x 578.16pt>
-File: 01_A06_douglasgardner_Appendix_files/figure-latex/Log recruits per spawne
-r by system2-1.pdf Graphic file (type pdf)
-<use 01_A06_douglasgardner_Appendix_files/figure-latex/Log recruits per spawner
- by system2-1.pdf>
-Package pdftex.def Info: 01_A06_douglasgardner_Appendix_files/figure-latex/Log 
-recruits per spawner by system2-1.pdf  used on input line 310.
-(pdftex.def)             Requested size: 514.73721pt x 514.73721pt.
-
-LaTeX Warning: `!h' float specifier changed to `!ht'.
-
 [12
 pdfTeX warning (ext4): destination with the same identifier (name{figure.9}) ha
 s been already used, duplicate ignored
 <argument> ...shipout:D \box_use:N \l_shipout_box 
                                                   \__shipout_drop_firstpage_...
-l.317 \newpage
+l.304 \newpage
                <./01_A06_douglasgardner_Appendix_files/figure-latex/Log recruit
 s per spawner by system-1.pdf>]
-<01_A06_douglasgardner_Appendix_files/figure-latex/unnamed-chunk-1-1.pdf, id=20
-2, 578.16pt x 505.89pt>
-File: 01_A06_douglasgardner_Appendix_files/figure-latex/unnamed-chunk-1-1.pdf G
-raphic file (type pdf)
-<use 01_A06_douglasgardner_Appendix_files/figure-latex/unnamed-chunk-1-1.pdf>
-Package pdftex.def Info: 01_A06_douglasgardner_Appendix_files/figure-latex/unna
-med-chunk-1-1.pdf  used on input line 325.
-(pdftex.def)             Requested size: 514.73721pt x 450.39505pt.
-
-LaTeX Warning: `!h' float specifier changed to `!ht'.
-
+<01_A06_douglasgardner_Appendix_files/figure-latex/Log recruits per spawner by 
+system2-1.pdf, id=200, 578.16pt x 578.16pt>
+File: 01_A06_douglasgardner_Appendix_files/figure-latex/Log recruits per spawne
+r by system2-1.pdf Graphic file (type pdf)
+<use 01_A06_douglasgardner_Appendix_files/figure-latex/Log recruits per spawner
+ by system2-1.pdf>
+Package pdftex.def Info: 01_A06_douglasgardner_Appendix_files/figure-latex/Log 
+recruits per spawner by system2-1.pdf  used on input line 308.
+(pdftex.def)             Requested size: 514.73721pt x 514.73721pt.
 [13
 pdfTeX warning (ext4): destination with the same identifier (name{figure.10}) h
 as been already used, duplicate ignored
 <argument> ...shipout:D \box_use:N \l_shipout_box 
                                                   \__shipout_drop_firstpage_...
-l.332 \clearpage
-                 <./01_A06_douglasgardner_Appendix_files/figure-latex/Log recru
-its per spawner by system2-1.pdf>] [14
+l.315 \newpage
+               <./01_A06_douglasgardner_Appendix_files/figure-latex/Log recruit
+s per spawner by system2-1.pdf>]
+<01_A06_douglasgardner_Appendix_files/figure-latex/unnamed-chunk-1-1.pdf, id=21
+7, 578.16pt x 505.89pt>
+File: 01_A06_douglasgardner_Appendix_files/figure-latex/unnamed-chunk-1-1.pdf G
+raphic file (type pdf)
+<use 01_A06_douglasgardner_Appendix_files/figure-latex/unnamed-chunk-1-1.pdf>
+Package pdftex.def Info: 01_A06_douglasgardner_Appendix_files/figure-latex/unna
+med-chunk-1-1.pdf  used on input line 323.
+(pdftex.def)             Requested size: 514.73721pt x 450.39505pt.
+[14
 pdfTeX warning (ext4): destination with the same identifier (name{figure.11}) h
 as been already used, duplicate ignored
 <argument> ...shipout:D \box_use:N \l_shipout_box 
                                                   \__shipout_drop_firstpage_...
-l.332 \clearpage
-                 <./01_A06_douglasgardner_Appendix_files/figure-latex/unnamed-c
-hunk-1-1.pdf>]
-<01_A06_douglasgardner_Appendix_files/figure-latex/Correlation plots by metric-
-1.pdf, id=230, 614.295pt x 686.565pt>
-File: 01_A06_douglasgardner_Appendix_files/figure-latex/Correlation plots by me
-tric-1.pdf Graphic file (type pdf)
-<use 01_A06_douglasgardner_Appendix_files/figure-latex/Correlation plots by met
-ric-1.pdf>
-Package pdftex.def Info: 01_A06_douglasgardner_Appendix_files/figure-latex/Corr
-elation plots by metric-1.pdf  used on input line 343.
-(pdftex.def)             Requested size: 514.73886pt x 575.29639pt.
+l.330 \newpage
+               <./01_A06_douglasgardner_Appendix_files/figure-latex/unnamed-chu
+nk-1-1.pdf>]
+<01_A06_douglasgardner_Appendix_files/figure-latex/Malick and Cox plot z-score-
+1.pdf, id=229, 505.89pt x 578.16pt>
+File: 01_A06_douglasgardner_Appendix_files/figure-latex/Malick and Cox plot z-s
+core-1.pdf Graphic file (type pdf)
+<use 01_A06_douglasgardner_Appendix_files/figure-latex/Malick and Cox plot z-sc
+ore-1.pdf>
+Package pdftex.def Info: 01_A06_douglasgardner_Appendix_files/figure-latex/Mali
+ck and Cox plot z-score-1.pdf  used on input line 338.
+(pdftex.def)             Requested size: 505.89645pt x 578.1674pt.
 [15
-
-
 pdfTeX warning (ext4): destination with the same identifier (name{figure.12}) h
 as been already used, duplicate ignored
 <argument> ...shipout:D \box_use:N \l_shipout_box 
                                                   \__shipout_drop_firstpage_...
-l.350 \newpage
-               <./01_A06_douglasgardner_Appendix_files/figure-latex/Correlation
- plots by metric-1.pdf>]
-<01_A06_douglasgardner_Appendix_files/figure-latex/Dendrogram plots-1.pdf, id=2
-44, 614.295pt x 686.565pt>
-File: 01_A06_douglasgardner_Appendix_files/figure-latex/Dendrogram plots-1.pdf 
-Graphic file (type pdf)
-<use 01_A06_douglasgardner_Appendix_files/figure-latex/Dendrogram plots-1.pdf>
-Package pdftex.def Info: 01_A06_douglasgardner_Appendix_files/figure-latex/Dend
-rogram plots-1.pdf  used on input line 358.
-(pdftex.def)             Requested size: 514.73886pt x 575.29639pt.
+l.345 \newpage
+               <./01_A06_douglasgardner_Appendix_files/figure-latex/Malick and 
+Cox plot z-score-1.pdf>]
+<01_A06_douglasgardner_Appendix_files/figure-latex/Malick and Cox plot logRPS-1
+.pdf, id=241, 505.89pt x 578.16pt>
+File: 01_A06_douglasgardner_Appendix_files/figure-latex/Malick and Cox plot log
+RPS-1.pdf Graphic file (type pdf)
+<use 01_A06_douglasgardner_Appendix_files/figure-latex/Malick and Cox plot logR
+PS-1.pdf>
+Package pdftex.def Info: 01_A06_douglasgardner_Appendix_files/figure-latex/Mali
+ck and Cox plot logRPS-1.pdf  used on input line 349.
+(pdftex.def)             Requested size: 505.89645pt x 578.1674pt.
 [16
 pdfTeX warning (ext4): destination with the same identifier (name{figure.13}) h
 as been already used, duplicate ignored
 <argument> ...shipout:D \box_use:N \l_shipout_box 
                                                   \__shipout_drop_firstpage_...
-l.364 \newpage
-               <./01_A06_douglasgardner_Appendix_files/figure-latex/Dendrogram 
-plots-1.pdf>]
-<01_A06_douglasgardner_Appendix_files/figure-latex/Tanglegrams z v log-1.pdf, i
-d=257, 614.295pt x 686.565pt>
-File: 01_A06_douglasgardner_Appendix_files/figure-latex/Tanglegrams z v log-1.p
-df Graphic file (type pdf)
-<use 01_A06_douglasgardner_Appendix_files/figure-latex/Tanglegrams z v log-1.pd
-f>
-Package pdftex.def Info: 01_A06_douglasgardner_Appendix_files/figure-latex/Tang
-legrams z v log-1.pdf  used on input line 372.
+l.356 \newpage
+               <./01_A06_douglasgardner_Appendix_files/figure-latex/Malick and 
+Cox plot logRPS-1.pdf>]
+<01_A06_douglasgardner_Appendix_files/figure-latex/Correlation plots by metric-
+1.pdf, id=252, 614.295pt x 686.565pt>
+File: 01_A06_douglasgardner_Appendix_files/figure-latex/Correlation plots by me
+tric-1.pdf Graphic file (type pdf)
+<use 01_A06_douglasgardner_Appendix_files/figure-latex/Correlation plots by met
+ric-1.pdf>
+Package pdftex.def Info: 01_A06_douglasgardner_Appendix_files/figure-latex/Corr
+elation plots by metric-1.pdf  used on input line 367.
 (pdftex.def)             Requested size: 514.73886pt x 575.29639pt.
 [17
 pdfTeX warning (ext4): destination with the same identifier (name{figure.14}) h
 as been already used, duplicate ignored
 <argument> ...shipout:D \box_use:N \l_shipout_box 
                                                   \__shipout_drop_firstpage_...
-l.379 \newpage
-               <./01_A06_douglasgardner_Appendix_files/figure-latex/Tanglegrams
- z v log-1.pdf>]
-<01_A06_douglasgardner_Appendix_files/figure-latex/Tanglegrams z vs std. esc-1.
-pdf, id=270, 614.295pt x 686.565pt>
-File: 01_A06_douglasgardner_Appendix_files/figure-latex/Tanglegrams z vs std. e
-sc-1.pdf Graphic file (type pdf)
-<use 01_A06_douglasgardner_Appendix_files/figure-latex/Tanglegrams z vs std. es
-c-1.pdf>
-Package pdftex.def Info: 01_A06_douglasgardner_Appendix_files/figure-latex/Tang
-legrams z vs std. esc-1.pdf  used on input line 383.
+l.374 \newpage
+               <./01_A06_douglasgardner_Appendix_files/figure-latex/Correlation
+ plots by metric-1.pdf>]
+<01_A06_douglasgardner_Appendix_files/figure-latex/Dendrogram plots-1.pdf, id=2
+66, 614.295pt x 686.565pt>
+File: 01_A06_douglasgardner_Appendix_files/figure-latex/Dendrogram plots-1.pdf 
+Graphic file (type pdf)
+<use 01_A06_douglasgardner_Appendix_files/figure-latex/Dendrogram plots-1.pdf>
+Package pdftex.def Info: 01_A06_douglasgardner_Appendix_files/figure-latex/Dend
+rogram plots-1.pdf  used on input line 382.
 (pdftex.def)             Requested size: 514.73886pt x 575.29639pt.
 [18
 pdfTeX warning (ext4): destination with the same identifier (name{figure.15}) h
 as been already used, duplicate ignored
 <argument> ...shipout:D \box_use:N \l_shipout_box 
                                                   \__shipout_drop_firstpage_...
-l.390 \newpage
-               <./01_A06_douglasgardner_Appendix_files/figure-latex/Tanglegrams
- z vs std. esc-1.pdf>]
-<01_A06_douglasgardner_Appendix_files/figure-latex/Tanglegrams z vs m.ave-1.pdf
-, id=282, 614.295pt x 686.565pt>
-File: 01_A06_douglasgardner_Appendix_files/figure-latex/Tanglegrams z vs m.ave-
-1.pdf Graphic file (type pdf)
-<use 01_A06_douglasgardner_Appendix_files/figure-latex/Tanglegrams z vs m.ave-1
-.pdf>
+l.388 \newpage
+               <./01_A06_douglasgardner_Appendix_files/figure-latex/Dendrogram 
+plots-1.pdf>]
+<01_A06_douglasgardner_Appendix_files/figure-latex/Tanglegrams z v log-1.pdf, i
+d=279, 614.295pt x 686.565pt>
+File: 01_A06_douglasgardner_Appendix_files/figure-latex/Tanglegrams z v log-1.p
+df Graphic file (type pdf)
+<use 01_A06_douglasgardner_Appendix_files/figure-latex/Tanglegrams z v log-1.pd
+f>
 Package pdftex.def Info: 01_A06_douglasgardner_Appendix_files/figure-latex/Tang
-legrams z vs m.ave-1.pdf  used on input line 394.
+legrams z v log-1.pdf  used on input line 396.
 (pdftex.def)             Requested size: 514.73886pt x 575.29639pt.
 [19
 pdfTeX warning (ext4): destination with the same identifier (name{figure.16}) h
 as been already used, duplicate ignored
 <argument> ...shipout:D \box_use:N \l_shipout_box 
                                                   \__shipout_drop_firstpage_...
-l.401 \newpage
+l.403 \newpage
                <./01_A06_douglasgardner_Appendix_files/figure-latex/Tanglegrams
- z vs m.ave-1.pdf>]
-<01_A06_douglasgardner_Appendix_files/figure-latex/Tanglegrams z vs logRPS-1.pd
-f, id=295, 614.295pt x 686.565pt>
-File: 01_A06_douglasgardner_Appendix_files/figure-latex/Tanglegrams z vs logRPS
--1.pdf Graphic file (type pdf)
-<use 01_A06_douglasgardner_Appendix_files/figure-latex/Tanglegrams z vs logRPS-
-1.pdf>
+ z v log-1.pdf>]
+<01_A06_douglasgardner_Appendix_files/figure-latex/Tanglegrams z vs m.ave-1.pdf
+, id=293, 614.295pt x 686.565pt>
+File: 01_A06_douglasgardner_Appendix_files/figure-latex/Tanglegrams z vs m.ave-
+1.pdf Graphic file (type pdf)
+<use 01_A06_douglasgardner_Appendix_files/figure-latex/Tanglegrams z vs m.ave-1
+.pdf>
 Package pdftex.def Info: 01_A06_douglasgardner_Appendix_files/figure-latex/Tang
-legrams z vs logRPS-1.pdf  used on input line 405.
+legrams z vs m.ave-1.pdf  used on input line 407.
 (pdftex.def)             Requested size: 514.73886pt x 575.29639pt.
 [20
 pdfTeX warning (ext4): destination with the same identifier (name{figure.17}) h
 as been already used, duplicate ignored
 <argument> ...shipout:D \box_use:N \l_shipout_box 
                                                   \__shipout_drop_firstpage_...
-l.412 \newpage
+l.414 \newpage
                <./01_A06_douglasgardner_Appendix_files/figure-latex/Tanglegrams
- z vs logRPS-1.pdf>]
-<01_A06_douglasgardner_Appendix_files/figure-latex/Pre-1980 z-1.pdf, id=307, 43
-3.62pt x 578.16pt>
-File: 01_A06_douglasgardner_Appendix_files/figure-latex/Pre-1980 z-1.pdf Graphi
-c file (type pdf)
-<use 01_A06_douglasgardner_Appendix_files/figure-latex/Pre-1980 z-1.pdf>
-Package pdftex.def Info: 01_A06_douglasgardner_Appendix_files/figure-latex/Pre-
-1980 z-1.pdf  used on input line 420.
-(pdftex.def)             Requested size: 433.63878pt x 578.18504pt.
+ z vs m.ave-1.pdf>]
+<01_A06_douglasgardner_Appendix_files/figure-latex/Tanglegrams z vs logRPS-1.pd
+f, id=305, 614.295pt x 686.565pt>
+File: 01_A06_douglasgardner_Appendix_files/figure-latex/Tanglegrams z vs logRPS
+-1.pdf Graphic file (type pdf)
+<use 01_A06_douglasgardner_Appendix_files/figure-latex/Tanglegrams z vs logRPS-
+1.pdf>
+Package pdftex.def Info: 01_A06_douglasgardner_Appendix_files/figure-latex/Tang
+legrams z vs logRPS-1.pdf  used on input line 418.
+(pdftex.def)             Requested size: 514.73886pt x 575.29639pt.
 [21
 pdfTeX warning (ext4): destination with the same identifier (name{figure.18}) h
 as been already used, duplicate ignored
 <argument> ...shipout:D \box_use:N \l_shipout_box 
                                                   \__shipout_drop_firstpage_...
-l.427 \newpage
-               <./01_A06_douglasgardner_Appendix_files/figure-latex/Pre-1980 z-
-1.pdf>]
-<01_A06_douglasgardner_Appendix_files/figure-latex/z-score tanglegram-1.pdf, id
-=320, 433.62pt x 578.16pt>
-File: 01_A06_douglasgardner_Appendix_files/figure-latex/z-score tanglegram-1.pd
-f Graphic file (type pdf)
-<use 01_A06_douglasgardner_Appendix_files/figure-latex/z-score tanglegram-1.pdf
->
-Package pdftex.def Info: 01_A06_douglasgardner_Appendix_files/figure-latex/z-sc
-ore tanglegram-1.pdf  used on input line 431.
+l.425 \newpage
+               <./01_A06_douglasgardner_Appendix_files/figure-latex/Tanglegrams
+ z vs logRPS-1.pdf>]
+<01_A06_douglasgardner_Appendix_files/figure-latex/Pre-1980 z-1.pdf, id=317, 43
+3.62pt x 578.16pt>
+File: 01_A06_douglasgardner_Appendix_files/figure-latex/Pre-1980 z-1.pdf Graphi
+c file (type pdf)
+<use 01_A06_douglasgardner_Appendix_files/figure-latex/Pre-1980 z-1.pdf>
+Package pdftex.def Info: 01_A06_douglasgardner_Appendix_files/figure-latex/Pre-
+1980 z-1.pdf  used on input line 433.
 (pdftex.def)             Requested size: 433.63878pt x 578.18504pt.
 [22
 pdfTeX warning (ext4): destination with the same identifier (name{figure.19}) h
 as been already used, duplicate ignored
 <argument> ...shipout:D \box_use:N \l_shipout_box 
                                                   \__shipout_drop_firstpage_...
-l.438 \newpage
-               <./01_A06_douglasgardner_Appendix_files/figure-latex/z-score tan
-glegram-1.pdf>]
-<01_A06_douglasgardner_Appendix_files/figure-latex/Pre-1980 logrps-1.pdf, id=33
-2, 433.62pt x 578.16pt>
-File: 01_A06_douglasgardner_Appendix_files/figure-latex/Pre-1980 logrps-1.pdf G
-raphic file (type pdf)
-<use 01_A06_douglasgardner_Appendix_files/figure-latex/Pre-1980 logrps-1.pdf>
-Package pdftex.def Info: 01_A06_douglasgardner_Appendix_files/figure-latex/Pre-
-1980 logrps-1.pdf  used on input line 444.
+l.440 \newpage
+               <./01_A06_douglasgardner_Appendix_files/figure-latex/Pre-1980 z-
+1.pdf>]
+<01_A06_douglasgardner_Appendix_files/figure-latex/z-score tanglegram-1.pdf, id
+=330, 433.62pt x 578.16pt>
+File: 01_A06_douglasgardner_Appendix_files/figure-latex/z-score tanglegram-1.pd
+f Graphic file (type pdf)
+<use 01_A06_douglasgardner_Appendix_files/figure-latex/z-score tanglegram-1.pdf
+>
+Package pdftex.def Info: 01_A06_douglasgardner_Appendix_files/figure-latex/z-sc
+ore tanglegram-1.pdf  used on input line 444.
 (pdftex.def)             Requested size: 433.63878pt x 578.18504pt.
 [23
 pdfTeX warning (ext4): destination with the same identifier (name{figure.20}) h
@@ -985,16 +976,15 @@ as been already used, duplicate ignored
 <argument> ...shipout:D \box_use:N \l_shipout_box 
                                                   \__shipout_drop_firstpage_...
 l.451 \newpage
-               <./01_A06_douglasgardner_Appendix_files/figure-latex/Pre-1980 lo
-grps-1.pdf>]
-<01_A06_douglasgardner_Appendix_files/figure-latex/Log RPS tanglegram-1.pdf, id
-=344, 433.62pt x 578.16pt>
-File: 01_A06_douglasgardner_Appendix_files/figure-latex/Log RPS tanglegram-1.pd
-f Graphic file (type pdf)
-<use 01_A06_douglasgardner_Appendix_files/figure-latex/Log RPS tanglegram-1.pdf
->
-Package pdftex.def Info: 01_A06_douglasgardner_Appendix_files/figure-latex/Log 
-RPS tanglegram-1.pdf  used on input line 455.
+               <./01_A06_douglasgardner_Appendix_files/figure-latex/z-score tan
+glegram-1.pdf>]
+<01_A06_douglasgardner_Appendix_files/figure-latex/Pre-1980 logrps-1.pdf, id=34
+2, 433.62pt x 578.16pt>
+File: 01_A06_douglasgardner_Appendix_files/figure-latex/Pre-1980 logrps-1.pdf G
+raphic file (type pdf)
+<use 01_A06_douglasgardner_Appendix_files/figure-latex/Pre-1980 logrps-1.pdf>
+Package pdftex.def Info: 01_A06_douglasgardner_Appendix_files/figure-latex/Pre-
+1980 logrps-1.pdf  used on input line 455.
 (pdftex.def)             Requested size: 433.63878pt x 578.18504pt.
 [24
 pdfTeX warning (ext4): destination with the same identifier (name{figure.21}) h
@@ -1002,99 +992,114 @@ as been already used, duplicate ignored
 <argument> ...shipout:D \box_use:N \l_shipout_box 
                                                   \__shipout_drop_firstpage_...
 l.462 \newpage
-               <./01_A06_douglasgardner_Appendix_files/figure-latex/Log RPS tan
-glegram-1.pdf>]
-<01_A06_douglasgardner_Appendix_files/figure-latex/Comparison of Z-score pre- a
-nd post-1980-1.pdf, id=356, 433.62pt x 361.35pt>
-File: 01_A06_douglasgardner_Appendix_files/figure-latex/Comparison of Z-score p
-re- and post-1980-1.pdf Graphic file (type pdf)
-<use 01_A06_douglasgardner_Appendix_files/figure-latex/Comparison of Z-score pr
-e- and post-1980-1.pdf>
-Package pdftex.def Info: 01_A06_douglasgardner_Appendix_files/figure-latex/Comp
-arison of Z-score pre- and post-1980-1.pdf  used on input line 470.
-(pdftex.def)             Requested size: 433.61894pt x 361.34912pt.
+               <./01_A06_douglasgardner_Appendix_files/figure-latex/Pre-1980 lo
+grps-1.pdf>]
+<01_A06_douglasgardner_Appendix_files/figure-latex/Log RPS tanglegram-1.pdf, id
+=354, 433.62pt x 578.16pt>
+File: 01_A06_douglasgardner_Appendix_files/figure-latex/Log RPS tanglegram-1.pd
+f Graphic file (type pdf)
+<use 01_A06_douglasgardner_Appendix_files/figure-latex/Log RPS tanglegram-1.pdf
+>
+Package pdftex.def Info: 01_A06_douglasgardner_Appendix_files/figure-latex/Log 
+RPS tanglegram-1.pdf  used on input line 466.
+(pdftex.def)             Requested size: 433.63878pt x 578.18504pt.
 [25
 pdfTeX warning (ext4): destination with the same identifier (name{figure.22}) h
 as been already used, duplicate ignored
 <argument> ...shipout:D \box_use:N \l_shipout_box 
                                                   \__shipout_drop_firstpage_...
-l.477 \newpage
+l.473 \newpage
+               <./01_A06_douglasgardner_Appendix_files/figure-latex/Log RPS tan
+glegram-1.pdf>]
+<01_A06_douglasgardner_Appendix_files/figure-latex/Comparison of Z-score pre- a
+nd post-1980-1.pdf, id=367, 433.62pt x 361.35pt>
+File: 01_A06_douglasgardner_Appendix_files/figure-latex/Comparison of Z-score p
+re- and post-1980-1.pdf Graphic file (type pdf)
+<use 01_A06_douglasgardner_Appendix_files/figure-latex/Comparison of Z-score pr
+e- and post-1980-1.pdf>
+Package pdftex.def Info: 01_A06_douglasgardner_Appendix_files/figure-latex/Comp
+arison of Z-score pre- and post-1980-1.pdf  used on input line 477.
+(pdftex.def)             Requested size: 433.61894pt x 361.34912pt.
+[26
+pdfTeX warning (ext4): destination with the same identifier (name{figure.23}) h
+as been already used, duplicate ignored
+<argument> ...shipout:D \box_use:N \l_shipout_box 
+                                                  \__shipout_drop_firstpage_...
+l.484 \newpage
                <./01_A06_douglasgardner_Appendix_files/figure-latex/Comparison 
-of Z-score pre- and post-1980-1.pdf>] [26
+of Z-score pre- and post-1980-1.pdf>] [27
 
 
 pdfTeX warning (ext4): destination with the same identifier (name{table.2}) has
  been already used, duplicate ignored
 <argument> ...shipout:D \box_use:N \l_shipout_box 
                                                   \__shipout_drop_firstpage_...
-l.538 \clearpage
-                
+l.545 \newpage
+              
 pdfTeX warning (ext4): destination with the same identifier (name{table.3}) has
  been already used, duplicate ignored
 <argument> ...shipout:D \box_use:N \l_shipout_box 
                                                   \__shipout_drop_firstpage_...
-l.538 \clearpage
-                ]
+l.545 \newpage
+              ]
 <01_A06_douglasgardner_Appendix_files/figure-latex/Effects plot of log RPS agai
-nst releases to area-1.pdf, id=376, 469.755pt x 325.215pt>
+nst releases to area-1.pdf, id=386, 469.755pt x 325.215pt>
 File: 01_A06_douglasgardner_Appendix_files/figure-latex/Effects plot of log RPS
  against releases to area-1.pdf Graphic file (type pdf)
 <use 01_A06_douglasgardner_Appendix_files/figure-latex/Effects plot of log RPS 
 against releases to area-1.pdf>
 Package pdftex.def Info: 01_A06_douglasgardner_Appendix_files/figure-latex/Effe
-cts plot of log RPS against releases to area-1.pdf  used on input line 544.
+cts plot of log RPS against releases to area-1.pdf  used on input line 551.
 (pdftex.def)             Requested size: 469.75386pt x 325.2142pt.
 <01_A06_douglasgardner_Appendix_files/figure-latex/Effects plot of log RPS agai
-nst year-1.pdf, id=377, 469.755pt x 325.215pt>
+nst year-1.pdf, id=387, 469.755pt x 325.215pt>
 File: 01_A06_douglasgardner_Appendix_files/figure-latex/Effects plot of log RPS
  against year-1.pdf Graphic file (type pdf)
 <use 01_A06_douglasgardner_Appendix_files/figure-latex/Effects plot of log RPS 
 against year-1.pdf>
 Package pdftex.def Info: 01_A06_douglasgardner_Appendix_files/figure-latex/Effe
-cts plot of log RPS against year-1.pdf  used on input line 546.
+cts plot of log RPS against year-1.pdf  used on input line 553.
 (pdftex.def)             Requested size: 469.75386pt x 325.2142pt.
-[27
-
- <./01_A06_douglasgardner_Appendix_files/figure-latex/Effects plot of log RPS a
-gainst releases to area-1.pdf> <./01_A06_douglasgardner_Appendix_files/figure-l
-atex/Effects plot of log RPS against year-1.pdf>]
+[28 <./01_A06_douglasgardner_Appendix_files/figure-latex/Effects plot of log RP
+S against releases to area-1.pdf> <./01_A06_douglasgardner_Appendix_files/figur
+e-latex/Effects plot of log RPS against year-1.pdf>]
 <01_A06_douglasgardner_Appendix_files/figure-latex/Effects plot of log escapeme
-nt against distance-1.pdf, id=405, 469.755pt x 289.08pt>
+nt against distance-1.pdf, id=415, 469.755pt x 289.08pt>
 File: 01_A06_douglasgardner_Appendix_files/figure-latex/Effects plot of log esc
 apement against distance-1.pdf Graphic file (type pdf)
 <use 01_A06_douglasgardner_Appendix_files/figure-latex/Effects plot of log esca
 pement against distance-1.pdf>
 Package pdftex.def Info: 01_A06_douglasgardner_Appendix_files/figure-latex/Effe
-cts plot of log escapement against distance-1.pdf  used on input line 554.
+cts plot of log escapement against distance-1.pdf  used on input line 561.
 (pdftex.def)             Requested size: 469.75386pt x 289.07928pt.
-<01_A06_douglasgardner_Appendix_files/figure-latex/Effects plot-1.pdf, id=406, 
+<01_A06_douglasgardner_Appendix_files/figure-latex/Effects plot-1.pdf, id=416, 
 469.755pt x 289.08pt>
 File: 01_A06_douglasgardner_Appendix_files/figure-latex/Effects plot-1.pdf Grap
 hic file (type pdf)
 <use 01_A06_douglasgardner_Appendix_files/figure-latex/Effects plot-1.pdf>
 Package pdftex.def Info: 01_A06_douglasgardner_Appendix_files/figure-latex/Effe
-cts plot-1.pdf  used on input line 556.
+cts plot-1.pdf  used on input line 563.
 (pdftex.def)             Requested size: 469.75386pt x 289.07928pt.
-[28 <./01_A06_douglasgardner_Appendix_files/figure-latex/Effects plot of log es
+[29 <./01_A06_douglasgardner_Appendix_files/figure-latex/Effects plot of log es
 capement against distance-1.pdf> <./01_A06_douglasgardner_Appendix_files/figure
 -latex/Effects plot-1.pdf>] (01_A06_douglasgardner_Appendix.aux) ) 
 Here is how much of TeX's memory you used:
- 15273 strings out of 478547
- 253999 string characters out of 2858250
- 577824 words of memory out of 3000000
- 33030 multiletter control sequences out of 15000+600000
- 517230 words of font info for 97 fonts, out of 8000000 for 9000
+ 15287 strings out of 478547
+ 254765 string characters out of 2858250
+ 577165 words of memory out of 3000000
+ 33039 multiletter control sequences out of 15000+600000
+ 517396 words of font info for 99 fonts, out of 8000000 for 9000
  1141 hyphenation exceptions out of 8191
- 74i,9n,77p,1029b,337s stack positions out of 10000i,1000n,20000p,200000b,80000s
+ 74i,9n,77p,1029b,335s stack positions out of 10000i,1000n,20000p,200000b,80000s
 {C:/MiKTeX/fo
 nts/enc/dvips/lm/lm-ec.enc}<C:/MiKTeX/fonts/type1/public/lm/lmbx10.pfb><C:/MiKT
 eX/fonts/type1/public/lm/lmbx12.pfb><C:/MiKTeX/fonts/type1/public/lm/lmr10.pfb>
 <C:/MiKTeX/fonts/type1/public/lm/lmr12.pfb><C:/MiKTeX/fonts/type1/public/lm/lmr
 17.pfb>
-Output written on 01_A06_douglasgardner_Appendix.pdf (28 pages, 4062640 bytes).
+Output written on 01_A06_douglasgardner_Appendix.pdf (29 pages, 4216908 bytes).
 
 PDF statistics:
- 549 PDF objects out of 1000 (max. 8388607)
- 101 named destinations out of 1000 (max. 500000)
- 26944 words of extra memory for PDF output out of 29859 (max. 10000000)
+ 560 PDF objects out of 1000 (max. 8388607)
+ 103 named destinations out of 1000 (max. 500000)
+ 26949 words of extra memory for PDF output out of 29859 (max. 10000000)
 

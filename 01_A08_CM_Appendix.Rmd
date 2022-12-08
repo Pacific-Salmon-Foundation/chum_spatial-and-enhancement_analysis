@@ -324,7 +324,7 @@ ggsave("figures/area 8 chum log rps pre vs post boxplot.png",dpi=600,height=8,wi
 
 ## Bubbleplots of metric by inlet
 
-```{r, Malick and Cox plot z-score, message = FALSE, warning = FALSE, echo = FALSE, fig.align = "center", fig.height = 8, fig.width = 6, fig.cap = "Escapement by inlet and z-score"}
+```{r, Malick and Cox plot z-score, message = FALSE, warning = FALSE, echo = FALSE, fig.align = "center", fig.height = 8, fig.width = 7, fig.cap = "Z-scores of escapement for each system grouped by inlet. Solid blue points indicate positive values and open red circles indicate negative values. The size of the point indicates the magnitude of the metric."}
 
 inlets <- read_csv("data/area 8 chum filtered stream list with inlets and distance.csv") %>%
   select(SYS_NM, inlet)
@@ -358,7 +358,7 @@ ggplot(g, aes(x = Year, y = SYS_NM, shape = `Z-score`, size = `Z-score`, color =
   scale_fill_manual(values = c("-3" = "darkred", "-2" = "red4", "-1" = "red1", 
                                 "0" = "black", 
                                 "1" = "royalblue1", "2" = "royalblue4", "3" = "royalblue4"))+
-  labs(y="Escapement",x="Year", legend = "Z-score")+
+  labs(y="",x="Year", legend = "Z-score")+
   theme_bw()+
   theme(legend.position="bottom")+
   guides(size=FALSE)+
@@ -372,7 +372,7 @@ ggsave("figures/a8 z scores bubble by inlet.png",dpi=600,height=7,width=6)
 
 \newpage
 
-```{r, Malick and Cox plot logRPS, message = FALSE, warning = FALSE, echo = FALSE, fig.align = "center", fig.height = 8, fig.width = 6, fig.cap = "Escapement by inlet and log RPS"}
+```{r, Malick and Cox plot logRPS, message = FALSE, warning = FALSE, echo = FALSE, fig.align = "center", fig.height = 8, fig.width = 7, fig.cap = "Log(recruits per spawner) for each system grouped by inlet. Solid blue points indicate positive values and open red circles indicate negative values. The size of the point indicates the magnitude of the metric."}
 inlets <- read_csv("data/area 8 chum filtered stream list with inlets and distance.csv") %>%
   select(SYS_NM, inlet)
 
@@ -408,7 +408,7 @@ ggplot(g, aes(x = Year, y = SYS_NM, shape = `log RPS`, size = `log RPS`, color =
                                 "0" = "black", 
                                 "1" = "royalblue1", "2" = "royalblue4", "3" = "royalblue4",
                                 "4" = "royalblue4", "5" = "royalblue4"))+
-  labs(y="Escapement",x="Year")+
+  labs(y="",x="Year")+
   theme_bw()+
   theme(legend.position="bottom")+
   guides(size=FALSE)+
