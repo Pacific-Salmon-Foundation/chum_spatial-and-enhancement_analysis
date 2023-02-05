@@ -635,7 +635,7 @@ corrplot(cor.rpslog, diag = FALSE, order="hclust", method="square", tl.col="blac
 \newpage
 ```{r Pairwise plots, Pairwise distance matrix stuff, echo = FALSE, message = FALSE, warning = FALSE}
  
-
+par(mfrow=c(1,1))
 # NEW code re: pairwise distance matrix from Ben Skinner
 long.z <- as.data.frame(cor.z) %>%  
   rownames_to_column('row') %>% 
@@ -650,13 +650,17 @@ names(dist_corr) <- c("source_stream", "destination_stream", "distance", "zscore
 dist_corr$plotlabels <- paste0(dist_corr$source_stream, "-", dist_corr$destination_stream)
 
 
-png(file = "figures/pairwise_correlations.png", width = 1024, height = 768, pointsize = 48)
+#png(file = "figures/pairwise_correlations.png", width = 1024, height = 768, pointsize = 48)
 ggplot(dist_corr, aes(distance/1000, zscore)) +
   geom_point() +
   labs(x = "Pairwise distance (km)", y = "Pairwise correlation (z-score)")
-dev.off()
+#dev.off()
 
 # Pivot pairwise distance matrix wide for use in dendrograms
+
+pairwise <- pairwise %>%
+  filter(source_stream != "INNER BASIN RIVER") %>%
+  filter(destination_stream != "INNER BASIN RIVER")
 
 pairwide <- pairwise[,1:3] %>%
   pivot_wider(names_from = c("source_stream"),
@@ -693,11 +697,11 @@ clust.dist.cor.d[["labels"]] <- str_to_title(clust.dist.cor.d[["labels"]])
 
 dendd <- as.dendrogram(clust.dist.cor.d)
 
-png(file = "figures/distances_dendrogram.png", width = 800, height = 600, pointsize = 12)
+#png(file = "figures/distances_dendrogram.png", width = 800, height = 600, pointsize = 12)
 dendd %>%
     set("labels_colors", dlabs) %>%
     plot(main = "Dendrogram of distance clusters", horiz = TRUE, dLeaf = 0.05)
-dev.off()
+#dev.off()
 
 
 ```
