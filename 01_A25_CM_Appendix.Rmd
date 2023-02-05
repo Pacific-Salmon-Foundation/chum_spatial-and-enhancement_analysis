@@ -32,6 +32,7 @@ library(tinytex)
 options(scipen=10000)
 
 rps.clean <- readRDS("RDS/a25cm_rps.clean.rds")
+pairwise <- read_csv("data/a25pairwise_matrix.csv")
 
 ```
 
@@ -482,8 +483,6 @@ dendclust.z[["labels"]][["inlet"]] <- inletlist
 xlenz <- .95 * length(zlabs$SYS_NM)
 ylenz <- .95 * (max(dendclust.z[["segments"]][["y"]]))
 
- 
-
 # Correlation analysis by log escapement
 
 cor.data.e<-escdata.filt%>%select(SYS_NM,Year,esc.log)%>%pivot_wider(names_from="Year",values_from="esc.log")%>%data.frame()
@@ -631,6 +630,76 @@ corrplot(cor.rpslog, diag = FALSE, order="hclust", method="square", tl.col="blac
          addrect = 6, tl.cex = 0.45, title = "Log RPS", mar=c(0,0,3,0))
 
 #dev.off()
+```
+
+\newpage
+```{r Pairwise plots, Pairwise distance matrix stuff, echo = FALSE, message = FALSE, warning = FALSE}
+ 
+
+# NEW code re: pairwise distance matrix from Ben Skinner
+long.z <- as.data.frame(cor.z) %>%  
+  rownames_to_column('row') %>% 
+  pivot_longer(cols = -row)
+
+names(long.z) <- c("source_stream", "destination_stream", "zscore")
+
+dist_corr <- merge(pairwise, long.z, by = "source_stream")
+dist_corr <- dist_corr[dist_corr$destination_stream.x == dist_corr$destination_stream.y,]
+dist_corr <- dist_corr[,c(1, 2, 3, 6)]
+names(dist_corr) <- c("source_stream", "destination_stream", "distance", "zscore")
+dist_corr$plotlabels <- paste0(dist_corr$source_stream, "-", dist_corr$destination_stream)
+
+
+png(file = "figures/pairwise_correlations.png", width = 1024, height = 768, pointsize = 48)
+ggplot(dist_corr, aes(distance/1000, zscore)) +
+  geom_point() +
+  labs(x = "Pairwise distance (km)", y = "Pairwise correlation (z-score)")
+dev.off()
+
+# Pivot pairwise distance matrix wide for use in dendrograms
+
+pairwide <- pairwise[,1:3] %>%
+  pivot_wider(names_from = c("source_stream"),
+              values_from = "distance_m")
+
+pairwide[is.na(pairwide)] <- 0
+pairwide <- as.data.frame(pairwide)
+rownames(pairwide) <- pairwide[,1]
+pairwide <- pairwide[,-1]
+pairwide <- mutate_all(pairwide, function(x) as.numeric(as.character(x)))
+cor.d <- cor(t(pairwide), use = "pairwise.complete.obs")
+dist.cor.d<- dist(cor.d)
+clust.dist.cor.d <- hclust(dist.cor.d)
+dendclust.d <- dendro_data(clust.dist.cor.d)
+
+dlabs <- as.data.frame(dendclust.d[["labels"]][["label"]])
+colnames(dlabs) <- "SYS_NM"
+dlabs$order <- c(1:length(dlabs$SYS_NM))
+dlabs <- merge(dlabs, rps.clean, by = "SYS_NM")
+dlabs <- dlabs %>%
+  select(SYS_NM, order, inlet)
+dlabs <- distinct(dlabs)
+dlabcols <- as.data.frame(unique(dlabs$inlet))
+colnames(dlabcols) <- "inlet"
+dlabcols <- dlabcols %>%
+  arrange(inlet)
+dlabcols$colour <- c("red", "blue", "forestgreen")
+dlabs <- merge(dlabcols, dlabs, by = "inlet")
+dlabs <- dlabs %>%
+  arrange(order)
+dlabs <- dlabs$colour
+
+clust.dist.cor.d[["labels"]] <- str_to_title(clust.dist.cor.d[["labels"]])
+
+dendd <- as.dendrogram(clust.dist.cor.d)
+
+png(file = "figures/distances_dendrogram.png", width = 800, height = 600, pointsize = 12)
+dendd %>%
+    set("labels_colors", dlabs) %>%
+    plot(main = "Dendrogram of distance clusters", horiz = TRUE, dLeaf = 0.05)
+dev.off()
+
+
 ```
 
 \newpage
