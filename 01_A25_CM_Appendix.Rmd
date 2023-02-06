@@ -651,9 +651,16 @@ dist_corr <- dist_corr[,c(1, 2, 3, 6)]
 names(dist_corr) <- c("source_stream", "destination_stream", "distance", "zscore")
 dist_corr$plotlabels <- paste0(dist_corr$source_stream, "-", dist_corr$destination_stream)
 
+model.z <- nls(zscore ~ a * distance ^ b, 
+               data = dist_corr,
+               start = list(a = 0.1, b = 0.1))
+zpreds <- predict(model.z, interval = "confidence")
+zplot <- cbind(dist_corr, zpreds)
+
 #png(file = "figures/pairwise_correlations.png", width = 1024, height = 768, pointsize = 48)
-ggplot(dist_corr, aes(distance/1000, zscore)) +
+ggplot(zplot, aes(distance/1000, zscore)) +
   geom_point() +
+  geom_line( aes(y = zpreds), size = 1) +
   labs(x = "Pairwise distance (km)", y = "Pairwise correlation (z-score)")
 #dev.off()
 
@@ -672,9 +679,16 @@ dist_logrps <- dist_logrps[dist_logrps$destination_stream.x == dist_logrps$desti
 dist_logrps <- dist_logrps[,c(1, 2, 3, 6)]
 names(dist_logrps) <- c("source_stream", "destination_stream", "distance", "logrps")
 
+model.logrps <- nls(logrps ~ a * distance ^ b, 
+               data = dist_logrps,
+               start = list(a = 1, b = 1))
+logrpspreds <- predict(model.logrps, interval = "confidence")
+logrpsplot <- cbind(dist_logrps, logrpspreds)
+
 #png(file = "figures/pairwise_correlations.png", width = 1024, height = 768, pointsize = 48)
-ggplot(dist_logrps, aes(distance/1000, logrps)) +
+ggplot(logrpsplot, aes(distance/1000, logrps)) +
   geom_point() +
+  geom_line( aes(y = logrpspreds), size = 1) +
   labs(x = "Pairwise distance (km)", y = "Pairwise correlation (Log RPS)")
 #dev.off()
 
@@ -755,9 +769,18 @@ dist_corr.pre <- dist_corr.pre[,c(1, 2, 3, 6)]
 names(dist_corr.pre) <- c("source_stream", "destination_stream", "distance", "zscore")
 dist_corr.pre$plotlabels <- paste0(dist_corr.pre$source_stream, "-", dist_corr.pre$destination_stream)
 
+
+model.zpre <- nls(zscore ~ a * distance ^ b, 
+               data = dist_corr.pre,
+               start = list(a = 1, b = 1))
+zprepreds <- predict(model.zpre, interval = "confidence")
+zpreplot <- cbind(dist_corr.pre, zprepreds)
+
+
 #png(file = "figures/pairwise_correlations.png", width = 1024, height = 768, pointsize = 48)
 ggplot(dist_corr.pre, aes(distance/1000, zscore)) +
   geom_point() +
+  geom_line( aes(y = zprepreds), size = 1) +
   labs(x = "Pairwise distance (km)", y = "Pairwise correlation (z-scores pre-1980)")
 #dev.off()
 
@@ -780,9 +803,17 @@ dist_corr.post <- dist_corr.post[,c(1, 2, 3, 6)]
 names(dist_corr.post) <- c("source_stream", "destination_stream", "distance", "zscore")
 dist_corr.post$plotlabels <- paste0(dist_corr.post$source_stream, "-", dist_corr.post$destination_stream)
 
+model.zpost <- nls(zscore ~ a * distance ^ b, 
+               data = dist_corr.post,
+               start = list(a = .1, b = .1))
+zpostpreds <- predict(model.zpost, interval = "confidence")
+zpostplot <- cbind(dist_corr.post, zpostpreds)
+
+
 #png(file = "figures/pairwise_correlations.png", width = 1024, height = 768, pointsize = 48)
-ggplot(dist_corr.post, aes(distance/1000, zscore)) +
+ggplot(zpostplot, aes(distance/1000, zscore)) +
   geom_point() +
+  geom_line( aes(y = zpostpreds), size = 1) +
   labs(x = "Pairwise distance (km)", y = "Pairwise correlation (z-scores post-1980)")
 #dev.off()
 
@@ -819,11 +850,21 @@ dist_corr.pre <- dist_corr.pre[,c(1, 2, 3, 6)]
 names(dist_corr.pre) <- c("source_stream", "destination_stream", "distance", "logrpsscore")
 dist_corr.pre$plotlabels <- paste0(dist_corr.pre$source_stream, "-", dist_corr.pre$destination_stream)
 
+model.logrpspre <- nls(logrpsscore ~ a * distance ^ b, 
+               data = dist_corr.pre,
+               start = list(a = 1, b = 1))
+logrpsprepreds <- predict(model.logrpspre, interval = "confidence")
+logrpspreplot <- cbind(dist_corr.pre, logrpsprepreds)
+
+
 #png(file = "figures/pairwise_correlations.png", width = 1024, height = 768, pointsilogrpse = 48)
 ggplot(dist_corr.pre, aes(distance/1000, logrpsscore)) +
   geom_point() +
+  geom_line( aes(y = logrpsprepreds), size = 1) +
   labs(x = "Pairwise distance (km)", y = "Pairwise correlation (Log RPS pre-1980)")
 #dev.off()
+
+#model.z <- lm(logrpsscore ~ distance, data = dist_corr.pre)
 
 # Log RPS Post-1980
 long.logrps.post <- as.data.frame(cor.logrps.post) %>%  
@@ -838,9 +879,17 @@ dist_corr.post <- dist_corr.post[,c(1, 2, 3, 6)]
 names(dist_corr.post) <- c("source_stream", "destination_stream", "distance", "logrpsscore")
 dist_corr.post$plotlabels <- paste0(dist_corr.post$source_stream, "-", dist_corr.post$destination_stream)
 
+model.logrpspost <- nls(logrpsscore ~ a * distance ^ b, 
+               data = dist_corr.post,
+               start = list(a = 1, b = 1))
+logrpspostpreds <- predict(model.logrpspost, interval = "confidence")
+logrpspostplot <- cbind(dist_corr.post, logrpspostpreds)
+
+
 #png(file = "figures/pairwise_correlations.png", width = 1024, height = 768, pointsilogrpse = 48)
-ggplot(dist_corr.post, aes(distance/1000, logrpsscore)) +
+ggplot(logrpspostplot, aes(distance/1000, logrpsscore)) +
   geom_point() +
+  geom_line( aes(y = logrpspostpreds), size = 1) +
   labs(x = "Pairwise distance (km)", y = "Pairwise correlation (Log RPS pre-1980)")
 #dev.off()
 
