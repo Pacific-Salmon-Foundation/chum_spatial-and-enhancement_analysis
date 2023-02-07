@@ -833,6 +833,21 @@ ggplot(zpostplot, aes(distance/1000, zscore)) +
   labs(x = "Pairwise distance (km)", y = "Pairwise correlation (z-scores post-1980)")
 #dev.off()
 
+# Combine plots
+
+zpreplot$prepost <- "pre"
+zpostplot$prepost <- "post"
+names(zpreplot)[names(zpreplot) == 'zprepreds'] <- 'preds'
+names(zpostplot)[names(zpostplot) == 'zpostpreds'] <- 'preds'
+z_all <- rbind(zpreplot, zpostplot)
+
+png(file = "figures/fig10pairwise_zscore.png", width = 1024, height = 768, pointsize = 48)
+ggplot(z_all, aes(distance/1000, zscore, color = prepost)) +
+  geom_point() +
+  geom_line(aes(y = preds), size = 1) +
+  labs(x = "Pairwise distance (km)", y = "Pairwise correlation (z-scores pre- and post-1980)")
+dev.off()
+
 ```
 
 
@@ -869,6 +884,7 @@ dist_corr.pre$plotlabels <- paste0(dist_corr.pre$source_stream, "-", dist_corr.p
 model.logrpspre <- nls(logrpsscore ~ a * distance ^ b, 
                data = dist_corr.pre,
                start = list(a = 1, b = 1))
+
 logrpsprepreds <- predict(model.logrpspre, interval = "confidence")
 logrpspreplot <- cbind(dist_corr.pre, logrpsprepreds)
 
@@ -901,12 +917,28 @@ logrpspostpreds <- predict(model.logrpspost, interval = "confidence")
 logrpspostplot <- cbind(dist_corr.post, logrpspostpreds)
 
 
-png(file = "figures/fig09_pairwise_logRPS.png", width = 1024, height = 768, pointsize = 48)
+#png(file = "figures/fig09_pairwise_logRPS.png", width = 1024, height = 768, pointsize = 48)
 ggplot(logrpspostplot, aes(distance/1000, logrpsscore)) +
   geom_point() +
   geom_line( aes(y = logrpspostpreds), size = 1) +
   labs(x = "Pairwise distance (km)", y = "Pairwise correlation (Log RPS pre-1980)")
+#dev.off()
+
+# Combine plots
+
+logrpspreplot$prepost <- "pre"
+logrpspostplot$prepost <- "post"
+names(logrpspreplot)[names(logrpspreplot) == 'logrpsprepreds'] <- 'preds'
+names(logrpspostplot)[names(logrpspostplot) == 'logrpspostpreds'] <- 'preds'
+logrps_all <- rbind(logrpspreplot, logrpspostplot)
+
+png(file = "figures/fig11pairwise_logRPS.png", width = 1024, height = 768, pointsize = 64)
+ggplot(logrps_all, aes(distance/1000, logrpsscore, color = prepost)) +
+  geom_point() +
+  geom_line(aes(y = preds), size = 1) +
+  labs(x = "Pairwise distance (km)", y = "Pairwise correlation (Log RPS pre- and post-1980)")
 dev.off()
+
 
 ```
 \newpage
