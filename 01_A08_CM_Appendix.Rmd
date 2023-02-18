@@ -506,20 +506,14 @@ dendclust.rpslog <- dendro_data(clust.dist.cor.rpslog)
 
 ```
 
-```{r, Correlation plots by metric, echo = FALSE, message = FALSE, error = FALSE, fig.align = "center", fig.height = 9.5, fig.width = 8.5, fig.cap = "Cross correlation plots to compare metrics."}
+```{r correlation plots, echo=FALSE,warning=FALSE,message=FALSE,fig.align="center",fig.height=9.5,fig.width=8.5,fig.cap="Cross correlation plots to compare metrics."}
+
 par(oma=c(0,0,0,0))
-par(mfrow=c(3,2))
+par(mfrow=c(2,1))
 
 corrplot(cor.z, diag = FALSE, order="hclust", method="square", tl.col="black",
          addrect = 6, tl.cex = 0.45, title = "Z-scores", mar=c(0,0,3,0))
-corrplot(cor.e, diag = FALSE, order="hclust", method="square", tl.col="black",
-         addrect = 6, tl.cex = 0.45, title = "Log escapement", mar=c(0,0,3,0))
-corrplot(cor.s, diag = FALSE, order="hclust", method="square", tl.col="black",
-         addrect = 6, tl.cex = 0.45, title = "Standardized escapement", mar=c(0,0,3,0))
-corrplot(cor.m, diag = FALSE, order="hclust", method="square", tl.col="black",
-         addrect = 6, tl.cex = 0.45, title = "Moving average", mar=c(0,0,3,0))
-corrplot(cor.rps, diag = FALSE, order="hclust", method="square", tl.col="black",
-         addrect = 6, tl.cex = 0.45, title = "RPS", mar=c(0,0,3,0))
+
 corrplot(cor.rpslog, diag = FALSE, order="hclust", method="square", tl.col="black",
          addrect = 6, tl.cex = 0.45, title = "Log RPS", mar=c(0,0,3,0))
 
@@ -546,10 +540,8 @@ dist_corr <- dist_corr[,c(1, 2, 3, 6)]
 names(dist_corr) <- c("source_stream", "destination_stream", "distance", "zscore")
 dist_corr$plotlabels <- paste0(dist_corr$source_stream, "-", dist_corr$destination_stream)
 
-model.z <- nls(zscore ~ a * distance ^ b, 
-               data = dist_corr,
-               start = list(a = 0.1, b = 0.1))
-
+model.z <- glm(zscore ~ distance, 
+               data = dist_corr)
 
 zpreds <- predict(model.z, interval = "confidence")
 zplot <- cbind(dist_corr, zpreds)
@@ -560,7 +552,7 @@ a<- ggplot(zplot, aes(distance/1000, zscore)) +
   geom_point() +
   geom_line( aes(y = zpreds), size = 1) +
   geom_label_repel(aes(label = plotlabels),
-                   data = subset(zplot, zscore < 0),  # These lines label negative outliers
+                   data = subset(zplot, zscore < -0.125),  # These lines label negative outliers
                    size = 2.5) +
   labs(x = "Pairwise distance (km)", y = "Pairwise correlation (z-score)")
 
@@ -580,7 +572,7 @@ names(dist_logrps) <- c("source_stream", "destination_stream", "distance", "logr
 dist_logrps$plotlabels <- paste0(dist_logrps$source_stream, "-", dist_logrps$destination_stream)
 
 model.logrps <- glm(logrps ~ distance, 
-               data = dist_logrps)
+                    data = dist_logrps)
 logrpspreds <- predict(model.logrps, interval = "confidence")
 logrpsplot <- cbind(dist_logrps, logrpspreds)
 
@@ -590,9 +582,9 @@ logrpsplot <- logrpsplot %>%
 b<- ggplot(logrpsplot, aes(distance/1000, logrps)) +
   geom_point() +
   geom_line( aes(y = logrpspreds), size = 1) +
-  #geom_label_repel(aes(label = plotlabels),
-   #                data = subset(logrpsplot, logrps < 0.35),  # These lines label negative outliers
-    #               size = 2.5) +
+  geom_label_repel(aes(label = plotlabels),
+                   data = subset(logrpsplot, logrps < -0.125),  # These lines label negative outliers
+                   size = 2.5) +
   labs(x = "Pairwise distance (km)", y = "Pairwise correlation (Log RPS)")
 
 grid.arrange(a,b)
@@ -918,37 +910,13 @@ rpsloglabs <- rpsloglabs$colour
 ```{r, Dendrogram plots, echo = FALSE, message = FALSE, warning = FALSE, fig.align = "center", fig.height = 9.5, fig.width = 8.5, fig.cap = "Dendrogram cluster analysis to compare uses of different metrics. Colours represent different subinlets; Bella Coola = red; Dean = blue; Kimsquit = green; Martin = yellow; Sagar = black"}
 
 par(oma=c(0,0,0,0))
-par(mfrow=c(3,2))
+par(mfrow=c(2,1))
 
 clust.dist.cor.z[["labels"]] <- str_to_sentence(word(clust.dist.cor.z[["labels"]]))
 dendz <- as.dendrogram(clust.dist.cor.z)
 dendz %>%
     set("labels_colors", zlabs) %>%
     plot(main = "Z-scores", horiz = TRUE)
-
-clust.dist.cor.e[["labels"]] <- str_to_sentence(word(clust.dist.cor.e[["labels"]]))
-dende <- as.dendrogram(clust.dist.cor.e)
-dende %>%
-    set("labels_colors", elabs) %>%
-    plot(main = "Log escapement", horiz = TRUE)
-
-clust.dist.cor.s[["labels"]] <- str_to_sentence(word(clust.dist.cor.s[["labels"]]))
-dends <- as.dendrogram(clust.dist.cor.s)
-dends %>%
-    set("labels_colors", slabs) %>%
-    plot(main = "Standardized escapement", horiz = TRUE)
-
-clust.dist.cor.m[["labels"]] <- str_to_sentence(word(clust.dist.cor.m[["labels"]]))
-dendm <- as.dendrogram(clust.dist.cor.m)
-dendm %>%
-    set("labels_colors", mlabs) %>%
-    plot(main = "Moving average", horiz = TRUE)
-
-clust.dist.cor.rps[["labels"]] <- str_to_sentence(word(clust.dist.cor.rps[["labels"]]))
-dendrps <- as.dendrogram(clust.dist.cor.rps)
-dendrps %>%
-    set("labels_colors", rpslabs) %>%
-    plot(main = "RPS", horiz = TRUE)
 
 clust.dist.cor.rpslog[["labels"]] <- str_to_sentence(word(clust.dist.cor.rpslog[["labels"]]))
 dendrpslog <- as.dendrogram(clust.dist.cor.rpslog)
@@ -960,41 +928,6 @@ dendrpslog %>%
 \newpage
 
 ## Tanglegrams to compare dendrograms
-
-```{r, Tanglegrams z v log, echo = FALSE, message = FALSE, warning = FALSE, fig.align = "center", fig.height = 9.5, fig.width = 8.5, fig.cap = "Tanglegram of z-score vs. logged escapements"}
-
-#png(file = "figures/a06cm_tanglegram_z_v_log.png", width = 2000, height = 3000, pointsize = 36)
-
-par(oma=c(2,2,2,2))
-par(mfrow=c(1,1))
-
-tangle1 <- dendlist(dendz, dende)
-                                                                                                            
-tanglegram(tangle1, lab.cex = .8, margin_inner = 3, main_left = "Z-score",
-           main_right = "Log escapement", cex_main = 1, highlight_distinct_edges = FALSE,
-           lwd = 2, edge.lwd = 1)
-
-#dev.off()
-
-```
-
-\newpage
-
-```{r, Tanglegrams z vs m.ave, echo = FALSE, message = FALSE, warning = FALSE, fig.align = "center", fig.height = 9.5, fig.width = 8.5, fig.cap = "Tanglegram of z-score vs. moving average"}
-
-#png(file = "figures/a06cm_tanglegram_z_v_mave.png", width = 2000, height = 3000, pointsize = 36)
-
-tangle3 <- dendlist(dendz, dendm)
-                                                                                                            
-tanglegram(tangle3, lab.cex = .8, margin_inner = 3, main_left = "Z-score",
-           main_right = "Moving average", cex_main = 1, highlight_distinct_edges = FALSE,
-           lwd = 2, edge.lwd = 1)
-
-#dev.off()
-
-```
-
-\newpage
 
 ```{r, Tanglegrams z vs logRPS, echo = FALSE, message = FALSE, warning = FALSE, fig.align = "center", fig.height = 9.5, fig.width = 8.5, fig.cap = "Tanglegram of z-score vs. log RPS"}
 
