@@ -29,6 +29,7 @@ library(dendextend)
 library(kableExtra)
 library(tinytex)
 library(ggrepel)
+library(gridExtra)
 
 options(scipen=10000)
 
@@ -634,7 +635,17 @@ corrplot(cor.rpslog, diag = FALSE, order="hclust", method="square", tl.col="blac
 ```
 
 \newpage
-```{r Pairwise plots, Pairwise distance matrix stuff, echo = FALSE, message = FALSE, warning = FALSE}
+
+
+
+
+
+
+
+
+## Pairwise comparisons of correlation metrics against distance
+
+```{r Pairwise distance plots, message = FALSE, warning = FALSE, echo = FALSE, fig.align = "center", fig.height = 7, fig.width = 7.5}
  
 par(mfrow=c(1,1))
 # NEW code re: pairwise distance matrix from Ben Skinner
@@ -655,6 +666,8 @@ dist_corr$plotlabels <- paste0(dist_corr$source_stream, "-", dist_corr$destinati
 model.z <- nls(zscore ~ a * distance ^ b, 
                data = dist_corr,
                start = list(a = 0.1, b = 0.1))
+
+
 zpreds <- predict(model.z, interval = "confidence")
 zplot <- cbind(dist_corr, zpreds)
 zplot <- zplot %>%
@@ -662,18 +675,18 @@ zplot <- zplot %>%
 
 #png(file = "figures/fig02pairwise_correlations_outliers.png", width = 1024, height = 768, pointsize = 48)
 
-ggplot(zplot, aes(distance/1000, zscore)) +
+a<- ggplot(zplot, aes(distance/1000, zscore)) +
   geom_point() +
   geom_line( aes(y = zpreds), size = 1) +
   geom_label_repel(aes(label = plotlabels),
-                   data = subset(zplot, zscore < 0),  # These lines label negative outliers
+                   data = subset(zplot, zscore < -0.25),  # These lines label negative outliers
                    size = 2.5) +
   labs(x = "Pairwise distance (km)", y = "Pairwise correlation (z-score)")
 #dev.off()
 
 
-ggplot(zplot, aes(zscore)) +
-  geom_histogram()
+#ggplot(zplot, aes(zscore)) +
+#  geom_histogram()
 
 
 # Log RPS
@@ -700,16 +713,24 @@ logrpsplot <- logrpsplot %>%
 
 
 #png(file = "figures/fig03pairwise_logrps.png", width = 1024, height = 768, pointsize = 48)
-ggplot(logrpsplot, aes(distance/1000, logrps)) +
+b<- ggplot(logrpsplot, aes(distance/1000, logrps)) +
   geom_point() +
   geom_line( aes(y = logrpspreds), size = 1) +
-  #geom_label_repel(aes(label = plotlabels),
-  #                 data = subset(logrpsplot, logrps < 0.35),  # These lines label negative outliers
-   #                size = 2.5) +
+  geom_label_repel(aes(label = plotlabels),
+                   data = subset(logrpsplot, logrps < 0.3),  # These lines label negative outliers
+                   size = 2.5) +
   labs(x = "Pairwise distance (km)", y = "Pairwise correlation (Log RPS)")
 #dev.off()
 
+grid.arrange(a, b)
 
+```
+
+\newpage 
+
+## Dendrogram of pairwise distances
+
+```{r Distance dendrogram, message = FALSE, warning = FALSE, echo = FALSE, fig.align = "center", fig.height = 8, fig.width = 7, fig.cap = "Dendrogram of pairwise distance between river mouths. Red labels - Esperanza Inlet; Blue - Nootka Inlet; Green - Tahsis Inlet"}
 
 # Distance dendrogram
 
@@ -755,14 +776,15 @@ dendd <- as.dendrogram(clust.dist.cor.d)
 #png(file = "figures/fig05distances_dendrogram.png", width = 800, height = 600, pointsize = 12)
 dendd %>%
     set("labels_colors", dlabs) %>%
-    plot(main = "Dendrogram of distance clusters", horiz = TRUE, dLeaf = 0.05)
+    plot(horiz = TRUE, dLeaf = 0.25)
 #dev.off()
 
 
 ```
+\newpage
 
-```{r pairwise z-scores pre- and post-1980, echo = FALSE, message = FALSE, warning = FALSE}
-
+## Correlation metrics against distance, pre- and post-1980
+```{r Correlation vs distance pre- and post-1980, message = FALSE, warning = FALSE, echo = FALSE, fig.align = "center", fig.height = 4.5, fig.width = 7.5}
 cor.data.z <-escdata.filt %>%
   select(SYS_NM,Year,z) %>%
   pivot_wider(names_from="Year",values_from="z") %>%
@@ -794,10 +816,10 @@ zpreplot <- cbind(dist_corr.pre, zprepreds)
 
 
 #png(file = "figures/fig06pairwise_zscore_pre.png", width = 1024, height = 768, pointsize = 48)
-ggplot(dist_corr.pre, aes(distance/1000, zscore)) +
-  geom_point() +
-  geom_line( aes(y = zprepreds), size = 1) +
-  labs(x = "Pairwise distance (km)", y = "Pairwise correlation (z-scores pre-1980)")
+#ggplot(dist_corr.pre, aes(distance/1000, zscore)) +
+#  geom_point() +
+#  geom_line( aes(y = zprepreds), size = 1) +
+#  labs(x = "Pairwise distance (km)", y = "Pairwise correlation (z-scores pre-1980)")
 #dev.off()
 
 
@@ -827,10 +849,10 @@ zpostplot <- cbind(dist_corr.post, zpostpreds)
 
 
 #png(file = "figures/fig07pairwise_zscore_post.png", width = 1024, height = 768, pointsize = 48)
-ggplot(zpostplot, aes(distance/1000, zscore)) +
-  geom_point() +
-  geom_line( aes(y = zpostpreds), size = 1) +
-  labs(x = "Pairwise distance (km)", y = "Pairwise correlation (z-scores post-1980)")
+#ggplot(zpostplot, aes(distance/1000, zscore)) +
+#  geom_point() +
+#  geom_line( aes(y = zpostpreds), size = 1) +
+#  labs(x = "Pairwise distance (km)", y = "Pairwise correlation (z-scores post-1980)")
 #dev.off()
 
 # Combine plots
@@ -841,17 +863,12 @@ names(zpreplot)[names(zpreplot) == 'zprepreds'] <- 'preds'
 names(zpostplot)[names(zpostplot) == 'zpostpreds'] <- 'preds'
 z_all <- rbind(zpreplot, zpostplot)
 
-png(file = "figures/fig10pairwise_zscore.png", width = 1024, height = 768, pointsize = 48)
+#png(file = "figures/fig10pairwise_zscore.png", width = 1024, height = 768, pointsize = 48)
 ggplot(z_all, aes(distance/1000, zscore, color = prepost)) +
   geom_point() +
   geom_line(aes(y = preds), size = 1) +
   labs(x = "Pairwise distance (km)", y = "Pairwise correlation (z-scores pre- and post-1980)")
-dev.off()
-
-```
-
-
-```{r pairwise log RPS pre- and post-1980, echo = FALSE, message = FALSE, warning = FALSE}
+#dev.off()
 
 cor.data.logrps <-rps.clean %>%
   select(SYS_NM,Year,logrps) %>%
@@ -889,12 +906,12 @@ logrpsprepreds <- predict(model.logrpspre, interval = "confidence")
 logrpspreplot <- cbind(dist_corr.pre, logrpsprepreds)
 
 
-png(file = "figures/fig08_pairwise_logRPS.png", width = 1024, height = 768, pointsize = 48)
-ggplot(dist_corr.pre, aes(distance/1000, logrpsscore)) +
-  geom_point() +
-  geom_line( aes(y = logrpsprepreds), size = 1) +
-  labs(x = "Pairwise distance (km)", y = "Pairwise correlation (Log RPS pre-1980)")
-dev.off()
+#png(file = "figures/fig08_pairwise_logRPS.png", width = 1024, height = 768, pointsize = 48)
+#ggplot(dist_corr.pre, aes(distance/1000, logrpsscore)) +
+#  geom_point() +
+#  geom_line( aes(y = logrpsprepreds), size = 1) +
+#  labs(x = "Pairwise distance (km)", y = "Pairwise correlation (Log RPS pre-1980)")
+#dev.off()
 
 
 # Log RPS Post-1980
@@ -918,10 +935,10 @@ logrpspostplot <- cbind(dist_corr.post, logrpspostpreds)
 
 
 #png(file = "figures/fig09_pairwise_logRPS.png", width = 1024, height = 768, pointsize = 48)
-ggplot(logrpspostplot, aes(distance/1000, logrpsscore)) +
-  geom_point() +
-  geom_line( aes(y = logrpspostpreds), size = 1) +
-  labs(x = "Pairwise distance (km)", y = "Pairwise correlation (Log RPS pre-1980)")
+#ggplot(logrpspostplot, aes(distance/1000, logrpsscore)) +
+#  geom_point() +
+#  geom_line( aes(y = logrpspostpreds), size = 1) +
+#  labs(x = "Pairwise distance (km)", y = "Pairwise correlation (Log RPS pre-1980)")
 #dev.off()
 
 # Combine plots
@@ -932,15 +949,16 @@ names(logrpspreplot)[names(logrpspreplot) == 'logrpsprepreds'] <- 'preds'
 names(logrpspostplot)[names(logrpspostplot) == 'logrpspostpreds'] <- 'preds'
 logrps_all <- rbind(logrpspreplot, logrpspostplot)
 
-png(file = "figures/fig11pairwise_logRPS.png", width = 1024, height = 768, pointsize = 64)
+#png(file = "figures/fig11pairwise_logRPS.png", width = 1024, height = 768, pointsize = 64)
 ggplot(logrps_all, aes(distance/1000, logrpsscore, color = prepost)) +
   geom_point() +
   geom_line(aes(y = preds), size = 1) +
   labs(x = "Pairwise distance (km)", y = "Pairwise correlation (Log RPS pre- and post-1980)")
-dev.off()
+#dev.off()
 
 
 ```
+
 \newpage
 
 ```{r, Make colour vectors for dendrogram inlets, message=FALSE, warning=FALSE, echo=FALSE, include = FALSE}

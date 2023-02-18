@@ -655,7 +655,7 @@ dendd <- as.dendrogram(clust.dist.cor.d)
 
 dendd %>%
     set("labels_colors", dlabs) %>%
-    plot(main = "Dendrogram of distance clusters", horiz = TRUE, dLeaf = 0.05)
+    plot(horiz = TRUE, dLeaf = 0.25)
 ```
 
 \newpage
