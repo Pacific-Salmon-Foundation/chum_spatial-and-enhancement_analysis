@@ -30,6 +30,8 @@ library(dendextend)
 library(corrplot)
 library(ggdendro)
 library(ggpubr)
+library(ggrepel)
+library(gridExtra)
 
 options(scipen=10000)
 
@@ -39,6 +41,7 @@ releases <- readRDS("RDS/douglas-gardner_releases.rds")
 escdata <- readRDS("RDS/cm_douglasgardner_escdata.rds")
 escdata.filtered <- readRDS("RDS/douglasgardner-cm_escdata_filtered.rds")
 rps.clean <- readRDS("RDS/douglas-gardner_cm_rpsclean.rds")
+pairwise <- read_csv("data/a06pairwise_matrix.csv")
 
 ```
 
@@ -507,6 +510,283 @@ corrplot(cor.rps, diag = FALSE, order="hclust", method="square", tl.col="black",
          addrect = 6, tl.cex = 0.45, title = "RPS", mar=c(0,0,3,0))
 corrplot(cor.rpslog, diag = FALSE, order="hclust", method="square", tl.col="black",
          addrect = 6, tl.cex = 0.45, title = "Log RPS", mar=c(0,0,3,0))
+
+```
+
+\newpage
+
+# Pairwise comparisons of correlation metrics against distance
+
+```{r Pairwise distance plots, message = FALSE, warning = FALSE, echo = FALSE, fig.align = "center", fig.height = 7, fig.width = 7.5}
+
+par(mfrow=c(2,1))
+
+# Z-scores vs pairwise distance
+
+long.z <- as.data.frame(cor.z) %>%  
+  rownames_to_column('row') %>% 
+  pivot_longer(cols = -row)
+
+names(long.z) <- c("source_stream", "destination_stream", "zscore")
+
+dist_corr <- merge(pairwise, long.z, by = "source_stream")
+dist_corr <- dist_corr[dist_corr$destination_stream.x == dist_corr$destination_stream.y,]
+dist_corr <- dist_corr[,c(1, 2, 3, 6)]
+names(dist_corr) <- c("source_stream", "destination_stream", "distance", "zscore")
+dist_corr$plotlabels <- paste0(dist_corr$source_stream, "-", dist_corr$destination_stream)
+
+model.z <- nls(zscore ~ a * distance ^ b, 
+               data = dist_corr,
+               start = list(a = 0.1, b = 0.1))
+
+
+zpreds <- predict(model.z, interval = "confidence")
+zplot <- cbind(dist_corr, zpreds)
+zplot <- zplot %>%
+  distinct(zscore, .keep_all = TRUE)
+
+a<- ggplot(zplot, aes(distance/1000, zscore)) +
+  geom_point() +
+  geom_line( aes(y = zpreds), size = 1) +
+  geom_label_repel(aes(label = plotlabels),
+                   data = subset(zplot, zscore < -0.25),  # These lines label negative outliers
+                   size = 2.5) +
+  labs(x = "Pairwise distance (km)", y = "Pairwise correlation (z-score)")
+
+
+# Log RPS vs pairwise distance
+
+long.logrps <- as.data.frame(cor.rpslog) %>%  
+  rownames_to_column('row') %>% 
+  pivot_longer(cols = -row)
+
+names(long.logrps) <- c("source_stream", "destination_stream", "logrps")
+
+dist_logrps <- merge(pairwise, long.logrps, by = "source_stream")
+dist_logrps <- dist_logrps[dist_logrps$destination_stream.x == dist_logrps$destination_stream.y,]
+dist_logrps <- dist_logrps[,c(1, 2, 3, 6)]
+names(dist_logrps) <- c("source_stream", "destination_stream", "distance", "logrps")
+dist_logrps$plotlabels <- paste0(dist_logrps$source_stream, "-", dist_logrps$destination_stream)
+
+model.logrps <- glm(logrps ~ distance, 
+               data = dist_logrps)
+logrpspreds <- predict(model.logrps, interval = "confidence")
+logrpsplot <- cbind(dist_logrps, logrpspreds)
+
+logrpsplot <- logrpsplot %>%
+  distinct(logrps, .keep_all = TRUE)
+
+b<- ggplot(logrpsplot, aes(distance/1000, logrps)) +
+  geom_point() +
+  geom_line( aes(y = logrpspreds), size = 1) +
+  #geom_label_repel(aes(label = plotlabels),
+   #                data = subset(logrpsplot, logrps < 0.35),  # These lines label negative outliers
+    #               size = 2.5) +
+  labs(x = "Pairwise distance (km)", y = "Pairwise correlation (Log RPS)")
+
+
+grid.arrange(a, b)
+```
+
+\newpage
+
+## Dendrogram of pairwise distances
+
+```{r Distance dendrogram, message = FALSE, warning = FALSE, echo = FALSE, fig.align = "center", fig.height = 8, fig.width = 7, fig.cap = "Dendrogram of pairwise distance between river mouths. Red labels - Dala Inlet; Blue - Douglas; Green - Kemano; Yellow - Khutze; Black - Kitimat Arm."}
+
+par(mfrow=c(1,1))
+
+pairwise <- pairwise %>%
+  filter(source_stream != "DOME CREEK") %>%
+  filter(destination_stream != "DOME CREEK")
+
+pairwide <- pairwise[,1:3] %>%
+  pivot_wider(names_from = c("source_stream"),
+              values_from = "distance_m")
+
+pairwide[is.na(pairwide)] <- 0
+pairwide <- as.data.frame(pairwide)
+rownames(pairwide) <- pairwide[,1]
+pairwide <- pairwide[,-1]
+pairwide <- mutate_all(pairwide, function(x) as.numeric(as.character(x)))
+cor.d <- cor(t(pairwide), use = "pairwise.complete.obs")
+dist.cor.d<- dist(cor.d)
+clust.dist.cor.d <- hclust(dist.cor.d)
+dendclust.d <- dendro_data(clust.dist.cor.d)
+
+dlabs <- as.data.frame(dendclust.d[["labels"]][["label"]])
+colnames(dlabs) <- "SYS_NM"
+
+dlabs$order <- c(1:length(dlabs$SYS_NM))
+dlabs <- merge(dlabs, rps.clean, by = "SYS_NM")
+dlabs <- dlabs %>%
+  select(SYS_NM, order, inlet)
+dlabs <- distinct(dlabs)
+
+
+dlabcols <- as.data.frame(unique(dlabs$inlet))
+colnames(dlabcols) <- "inlet"
+dlabcols <- dlabcols %>%
+  arrange(inlet)
+dlabcols$colour <- c("red", "blue", "forestgreen", "goldenrod", "black")
+
+
+dlabs <- merge(dlabcols, dlabs, by = "inlet")
+dlabs <- dlabs %>%
+  arrange(order)
+dlabs <- dlabs$colour
+
+clust.dist.cor.d[["labels"]] <- str_to_title(clust.dist.cor.d[["labels"]])
+
+dendd <- as.dendrogram(clust.dist.cor.d)
+
+dendd %>%
+    set("labels_colors", dlabs) %>%
+    plot(horiz = TRUE, dLeaf = 0.25)
+
+```
+
+\newpage
+
+## Correlation metrics against distance, pre- and post-1980
+```{r Correlation vs distance pre- and post-1980, message = FALSE, warning = FALSE, echo = FALSE, fig.align = "center", fig.height = 4.5, fig.width = 7.5}
+# Z-score vs pairwise distance (pre- and post-1980)
+
+cor.data.z <-escdata.filtered %>%
+  select(SYS_NM,Year,z) %>%
+  pivot_wider(names_from="Year",values_from="z") %>%
+  data.frame()
+
+cor.data.z.pre<-cor.data.z[,1:32]
+rownames(cor.data.z.pre)<-cor.data.z.pre$SYS_NM
+cor.data.z.pre<-cor.data.z.pre%>%select(-SYS_NM)
+cor.z.pre<-cor(t(cor.data.z.pre),use="pairwise.complete.obs")
+
+# Z-scores pre-1980
+long.z.pre <- as.data.frame(cor.z.pre) %>%  
+  rownames_to_column('row') %>% 
+  pivot_longer(cols = -row)
+
+names(long.z.pre) <- c("source_stream", "destination_stream", "zscore")
+
+dist_corr.pre <- merge(pairwise, long.z.pre, by = "source_stream")
+dist_corr.pre <- dist_corr.pre[dist_corr.pre$destination_stream.x == dist_corr.pre$destination_stream.y,]
+dist_corr.pre <- dist_corr.pre[,c(1, 2, 3, 6)]
+names(dist_corr.pre) <- c("source_stream", "destination_stream", "distance", "zscore")
+dist_corr.pre$plotlabels <- paste0(dist_corr.pre$source_stream, "-", dist_corr.pre$destination_stream)
+
+model.zpre <- glm(zscore ~ distance, 
+               data = dist_corr.pre)
+zprepreds <- predict(model.zpre, interval = "confidence")
+zpreplot <- cbind(dist_corr.pre, zprepreds)
+
+# Z-scores post-1980
+cor.data.z.post<-cor.data.z[,c(1,33:70)]
+rownames(cor.data.z.post)<-cor.data.z.post$SYS_NM
+cor.data.z.post<-cor.data.z.post%>%select(-SYS_NM)
+cor.z.post<-cor(t(cor.data.z.post),use="pairwise.complete.obs")
+
+long.z.post <- as.data.frame(cor.z.post) %>%  
+  rownames_to_column('row') %>% 
+  pivot_longer(cols = -row)
+
+names(long.z.post) <- c("source_stream", "destination_stream", "zscore")
+
+dist_corr.post <- merge(pairwise, long.z.post, by = "source_stream")
+dist_corr.post <- dist_corr.post[dist_corr.post$destination_stream.x == dist_corr.post$destination_stream.y,]
+dist_corr.post <- dist_corr.post[,c(1, 2, 3, 6)]
+names(dist_corr.post) <- c("source_stream", "destination_stream", "distance", "zscore")
+dist_corr.post$plotlabels <- paste0(dist_corr.post$source_stream, "-", dist_corr.post$destination_stream)
+
+model.zpost <- glm(zscore ~ distance, 
+               data = dist_corr.post)
+zpostpreds <- predict(model.zpost, interval = "confidence")
+zpostplot <- cbind(dist_corr.post, zpostpreds)
+
+#combine plots
+zpreplot$prepost <- "pre"
+zpostplot$prepost <- "post"
+names(zpreplot)[names(zpreplot) == 'zprepreds'] <- 'preds'
+names(zpostplot)[names(zpostplot) == 'zpostpreds'] <- 'preds'
+z_all <- rbind(zpreplot, zpostplot)
+
+#png(file = "figures/fig10pairwise_zscore.png", width = 1024, height = 768, pointsize = 48)
+ggplot(z_all, aes(distance/1000, zscore, color = prepost)) +
+  geom_point() +
+  geom_line(aes(y = preds), size = 1) +
+  labs(x = "Pairwise distance (km)", y = "Pairwise correlation (z-scores pre- and post-1980)")
+#dev.off()
+
+
+# Log RPS vs pairwise distance (pre- and post-1980)
+
+cor.data.logrps <-rps.clean %>%
+  select(SYS_NM,Year,logrps) %>%
+  arrange(Year) %>%
+  pivot_wider(names_from="Year",values_from="logrps") %>%
+  filter(SYS_NM != "NA") %>%
+  data.frame()
+
+
+cor.data.logrps.pre<-cor.data.logrps[,1:28]
+rownames(cor.data.logrps.pre)<-cor.data.logrps.pre$SYS_NM
+cor.data.logrps.pre<-cor.data.logrps.pre%>%select(-SYS_NM)
+cor.logrps.pre<-cor(t(cor.data.logrps.pre),use="pairwise.complete.obs")
+
+cor.data.logrps.post<-cor.data.logrps[,c(1,29:63)]
+rownames(cor.data.logrps.post)<-cor.data.logrps.post$SYS_NM
+cor.data.logrps.post<-cor.data.logrps.post%>%select(-SYS_NM)
+cor.logrps.post<-cor(t(cor.data.logrps.post),use="pairwise.complete.obs")
+
+# Log RPS pre-1980
+long.logrps.pre <- as.data.frame(cor.logrps.pre) %>%  
+  rownames_to_column('row') %>% 
+  pivot_longer(cols = -row)
+
+names(long.logrps.pre) <- c("source_stream", "destination_stream", "logrpsscore")
+
+dist_corr.pre <- merge(pairwise, long.logrps.pre, by = "source_stream")
+dist_corr.pre <- dist_corr.pre[dist_corr.pre$destination_stream.x == dist_corr.pre$destination_stream.y,]
+dist_corr.pre <- dist_corr.pre[,c(1, 2, 3, 6)]
+names(dist_corr.pre) <- c("source_stream", "destination_stream", "distance", "logrpsscore")
+dist_corr.pre$plotlabels <- paste0(dist_corr.pre$source_stream, "-", dist_corr.pre$destination_stream)
+
+model.logrpspre <- glm(logrpsscore ~ distance, 
+               data = dist_corr.pre)
+
+logrpsprepreds <- predict(model.logrpspre, interval = "confidence")
+logrpspreplot <- cbind(dist_corr.pre, logrpsprepreds)
+
+#Post 1980
+long.logrps.post <- as.data.frame(cor.logrps.post) %>%  
+  rownames_to_column('row') %>% 
+  pivot_longer(cols = -row)
+
+names(long.logrps.post) <- c("source_stream", "destination_stream", "logrpsscore")
+
+dist_corr.post <- merge(pairwise, long.logrps.post, by = "source_stream")
+dist_corr.post <- dist_corr.post[dist_corr.post$destination_stream.x == dist_corr.post$destination_stream.y,]
+dist_corr.post <- dist_corr.post[,c(1, 2, 3, 6)]
+names(dist_corr.post) <- c("source_stream", "destination_stream", "distance", "logrpsscore")
+dist_corr.post$plotlabels <- paste0(dist_corr.post$source_stream, "-", dist_corr.post$destination_stream)
+
+model.logrpspost <- glm(logrpsscore ~ distance, 
+               data = dist_corr.post)
+logrpspostpreds <- predict(model.logrpspost, interval = "confidence")
+logrpspostplot <- cbind(dist_corr.post, logrpspostpreds)
+
+
+# Combine plots
+logrpspreplot$prepost <- "pre"
+logrpspostplot$prepost <- "post"
+names(logrpspreplot)[names(logrpspreplot) == 'logrpsprepreds'] <- 'preds'
+names(logrpspostplot)[names(logrpspostplot) == 'logrpspostpreds'] <- 'preds'
+logrps_all <- rbind(logrpspreplot, logrpspostplot)
+
+ggplot(logrps_all, aes(distance/1000, logrpsscore, color = prepost)) +
+  geom_point() +
+  geom_line(aes(y = preds), size = 1) +
+  labs(x = "Pairwise distance (km)", y = "Pairwise correlation (Log RPS pre- and post-1980)")
 
 ```
 
