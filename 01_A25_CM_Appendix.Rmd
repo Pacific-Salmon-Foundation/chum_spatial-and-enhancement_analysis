@@ -630,9 +630,9 @@ corrplot(cor.rpslog, diag = FALSE, order="hclust", method="square", tl.col="blac
 \newpage
 
 
-## Pairwise comparisons of correlation metrics against distance
+## Pairwise stream to stream correlation versus distance
 
-```{r Pairwise distance plots, message = FALSE, warning = FALSE, echo = FALSE, fig.align = "center", fig.height = 7, fig.width = 7.5}
+```{r Pairwise distance plots, message = FALSE, warning = FALSE, echo = FALSE, fig.align = "center", fig.height = 7, fig.width = 7.5, fig.cap="Pairwise stream-stream correlation of Z-score (top) and log(RPS) (bottom) against pairwise distance."}
  
 par(mfrow=c(1,1))
 # NEW code re: pairwise distance matrix from Ben Skinner
