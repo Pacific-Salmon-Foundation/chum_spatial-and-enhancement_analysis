@@ -116,6 +116,12 @@ write_rds(EPC_RPS_TOTREL, 'RDS/EPC_RPS_TOTREL.rds')
 rpsaic <- AIC(a, b, c, d, e, f, g, h, i, j)
 saveRDS(rpsaic, "RDS/rpsaic.rds")
 
+# Try filter for outlier to see if it fixes log(esc) x dist regression fit
+
+newmodeldat <- modeldat
+
+newmodeldat <- newmodeldat %>% filter(escapement < 100000)
+
 
 adist <- glm(log(escapement) ~ distancefromconuma + Year, 
              data = modeldat)
@@ -136,16 +142,35 @@ summary(ddist)
 summary(edist)
 summary(fdist)
 
+preds <- predict(fdist)
+
 escaic <- AIC(adist, bdist, cdist, ddist, edist, fdist)
 saveRDS(escaic, "RDS/escaic.rds")
 
 EP_ESC_COR <- effect_plot(fdist, pred = corcoef, interval = TRUE, plot.points = TRUE, jitter = .25,
             x.label = "Correlation coefficient", y.label = "Log escapement")
-EP_ESC_DIST <- effect_plot(fdist, pred = distancefromconuma, interval = TRUE, plot.points = TRUE, jitter = 0,
-            x.label = "Distance from enhanced system", y.label = "Log escapement")
+
+#EP_ESC_DIST <- effect_plot(fdist, 
+#                           pred = distancefromconuma,
+#                           plot.points = TRUE, 
+#                           jitter = 0,
+#                           x.label = "Distance from enhanced system", 
+#                           y.label = "Log escapement")
+EP_ESC_DIST <- ggplot(data = modeldat, aes(distancefromconuma, y = log(escapement))) +
+  geom_point() + geom_smooth(method = 'lm', color = "black") + theme_light() +
+  labs(x = "Distance from Conuma", y = "Log escapement")
+
+
+EP_ESC_COR
+
+EP_ESC_DIST# + geom_smooth()# + geom_line(y = preds)
+
 EP_ESC_TOTREL <- effect_plot(fdist, pred = totreleases, interval = TRUE, plot.points = TRUE, jitter = 0,
             x.label = "Total releases", y.label = "Log escapement")
 
+plotsumms <- plot_summs(fdist)
+
+saveRDS(plotsumms, "RDS/plotsumms.rds")
 saveRDS(EP_ESC_COR, "RDS/EP_ESC_COR.rds")
 saveRDS(EP_ESC_DIST, "RDS/EP_ESC_DIST.rds")
 saveRDS(EP_ESC_TOTREL, "RDS/EP_ESC_TOTREL.rds")
@@ -264,7 +289,7 @@ qqp(totrel$totreleases, "pois", lambda = poisson$estimate)
 
 # Stream as random effect
 
-mod_stream_log <- lmer(rps ~ logdistance + logreleases + Enhancement_Rank + (1 | SYS_NM), 
+mod_stream_log <- lmer(rps ~ logdistance + logreleases + (1 | SYS_NM), 
                    data = modeldat, REML = FALSE,)
 
 summary(mod_stream_log) 

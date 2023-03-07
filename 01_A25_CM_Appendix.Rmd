@@ -1375,6 +1375,14 @@ kable(esctab, format = "latex",caption="Candidate models for log escapement and 
 
 ## Effects plots for top models 
 
+```{r, Effects across all metrics, echo = FALSE, message = FALSE, warning = FALSE, fig.align = "center", fig.height = 5, fig.width = 8, fig.cap = "Plot of effects included in most parsimonious model."}
+
+
+effectsplot <- readRDS("RDS/plotsumms.rds")
+plot(effectsplot)
+
+```
+
 ```{r, Effects plot log rps by year, echo = FALSE, message = FALSE, warning = FALSE, fig.align = "center", fig.height = 5, fig.width = 8, fig.cap = "Effects plots of Recruits per spawner by year"}
 
 par(mfrow=c(1,1))
