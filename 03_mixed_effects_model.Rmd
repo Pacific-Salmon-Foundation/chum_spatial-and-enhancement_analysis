@@ -150,18 +150,20 @@ saveRDS(escaic, "RDS/escaic.rds")
 EP_ESC_COR <- effect_plot(fdist, pred = corcoef, interval = TRUE, plot.points = TRUE, jitter = .25,
             x.label = "Correlation coefficient", y.label = "Log escapement")
 
-EP_ESC_DIST <- effect_plot(fdist, 
-                           pred = distancefromconuma,
-                           plot.points = TRUE, 
-                           jitter = 0,
-                           x.label = "Distance from enhanced system", 
-                           y.label = "Log escapement")
+#EP_ESC_DIST <- effect_plot(fdist, 
+#                           pred = distancefromconuma,
+#                           plot.points = TRUE, 
+#                           jitter = 0,
+#                           x.label = "Distance from enhanced system", 
+#                           y.label = "Log escapement")
 EP_ESC_DIST <- ggplot(data = modeldat, aes(distancefromconuma, y = log(escapement))) +
-  geom_point() + geom_smooth(method = 'lm', color = "black")
+  geom_point() + geom_smooth(method = 'lm', color = "black") + theme_light() +
+  labs(x = "Distance from Conuma", y = "Log escapement")
 
 
+EP_ESC_COR
 
-EP_ESC_DIST + geom_smooth()# + geom_line(y = preds)
+EP_ESC_DIST# + geom_smooth()# + geom_line(y = preds)
 
 EP_ESC_TOTREL <- effect_plot(fdist, pred = totreleases, interval = TRUE, plot.points = TRUE, jitter = 0,
             x.label = "Total releases", y.label = "Log escapement")
