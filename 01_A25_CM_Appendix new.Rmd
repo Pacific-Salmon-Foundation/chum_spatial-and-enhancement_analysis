@@ -1,0 +1,1539 @@
+---
+title: "Appendix 1"
+subtitle: "Area 25 Chum Salmon"
+author: "Coastland"
+date: "`r Sys.Date()`"
+papersize: ledger
+geometry: margin = 1.75cm
+toc: TRUE
+output:
+  pdf_document: default
+  pescdata.filt_document: default
+  html_document: default
+editor_options:
+  chunk_output_type: console
+---
+
+```{r setup, echo=FALSE,message=FALSE,warning=FALSE}
+#load libraries
+knitr::opts_chunk$set(echo = TRUE, fig.align="center",fig.pos = 'p')
+options(knitr.table.format ='pdf' ) 
+
+library(data.table)
+library(tidyverse)
+library(corrplot)
+library(ggpubr)
+library(zoo)
+library(ggdendro)
+library(dendextend)
+library(kableExtra)
+library(tinytex)
+library(ggrepel)
+library(gridExtra)
+
+options(scipen=10000)
+```
+
+
+```{r load files, echo=FALSE,message=FALSE,warning=FALSE}
+rps.clean <- readRDS("RDS/a25cm_rps.clean.rds")
+pairwise <- read_csv("data/a25pairwise_matrix.csv")
+
+```
+
+\newpage
+
+# Study area
+
+## Area 25 Chum streams
+
+![](figures/area 25 chum stream distances.png)
+
+```{r functions, echo=FALSE,message=FALSE,warning=FALSE}
+#function to extract data and group it
+
+getridofggplotlinesbetweenpoints<-function(data,colstokeep,yearcolumnname) {
+  d2<-data%>%select(year=yearcolumnname,colstokeep)
+  idx <- c(1, diff(d2$year))
+  i2 <- c(1,which(idx != 1), nrow(d2)+1)
+  d2$grp <- rep(1:length(diff(i2)), diff(i2))
+  d2
+}
+```
+
+\newpage
+
+```{r load escapement data,echo=FALSE}
+
+escdata.raw<-fread("data/area 25 escapement data all.csv")
+escdata.filt<-fread("data/area 25 escapement data filtered.csv")
+
+```
+
+# Summary statistics 
+
+## Bubbleplot of escapement by enhancement rank
+
+```{r escapement bubble plot, fig.align="center",fig.height=8,fig.width=6,fig.cap="Escapement to all Area 8 chum streams in the PSE database.",echo=FALSE,warning=FALSE,message=FALSE}
+
+par(mfrow = c(1, 1))
+#bubbleplot of escapements for whole area
+ggplot(escdata.raw,aes(x=Year,y=SYS_NM,color=Enhancement_Rank,size=escapement))+
+  geom_point(alpha=.5)+
+  scale_colour_manual(breaks=c("NONE","LOW","HIGH"),
+                      values=c("grey50","steelblue","darkred"))+
+  labs(y="Escapement",color="Enhancement",x="Year",size="Escapement")+
+  theme_bw()+
+  theme(legend.position="bottom")+
+  guides(colour = guide_legend(nrow = 4))+
+  guides(size = guide_legend(nrow = 4))+ 
+  theme(axis.text.x = element_text(size = 7))
+
+```
+
+\newpage 
+
+```{r escapement filtered streams only, fig.align="center",fig.height=8,fig.width=7,fig.cap="Escapement to all streams for Area 25 chum. Colour shows the stream enhancement level from the PSE database.",echo=FALSE,warning=FALSE,message=FALSE}
+
+ggplot(escdata.filt,aes(x=Year,y=escapement,color=Enhancement_Rank))+
+  geom_point()+geom_line()+theme_bw()+
+  facet_wrap(~SYS_NM,ncol=3,scale="free_y")+
+  labs(y="Escapement",color="Enhancement Level", title = "Area 25 Escapement")+
+  theme(legend.position="bottom")
+
+```
+
+\newpage
+
+```{r, Kable of distances by inlet, echo = FALSE, warning = FALSE, message = FALSE, fig.align="center", fig.height = 7, fig.width = 7}
+
+streaminlet <- fread("data/CM A25 filtered stream list_with inlets.csv")
+
+
+streaminlet <- read_csv("data/CM A25 filtered stream list_with inlets.csv")
+streaminlet <- streaminlet[,c(1,5)]
+
+colnames(streaminlet) <- c("Stream", "Dist. from enhancement")
+
+kable(streaminlet, format = "latex",caption="Distance from Conuma River (major enhancement location for chum systems included in analysis)")%>%
+      kable_styling(latex_options = "hold_position")
+
+
+#colnames(streaminlet) <- c("System name", "NOTNAS", "Inlet", "Subinlet", "Dist. from enhancement")
+#colaligns <- c("l", "c", "l", "l", "r")
+#streaminlet$`System name` <- str_to_title(streaminlet$`System name`)
+#streaminlet$Inlet <- str_to_sentence(streaminlet$Inlet)
+#streaminlet$Subinlet <- str_to_sentence(streaminlet$Subinlet)
+
+#streaminlet %>%
+#  kbl(align = colaligns, format.args = list(big.mark = ",")) %>%
+#  kable_paper(full_width = F, html_font = "Courier New") %>%
+#  kable_styling(latex_options = "HOLD_position")
+
+```
+
+\newpage
+
+## Hatchery releases to area
+```{r releases for area 25, fig.align="center", fig.height=5, fig.width=8, fig.cap="Total hatchery chum salmon releases in Area 25",echo=FALSE,warning=FALSE,message=FALSE}
+
+releases.raw <- read_csv("data/Area 25 chum releases totals.csv")
+
+ggplot(releases.raw, aes(x = RELEASE_YEAR, y = totreleases/1000000)) + 
+  geom_point() +
+  geom_col(fill="steelblue",color="black") +
+  labs(x="Release Year",y="Total Releases (millions)",title="Area 8 Chum total terminal releases")+
+  theme_bw()
+```
+
+\newpage
+
+## Releases by system
+
+```{r, echo=FALSE,message=FALSE,warning=FALSE,fig.height=7,fig.width=7,fig.cap="Chum releases to Area 25 by release site and release stage."}
+
+swvi.chum<-fread("data/swvi chum releases filtered.csv")
+
+ggdata.rel <- swvi.chum
+ggdata.rel <- ggdata.rel[,2:13]
+
+idx <- c(1, diff(ggdata.rel$RELEASE_YEAR))
+i2 <- c(1,which(idx != 1), nrow(ggdata.rel)+1)
+ggdata.rel$grp <- rep(1:length(diff(i2)), diff(i2))
+
+ggplot(ggdata.rel,aes(x=RELEASE_YEAR,y=releases,color=RELEASE_STAGE_NAME,group=grp))+
+  geom_line()+
+  geom_point(size = 0.7)+
+  scale_color_brewer(palette="Set1")+
+  facet_wrap(~`site-stock`,ncol=3)+
+  theme_bw()+
+  labs(x="Release Year",y="Releases",color="Release Stage")+
+  theme(legend.position = "bottom")
+
+```
+
+\newpage
+
+## Metrics
+
+### Escapement, logged escapement, Z-scores, Pavg, and moving average
+
+```{r metric plots,fig.align="center",fig.height=8,fig.width=6,fig.cap="Various plots for escapement and transformations.",echo=FALSE,warning=FALSE,message=FALSE}
+#plot streams by enhancement
+
+p1<-ggplot(escdata.filt,aes(x=Year,y=escapement,color=Enhancement_Rank,group=SYS_NM))+
+  geom_line()+
+  theme_bw()+
+  labs(y="Escapement",title="Raw Escapement",color="Enhancement Rank")
+
+p2<-ggplot(escdata.filt,aes(x=Year,y=esc.log,color=Enhancement_Rank,group=SYS_NM))+
+ geom_line()+
+  theme_bw()+
+  labs(y="log(Escapement)",title="Logged Escapement")
+
+p3<-ggplot(escdata.filt,aes(x=Year,y=z,color=Enhancement_Rank,group=SYS_NM))+
+  geom_line()+
+  geom_hline(yintercept=0)+
+  theme_bw()+
+  labs(y="Z-scores (Escapement)",title="Z-scores Escapement")
+
+p4<-ggplot(escdata.filt,aes(x=Year,y=esc.stand,color=Enhancement_Rank,group=SYS_NM))+
+  geom_line()+
+  theme_bw()+
+  labs(y="Standardized Escapement (pavg)",title="Escapement/Average (Pavg)")
+
+ggarrange(p1,p2,p3,p4,ncol=1,common.legend = TRUE,align='v',legend="bottom")
+
+```
+
+\newpage
+
+### Moving average and LOESSS fits
+
+```{r moving average and LOESS plots, echo=FALSE,warning=FALSE,message=FALSE,fig.align="center",fig.height=5,fig.width=6,fig.cap="Moving average and LOESS fits on logged escapement by enhancement ranking."}
+
+t1<-ggplot(escdata.filt,aes(x=Year,y=m.ave,color=Enhancement_Rank,group=SYS_NM))+
+  geom_line()+
+  theme_bw()+
+  labs(y="Moving Average",title="Moving-Average",color="Enhancement Rank")
+
+t2<-ggplot(escdata.filt,aes(x=Year,y=z,color=Enhancement_Rank,group=SYS_NM))+
+  geom_smooth(method="loess",se=FALSE,span=.1,linewidth=.7)+
+  geom_hline(yintercept=0)+
+  theme_bw()+
+  labs(y="Z-score",title="Loess fit on Z-scores")
+
+ggarrange(t1,t2,ncol=1,common.legend = TRUE,legend = "bottom",align='v')
+
+```
+
+\newpage
+
+### Means trends by enhancement rank
+
+```{r means by enhancement rank, echo=FALSE,warning=FALSE,message=FALSE,fig.align="center",fig.height=7,fig.width=6,fig.cap="Area 25 chum: Mean Z-score for analysis streams by enhancement rank. Linear regression over all years with SE are shown."}
+
+mean.z<-escdata.filt%>%group_by(Enhancement_Rank,Year) %>% summarise(u=mean(z,na.rm=TRUE))
+
+ggplot(mean.z,aes(x=Year,y=u,color=Enhancement_Rank))+
+  geom_line(size=1.5,alpha=.7)+theme_bw()+
+  scale_color_brewer(palette = "Set1")+
+  labs(y="Mean Z-score")+
+  geom_hline(yintercept=0,linetype="dashed")+
+  geom_vline(xintercept=1980)+
+  facet_wrap(~Enhancement_Rank,ncol=1)+
+  geom_smooth(method="lm",color="black")+
+  guides(color=FALSE)
+  
+```
+
+\newpage
+
+### Recruits per spawner by system
+
+```{r, Plotting RPS by system, echo = FALSE, message = FALSE, warning = FALSE, fig.align = "center", fig.height = 8, fig.width = 7, fig.cap = "Area 25 chum: recruits per spawner by system."}
+
+# RPS by system
+
+ggplot(rps.clean,aes(x=Year,y=rps))+
+  geom_line()+geom_point()+
+  geom_smooth(method='lm',se=TRUE,size=.7)+
+  facet_wrap(~SYS_NM,ncol=3,scale="free_y")+
+  theme_bw()+
+  geom_hline(yintercept=1)
+
+```
+
+\newpage
+
+### Log recruits per spawner by system by period
+
+```{r rps figure pre post with lm, echo=FALSE, warning=FALSE, message=FALSE ,fig.align="center", fig.height=7, fig.width=6 ,fig.cap="Area 25 chum: log recruits per spawner by system fitted with linear regression for the periods pre- and post-enhancement."}
+
+a25.rps<-fread("data/area 25 chum rps.csv")
+
+gga25.logrps<-a25.rps%>%select(Year,prepost,logrps,SYS_NM)%>%arrange(SYS_NM,prepost,Year)
+
+idx <- c(1, diff(gga25.logrps$Year))
+i2 <- c(1,which(idx != 1), nrow(gga25.logrps)+1)
+gga25.logrps$grp <- rep(1:length(diff(i2)), diff(i2))
+
+ggplot(gga25.logrps,aes(x=Year,y=logrps,color=prepost,group=grp))+
+  geom_line(alpha=.5)+geom_point(alpha=.5)+
+  scale_color_brewer(palette="Set1")+
+  geom_smooth(method='lm',se=TRUE)+
+  facet_wrap(~SYS_NM,ncol=3,scale="free_y")+
+  theme_bw()+
+  geom_hline(yintercept=0,linetype="dashed")+
+  labs(x="Brood Year",y="log(Recruits per spawner)",color="Period")+
+  theme(legend.position="bottom")
+```
+
+
+\newpage
+
+### Log RPS comparison before and after enhancement
+
+```{r rps figure boxplot,echo=FALSE,warning=FALSE,message=FALSE,fig.align="center",fig.height=7,fig.width=6,fig.cap="Area 25 chum: Boxplots of log recruits per spawner by system."}
+
+ggplot(gga25.logrps,aes(y=SYS_NM,x=logrps,fill=prepost))+
+  geom_boxplot(notch=F)+
+  scale_fill_brewer(palette="Set1")+
+  geom_vline(xintercept=0)+
+  theme_bw()+
+  labs(y="System Name",x="log(Recruits per spawner)",title="Area 25 Chum")+
+  theme(legend.position="bottom")
+
+```
+
+\newpage
+
+### Bubbleplots of metric by inlet
+
+```{r, Malick and Cox plot z-score, message = FALSE, warning = FALSE, echo = FALSE, fig.align = "center", fig.height = 8, fig.width = 7, fig.cap = "Z-scores of log escapement for each system grouped by inlet. Solid blue points indicate positive values and open red circles indicate negative values. The size of the point indicates the magnitude of the metric."}
+
+inlets <- read_csv("data/CM A25 filtered stream list_with inlets.csv")  %>%
+  select(SYS_NM, inlet)
+
+f<-escdata.filt%>%select(Year,SYS_NM,z)
+
+g<-merge(f,inlets,by="SYS_NM")
+
+
+`Z-score` <- c(-3, -2, -1, 0, 1, 2, 3)
+shape <- c(21, 21, 21, 20, 19, 19, 19)
+cols <- c("red", "red", "red", "black", "blue", "blue", "blue")
+shapelkp <- tibble(`Z-score`, shape, cols)
+g$`Z-score` <- as.numeric(substr(g$z, 1, 2))
+g$size <- abs(g$z)
+g <- merge(shapelkp, g, by = "Z-score")
+g$`Z-score` <- as.factor(g$`Z-score`)
+
+ggplot(g, aes(x = Year, y = SYS_NM, shape = `Z-score`, size = `Z-score`, color = `Z-score`, fill = `Z-score`)) +
+  geom_point() +
+  scale_size_manual(values = c("-3" = 5, "-2" = 3, "-1" = 2, 
+                               "0" = 2, 
+                               "1" = 2, "2" = 3, "3" = 5))+
+  scale_shape_manual(values = c("-3" = 1, "-2" = 1, "-1" = 1, 
+                                "0" = 20, 
+                                "1" = 21, "2" = 21, "3" = 21)) +
+  scale_color_manual(values = c("-3" = "darkred", "-2" = "red4", "-1" = "red1", 
+                                "0" = "black", 
+                                "1" = "royalblue1", "2" = "royalblue4", "3" = "royalblue4"))+
+  scale_fill_manual(values = c("-3" = "darkred", "-2" = "red4", "-1" = "red1", 
+                                "0" = "black", 
+                                "1" = "royalblue1", "2" = "royalblue4", "3" = "royalblue4"))+
+  labs(y="",x="Year", legend = "Z-score")+
+  theme_bw()+
+  theme(legend.position="bottom")+
+  guides(size=FALSE)+
+  theme(axis.text.y = element_text(size = 6))+
+  guides(shape = guide_legend(ncol = 7))+ 
+  facet_grid(inlet~.,switch="y",space="free_y",scale="free_y")
+
+#ggsave("figures/a25 z scores bubble by inlet.png",dpi=600,height=7,width=6)
+
+```
+
+\newpage
+
+```{r, Malick and Cox plot logRPS, message = FALSE, warning = FALSE, echo = FALSE, fig.align = "center", fig.height = 8, fig.width = 7, fig.cap = "Log(recruits per spawner) for each system grouped by inlet. Solid blue points indicate positive values and open red circles indicate negative values. The size of the point indicates the magnitude of the metric."}
+inlets <- read_csv("data/CM A25 filtered stream list_with inlets.csv")  %>%
+  select(SYS_NM, inlet)
+
+f<-rps.clean%>%select(Year,SYS_NM,logrps)
+
+g<-merge(f,inlets,by="SYS_NM")
+
+
+`log RPS` <- c(-5, -4, -3, -2, -1, 0, 1, 2, 3, 4, 5)
+shape <- c(21, 21, 21, 21, 21, 20, 19, 19, 19, 19, 19)
+cols <- c("red", "red", "red", "red", "red", "black", "blue", "blue", "blue", "blue", "blue")
+shapelkp <- tibble(`log RPS`, shape, cols)
+g$`log RPS` <- as.numeric(substr(g$logrps, 1, 2))
+g$size <- abs(g$`log RPS`)
+g <- merge(shapelkp, g, by = "log RPS")
+g$`log RPS` <- as.factor(g$`log RPS`)
+
+ggplot(g, aes(x = Year, y = SYS_NM, shape = `log RPS`, size = `log RPS`, color = `log RPS`, fill = `log RPS`)) +
+  geom_point() +
+  scale_size_manual(values = c("-5" = 5, "-4" = 4, "-3" = 3, "-2" = 2, "-1" = 1, 
+                               "0" = 1, 
+                               "1" = 1, "2" = 2, "3" = 3, "4" = 4, "5" = 5))+
+  scale_shape_manual(values = c("-5" = 1, "-4" = 1, "-3" = 1, "-2" = 1, "-1" = 1, 
+                                "0" = 20, 
+                                "1" = 21, "2" = 21, "3" = 21, "4" = 21, "5" = 21)) +
+  scale_color_manual(values = c("-5" = "darkred", "-4" = "darkred","-3" = "darkred",
+                                "-2" = "red4", "-1" = "red1", 
+                                "0" = "black", 
+                                "1" = "royalblue1", "2" = "royalblue2", "3" = "royalblue3",
+                                "4" = "royalblue4", "5" = "royalblue4"))+
+  scale_fill_manual(values = c("-5" = "darkred", "-4" = "darkred",
+                               "-3" = "darkred", "-2" = "red4", "-1" = "red1", 
+                                "0" = "black", 
+                                "1" = "royalblue1", "2" = "royalblue4", "3" = "royalblue4",
+                                "4" = "royalblue4", "5" = "royalblue4"))+
+  labs(y="",x="Year")+
+  theme_bw()+
+  theme(legend.position="bottom")+
+  guides(size=FALSE)+
+  theme(axis.text.y = element_text(size = 6))+
+  guides(shape = guide_legend(ncol = 11, nrow = 2))+ 
+  facet_grid(inlet~.,switch="y",space="free_y",scale="free_y")
+
+#ggsave("figures/a25 log RPS bubble by inlet.png",dpi=600,height=7,width=6)
+
+```
+
+
+\newpage
+
+```{r correlations for all metrics, echo = FALSE, warning = FALSE, message = FALSE}
+
+#prep data for correlations
+
+# Merge stream inlet table into escdata.filt
+
+streaminlet <- fread("data/CM A25 filtered stream list_with inlets.csv")
+
+rps.clean <- merge(streaminlet, rps.clean, by = "SYS_NM", all = TRUE)
+
+escdata.filt<-merge(escdata.filt,streaminlet,by="SYS_NM")
+
+#old way
+#escdata.filt <- escdata.filt %>%
+#  inner_join(streaminlet, escdata.filt, by = "SYS_NM")
+
+# Factor out inlet and create escdata.filt of inlet colours
+
+escdata.filt$inlet <- as.factor(escdata.filt$inlet)
+inlets <- as.data.frame(levels(escdata.filt$inlet))
+inlets$colour <- c("red", "blue", "darkgreen")
+colnames(inlets) <- c("inlet", "colour")
+
+
+# Correlation analysis by z-score
+
+cor.data.z<-escdata.filt%>%select(SYS_NM,Year,z)%>%
+  pivot_wider(names_from="Year",values_from="z")%>%
+  data.frame()
+
+rownames(cor.data.z)<-cor.data.z$SYS_NM
+
+cor.data.z<-cor.data.z%>%select(-SYS_NM)
+
+cor.z<-cor(t(cor.data.z),use="pairwise.complete.obs")
+
+# Dendrogram, factored by inlet, by z-score
+
+dist.cor.z<- dist(cor.z)
+clust.dist.cor.z <- hclust(dist.cor.z)
+
+dendclust.z <- dendro_data(clust.dist.cor.z)
+zlabs <- as.data.frame(dendclust.z[["labels"]][["label"]])
+
+zlabs$order <- 1:length(zlabs[,1])
+colnames(zlabs) <- c("SYS_NM", "order")
+zlabs <- merge(streaminlet, zlabs, by = "SYS_NM")
+zlabs <- merge(inlets, zlabs, by = "inlet")
+zlabs <- zlabs %>%
+  arrange(order)
+zlabcolours <- zlabs$colour
+zlabnames <- zlabs$SYS_NM
+inletlist <- as.factor(zlabs$inlet) 
+  
+dendclust.z[["labels"]][["inlet"]] <- inletlist
+
+nameslookup <- as.data.frame(c("Tlupana", "Canton", "Conuma", "Leiner", "Deserted", "Sucwoa", 
+                 "Mooyah", "Ransom", "Burman", "Kleeptee", "Espinosa",
+                 "L. Zeballos", "Hoiss", "Lord", "Zeballos", "Tahsis", "Tsowwin",
+                 "Hammond", "Marvinas", "Brodick", "Owossitsa", "Chum", 
+                 "Mamat", "Park"))
+
+colnames(nameslookup) <- "shortnames"
+
+nameslookup$SYS_NM <- zlabnames  
+
+nameslookup$erank <- c("red", "red", "red", "black", "#3399FF", "red",
+                       "black", "black", "black", "black", "black",
+                       "black", "black", "black", "red", "black", "black",
+                       "black", "black", "black", "black", "black",
+                       "black", "black")
+  
+dendclust.z[["labels"]][["inlet"]] <- inletlist
+
+xlenz <- .95 * length(zlabs$SYS_NM)
+ylenz <- .95 * (max(dendclust.z[["segments"]][["y"]]))
+
+# Correlation analysis by log escapement
+
+cor.data.e<-escdata.filt%>%select(SYS_NM,Year,esc.log)%>%pivot_wider(names_from="Year",values_from="esc.log")%>%data.frame()
+
+rownames(cor.data.e)<-cor.data.e$SYS_NM
+
+cor.data.e<-cor.data.e%>%select(-SYS_NM)
+
+cor.e<-cor(t(cor.data.e),use="pairwise.complete.obs")
+
+# Dendrogram, factored by inlet, by log escapement
+
+dist.cor.e<- dist(cor.e)
+clust.dist.cor.e <- hclust(dist.cor.e)
+
+dendclust.e <- dendro_data(clust.dist.cor.e)
+elabs <- as.data.frame(dendclust.e[["labels"]][["label"]])
+elabs$order <- 1:length(elabs[,1])
+colnames(elabs) <- c("SYS_NM", "order")
+elabs <- merge(streaminlet, elabs, by = "SYS_NM")
+elabs <- merge(inlets, elabs, by = "inlet")
+elabs <- elabs %>%
+  arrange(order)
+elabcolours <- elabs$colour
+elabnames <- elabs$SYS_NM
+inletlist <- as.factor(elabs$inlet)
+  
+dendclust.e[["labels"]][["inlet"]] <- inletlist
+
+xlene <- .95 * length(elabs$SYS_NM)
+ylene <- .95 * (max(dendclust.e[["segments"]][["y"]]))
+
+
+# Correlation analysis by standardized escapement
+cor.data.s<-escdata.filt%>%select(SYS_NM,Year,esc.stand)%>%pivot_wider(names_from="Year",values_from="esc.stand")%>%data.frame()
+
+rownames(cor.data.s)<-cor.data.s$SYS_NM
+
+cor.data.s<-cor.data.s%>%select(-SYS_NM)
+
+cor.s<-cor(t(cor.data.s),use="pairwise.complete.obs")
+
+# Dendrogram, factored by inlet, by standardized escapement
+
+dist.cor.s<- dist(cor.s)
+clust.dist.cor.s <- hclust(dist.cor.s)
+
+dendclust.s <- dendro_data(clust.dist.cor.s)
+slabs <- as.data.frame(dendclust.s[["labels"]][["label"]])
+slabs$order <- 1:length(slabs[,1])
+colnames(slabs) <- c("SYS_NM", "order")
+slabs <- merge(streaminlet, slabs, by = "SYS_NM")
+slabs <- merge(inlets, slabs, by = "inlet")
+slabs <- slabs %>%
+  arrange(order)
+slabcolours <- slabs$colour
+slabnames <- slabs$SYS_NM
+inletlist <- as.factor(slabs$inlet)
+  
+dendclust.s[["labels"]][["inlet"]] <- inletlist
+
+xlens <- .95 * length(slabs$SYS_NM)
+ylens <- .95 * (max(dendclust.s[["segments"]][["y"]]))
+
+# Correlation analysis by moving average
+cor.data.m<-escdata.filt%>%select(SYS_NM,Year,m.ave)%>%pivot_wider(names_from="Year",values_from="m.ave")%>%data.frame()
+
+rownames(cor.data.m)<-cor.data.m$SYS_NM
+
+cor.data.m<-cor.data.m%>%select(-SYS_NM)
+
+cor.m<-cor(t(cor.data.m),use="pairwise.complete.obs")
+
+# Dendrogram, factored by inlet, by moving average
+
+dist.cor.m<- dist(cor.m)
+clust.dist.cor.m <- hclust(dist.cor.m)
+dendclust.m <- dendro_data(clust.dist.cor.m)
+
+mlabs <- as.data.frame(dendclust.m[["labels"]][["label"]])
+mlabs$order <- 1:length(mlabs[,1])
+colnames(mlabs) <- c("SYS_NM", "order")
+mlabs <- merge(streaminlet, mlabs, by = "SYS_NM")
+mlabs <- merge(inlets, mlabs, by = "inlet")
+mlabs <- mlabs %>%
+  arrange(order)
+mlabcolours <- mlabs$colour
+mlabnames <- mlabs$SYS_NM
+inletlist <- as.factor(mlabs$inlet)
+  
+dendclust.m[["labels"]][["inlet"]] <- inletlist
+
+xlenm <- .95 * length(mlabs$SYS_NM)
+ylenm <- .95 * (max(dendclust.m[["segments"]][["y"]]))
+
+cor.data.rps<-rps.clean%>%select(SYS_NM,Year,rps)%>%
+  pivot_wider(names_from="Year",values_from="rps")%>%
+  data.frame()
+rownames(cor.data.rps)<-cor.data.rps$SYS_NM
+cor.data.rps<-cor.data.rps%>%select(-SYS_NM)
+cor.rps<-cor(t(cor.data.rps),use="pairwise.complete.obs")
+dist.cor.rps<- dist(cor.rps)
+clust.dist.cor.rps <- hclust(dist.cor.rps)
+dendclust.rps <- dendro_data(clust.dist.cor.rps)
+
+cor.data.rpslog<-rps.clean%>%select(SYS_NM,Year,logrps)%>%
+  pivot_wider(names_from="Year",values_from="logrps")%>%
+  data.frame()
+rownames(cor.data.rpslog)<-cor.data.rpslog$SYS_NM
+cor.data.rpslog<-cor.data.rpslog%>%select(-SYS_NM)
+cor.rpslog<-cor(t(cor.data.rpslog),use="pairwise.complete.obs")
+dist.cor.rpslog<- dist(cor.rpslog)
+clust.dist.cor.rpslog <- hclust(dist.cor.rpslog)
+dendclust.rpslog <- dendro_data(clust.dist.cor.rpslog)
+
+
+```
+
+\newpage
+
+# Correlation analyses and Dendrograms
+
+## Cross correlation plots
+
+```{r correlation plots, echo=FALSE,warning=FALSE,message=FALSE,fig.align="center",fig.height=9.5,fig.width=8.5,fig.cap="Cross correlation plots to compare metrics."}
+
+# Corplots to knit
+
+#png(file = "figures/corrplots.png", width = 2000, height = 3000, pointsize = 48)
+
+par(oma=c(0,0,0,0))
+par(mfrow=c(2,1))
+
+corrplot(cor.z, diag = FALSE, order="hclust", method="square", tl.col="black",
+         addrect = 6, tl.cex = 0.45, title = "Z-scores", mar=c(0,0,3,0))
+
+corrplot(cor.rpslog, diag = FALSE, order="hclust", method="square", tl.col="black",
+         addrect = 6, tl.cex = 0.45, title = "Log RPS", mar=c(0,0,3,0))
+
+#dev.off()
+```
+
+
+\newpage
+
+```{r, Make colour vectors for dendrogram inlets, message=FALSE, warning=FALSE, echo=FALSE, include = FALSE}
+
+zlabs <- as.data.frame(dendclust.z[["labels"]][["label"]])
+colnames(zlabs) <- "SYS_NM"
+zlabs$order <- c(1:length(zlabs$SYS_NM))
+zlabs <- merge(zlabs, rps.clean, by = "SYS_NM")
+zlabs <- zlabs %>%
+  select(SYS_NM, order, inlet)
+zlabs <- distinct(zlabs)
+zlabcols <- as.data.frame(unique(zlabs$inlet))
+colnames(zlabcols) <- "inlet"
+zlabcols <- zlabcols %>%
+  arrange(inlet)
+zlabcols$colour <- c("red", "blue", "green")
+zlabs <- merge(zlabcols, zlabs, by = "inlet")
+zlabs <- zlabs %>%
+  arrange(order)
+zlabs <- zlabs$colour
+
+elabs <- as.data.frame(dendclust.e[["labels"]][["label"]])
+colnames(elabs) <- "SYS_NM"
+elabs$order <- c(1:length(elabs$SYS_NM))
+elabs <- merge(elabs, rps.clean, by = "SYS_NM")
+elabs <- elabs %>%
+  select(SYS_NM, order, inlet)
+elabs <- distinct(elabs)
+elabcols <- as.data.frame(unique(elabs$inlet))
+colnames(elabcols) <- "inlet"
+elabcols <- elabcols %>%
+  arrange(inlet)
+elabcols$colour <- c("red", "blue", "green")
+elabs <- merge(elabcols, elabs, by = "inlet")
+elabs <- elabs %>%
+  arrange(order)
+elabs <- elabs$colour
+
+slabs <- as.data.frame(dendclust.s[["labels"]][["label"]])
+colnames(slabs) <- "SYS_NM"
+slabs$order <- c(1:length(slabs$SYS_NM))
+slabs <- merge(slabs, rps.clean, by = "SYS_NM")
+slabs <- slabs %>%
+  select(SYS_NM, order, inlet)
+slabs <- distinct(slabs)
+slabcols <- as.data.frame(unique(slabs$inlet))
+colnames(slabcols) <- "inlet"
+slabcols <- slabcols %>%
+  arrange(inlet)
+slabcols$colour <- c("red", "blue", "green")
+slabs <- merge(slabcols, slabs, by = "inlet")
+slabs <- slabs %>%
+  arrange(order)
+slabs <- slabs$colour
+
+mlabs <- as.data.frame(dendclust.m[["labels"]][["label"]])
+colnames(mlabs) <- "SYS_NM"
+mlabs$order <- c(1:length(mlabs$SYS_NM))
+mlabs <- merge(mlabs, rps.clean, by = "SYS_NM")
+mlabs <- mlabs %>%
+  select(SYS_NM, order, inlet)
+mlabs <- distinct(mlabs)
+mlabcols <- as.data.frame(unique(mlabs$inlet))
+colnames(mlabcols) <- "inlet"
+mlabcols <- mlabcols %>%
+  arrange(inlet)
+mlabcols$colour <- c("red", "blue", "green")
+mlabs <- merge(mlabcols, mlabs, by = "inlet")
+mlabs <- mlabs %>%
+  arrange(order)
+mlabs <- mlabs$colour
+
+rpslabs <- as.data.frame(dendclust.rps[["labels"]][["label"]])
+colnames(rpslabs) <- "SYS_NM"
+rpslabs$order <- c(1:length(rpslabs$SYS_NM))
+rpslabs <- merge(rpslabs, rps.clean, by = "SYS_NM")
+rpslabs <- rpslabs %>%
+  select(SYS_NM, order, inlet)
+rpslabs <- distinct(rpslabs)
+rpslabcols <- as.data.frame(unique(rpslabs$inlet))
+colnames(rpslabcols) <- "inlet"
+rpslabcols <- rpslabcols %>%
+  arrange(inlet)
+rpslabcols$colour <- c("red", "blue", "green")
+rpslabs <- merge(rpslabcols, rpslabs, by = "inlet")
+rpslabs <- rpslabs %>%
+  arrange(order)
+rpslabs <- rpslabs$colour
+
+
+rpsloglabs <- as.data.frame(dendclust.rpslog[["labels"]][["label"]])
+colnames(rpsloglabs) <- "SYS_NM"
+rpsloglabs$order <- c(1:length(rpsloglabs$SYS_NM))
+rpsloglabs <- merge(rpsloglabs, rps.clean, by = "SYS_NM")
+rpsloglabs <- rpsloglabs %>%
+  select(SYS_NM, order, inlet)
+rpsloglabs <- distinct(rpsloglabs)
+rpsloglabcols <- as.data.frame(unique(rpsloglabs$inlet))
+colnames(rpsloglabcols) <- "inlet"
+rpsloglabcols <- rpsloglabcols %>%
+  arrange(inlet)
+rpsloglabcols$colour <- c("red", "blue", "green")
+rpsloglabs <- merge(rpsloglabcols, rpsloglabs, by = "inlet")
+rpsloglabs <- rpsloglabs %>%
+  arrange(order)
+rpsloglabs <- rpsloglabs$colour
+
+```
+
+```{r, Dendrogram plots, echo = FALSE, message = FALSE, warning = FALSE, fig.align = "center", fig.height = 9.5, fig.width = 8.5, fig.cap = "Dendrograms by metric. Red labels are from Esperanza inlet, blue are from Nootka inlet, and green are from Tahsis inlet."}
+
+par(oma=c(0,0,0,0))
+par(mfrow=c(2,1))
+
+clust.dist.cor.z[["labels"]] <- str_to_sentence(word(clust.dist.cor.z[["labels"]]))
+dendz <- as.dendrogram(clust.dist.cor.z)
+dendz %>%
+    set("labels_colors", zlabs) %>%
+    plot(main = "Z-scores", horiz = TRUE)
+
+
+clust.dist.cor.rpslog[["labels"]] <- str_to_sentence(word(clust.dist.cor.rpslog[["labels"]]))
+dendrpslog <- as.dendrogram(clust.dist.cor.rpslog)
+dendrpslog %>%
+    set("labels_colors", rpsloglabs) %>%
+    plot(main = "Log RPS", horiz = TRUE)
+```
+
+\newpage
+
+## Tanglegrams comparing effect of metric choice on cluster analysis
+
+```{r, Tanglegrams z vs logRPS, echo = FALSE, message = FALSE, warning = FALSE, fig.align = "center", fig.height = 9.5, fig.width = 8.5, fig.cap = "Tanglegram of z-score vs. Log RPS"}
+
+#png(file = "figures/a06cm_tanglegram_z_v_mave.png", width = 2000, height = 3000, pointsize = 36)
+
+tangle4 <- dendlist(dendz, dendrpslog)
+                                                                                                            
+tanglegram(tangle4, lab.cex = .8, margin_inner = 3, main_left = "Z-score",
+           main_right = "Log RPS", cex_main = 1, highlight_distinct_edges = FALSE,
+           lwd = 2, edge.lwd = 1)
+
+#dev.off()
+
+```
+
+\newpage
+
+# Pre- and post-enhancement correlation analyses
+
+```{r Corr plots for z-score, pre- and post-1980, echo=FALSE, warning=FALSE, message=FALSE, fig.align = "center", fig.height = 8, fig.width = 6, fig.cap = "Cross correlation plots of z-scores to compare pre- and post-enhancement."}
+#prep data for correlations
+
+cor.data.z <-escdata.filt %>%
+  select(SYS_NM,Year,z) %>%
+  pivot_wider(names_from="Year",values_from="z") %>%
+  data.frame()
+
+cor.data.z.pre<-cor.data.z[,1:31]
+rownames(cor.data.z.pre)<-cor.data.z.pre$SYS_NM
+cor.data.z.pre<-cor.data.z.pre%>%select(-SYS_NM)
+cor.z.pre<-cor(t(cor.data.z.pre),use="pairwise.complete.obs")
+
+cor.data.z.post<-cor.data.z[,c(1,32:70)]
+rownames(cor.data.z.post)<-cor.data.z.post$SYS_NM
+cor.data.z.post<-cor.data.z.post%>%select(-SYS_NM)
+cor.z.post<-cor(t(cor.data.z.post),use="pairwise.complete.obs")
+
+#png(file = "figures/corrplot_1980_z.png", width = 2000, height = 3000, pointsize = 48)
+
+par(mfrow=c(2,1))
+corrplot(cor.z.pre, diag = FALSE, order="hclust", method="square", tl.col="black",
+         addrect = 6, tl.cex = 0.5, title = "Z-scores (Pre-1980)", cex.main = .7, mar=c(0,0,1,0))
+corrplot(cor.z.post, diag = FALSE, order="hclust", method="square", tl.col="black",
+         addrect = 6, tl.cex = 0.5, title = "Z-score (Post-1980)", sub = "Z-scores", cex.main = .7, mar=c(0,0,1,0))
+
+#dev.off()
+```
+
+\newpage
+
+```{r, z-score tanglegram, echo = FALSE, fig.align = "center", fig.height = 8, fig.width = 6, fig.cap = "Tanglegram comparing z-scores pre- and post-enhancement (1980)"}
+# Dendrogram, factored by inlet, by z-score
+
+#png(file = "figures/tanglegram_1980_z.png", width = 2000, height = 3000, pointsize = 48)
+
+par(mfrow=c(1,1))
+
+# Pre-1980
+dist.cor.z.pre <- dist(cor.z.pre)
+clust.dist.cor.z.pre <- hclust(dist.cor.z.pre)
+tanglelabs.z.pre <- as.data.frame(clust.dist.cor.z.pre[["labels"]])
+colnames(tanglelabs.z.pre) <- "SYS_NM"
+tanglelabs.z.pre <- merge(tanglelabs.z.pre, nameslookup, on = "SYS_NM")
+clust.dist.cor.z.pre[["labels"]] <- tanglelabs.z.pre$shortnames
+dendz.pre <- as.dendrogram(clust.dist.cor.z.pre)
+
+# Post-1980
+dist.cor.z.post <- dist(cor.z.post)
+clust.dist.cor.z.post <- hclust(dist.cor.z.post)
+tanglelabs.z.post <- as.data.frame(clust.dist.cor.z.post[["labels"]])
+colnames(tanglelabs.z.post) <- "SYS_NM"
+tanglelabs.z.post <- merge(tanglelabs.z.post, nameslookup, on = "SYS_NM")
+clust.dist.cor.z.post[["labels"]] <- tanglelabs.z.post$shortnames
+dendz.post <- as.dendrogram(clust.dist.cor.z.post)
+
+# Tanglegram
+tangle.z <- dendlist(dendz.pre, dendz.post)
+tanglegram(tangle.z, lab.cex = .8, margin_inner = 3, main = "Z-scores", main_left = "Pre-1980",
+           main_right = "Post-1980", cex_main = 1, highlight_distinct_edges = FALSE,
+           lwd = 2, edge.lwd = 1)
+
+#dev.off()
+
+```
+
+\newpage
+
+```{r, Pre-1980 logrps, echo = FALSE, message = FALSE, warning = FALSE, fig.align = "center", fig.height = 8, fig.width = 6, fig.cap = "Cross correlation plots of Log RPS to compare pre- and post-enhancement."}
+
+cor.data.logrps <-rps.clean %>%
+  select(SYS_NM,Year,logrps) %>%
+  pivot_wider(names_from="Year",values_from="logrps") %>%
+  data.frame()
+
+cor.data.logrps.pre<-cor.data.logrps[,1:27]
+rownames(cor.data.logrps.pre)<-cor.data.logrps.pre$SYS_NM
+cor.data.logrps.pre<-cor.data.logrps.pre%>%select(-SYS_NM)
+cor.logrps.pre<-cor(t(cor.data.logrps.pre),use="pairwise.complete.obs")
+
+cor.data.logrps.post<-cor.data.logrps[,c(1,28:63)]
+rownames(cor.data.logrps.post)<-cor.data.logrps.post$SYS_NM
+cor.data.logrps.post<-cor.data.logrps.post%>%select(-SYS_NM)
+cor.logrps.post<-cor(t(cor.data.logrps.post),use="pairwise.complete.obs")
+
+dist.cor.logrps.pre <- dist(cor.logrps.pre)
+clust.dist.cor.logrps.pre <- hclust(dist.cor.logrps.pre)
+tanglelabs.logrps.pre <- as.data.frame(clust.dist.cor.logrps.pre[["labels"]])
+colnames(tanglelabs.logrps.pre) <- "SYS_NM"
+tanglelabs.logrps.pre$shortnames <- str_to_sentence(word(tanglelabs.logrps.pre$SYS_NM))
+#colnames(nameslookup) <- "SYS_NM"
+clust.dist.cor.logrps.pre[["labels"]] <- tanglelabs.logrps.pre$shortnames
+dendlogrps.pre <- as.dendrogram(clust.dist.cor.logrps.pre)
+
+# Post-1980
+cor.data.logrps.post<-cor.data.logrps[,1:26]
+rownames(cor.data.logrps.post)<-cor.data.logrps.post$SYS_NM
+cor.data.logrps.post<-cor.data.logrps.post%>%select(-SYS_NM)
+cor.logrps.post<-cor(t(cor.data.logrps.post),use="pairwise.complete.obs")
+
+cor.data.logrps.post<-cor.data.logrps[,c(1,27:62)]
+rownames(cor.data.logrps.post)<-cor.data.logrps.post$SYS_NM
+cor.data.logrps.post<-cor.data.logrps.post%>%select(-SYS_NM)
+cor.logrps.post<-cor(t(cor.data.logrps.post),use="pairwise.complete.obs")
+
+dist.cor.logrps.post <- dist(cor.logrps.post)
+clust.dist.cor.logrps.post <- hclust(dist.cor.logrps.post)
+tanglelabs.logrps.post <- as.data.frame(clust.dist.cor.logrps.post[["labels"]])
+colnames(tanglelabs.logrps.post) <- "SYS_NM"
+tanglelabs.logrps.post$shortnames <- str_to_sentence(word(tanglelabs.logrps.post$SYS_NM))
+#colnames(nameslookup) <- "SYS_NM"
+clust.dist.cor.logrps.post[["labels"]] <- tanglelabs.logrps.post$shortnames
+dendlogrps.post <- as.dendrogram(clust.dist.cor.logrps.post)
+
+par(mfrow=c(2,1))
+corrplot(cor.logrps.pre, diag = FALSE, order="hclust", method="square", tl.col="black",
+         addrect = 6, tl.cex = 0.5, title = "Log RPS (Pre-1980)", cex.main = .7, mar=c(0,0,1,0))
+corrplot(cor.logrps.post, diag = FALSE, order="hclust", method="square", tl.col="black",
+         addrect = 6, tl.cex = 0.5, title = "Lof RPS (Post-1980)", cex.main = .7, mar=c(0,0,1,0))
+
+
+```
+
+\newpage
+
+```{r, Log RPS tanglegram, echo = FALSE, message = FALSE, warning = FALSE, fig.align = "center", fig.height = 8, fig.width = 6, fig.cap = "Tanglegram comparing Log RPS pre- and post-enhancement (1980)"}
+# Dendrogram, factored by inlet, by logrps-score
+
+#png(file = "figures/tanglegram_1980_logrps.png", width = 2000, height = 3000, pointsilogrpse = 48)
+
+par(mfrow=c(1,1))
+
+# Pre-1980
+dist.cor.logrps.pre <- dist(cor.logrps.pre)
+clust.dist.cor.logrps.pre <- hclust(dist.cor.logrps.pre)
+tanglelabs.logrps.pre <- as.data.frame(clust.dist.cor.logrps.pre[["labels"]])
+colnames(tanglelabs.logrps.pre) <- "SYS_NM"
+#tanglelabs.logrps.pre <- merge(tanglelabs.logrps.pre, nameslookup, on = "SYS_NM")
+tanglelabs.logrps.pre$shortnames <- str_to_sentence(word(tanglelabs.logrps.pre$SYS_NM))
+clust.dist.cor.logrps.pre[["labels"]] <- tanglelabs.logrps.pre$shortnames
+dendlogrps.pre <- as.dendrogram(clust.dist.cor.logrps.pre)
+
+# Post-1980
+dist.cor.logrps.post <- dist(cor.logrps.post)
+clust.dist.cor.logrps.post <- hclust(dist.cor.logrps.post)
+tanglelabs.logrps.post <- as.data.frame(clust.dist.cor.logrps.post[["labels"]])
+colnames(tanglelabs.logrps.post) <- "SYS_NM"
+#tanglelabs.logrps.post <- merge(tanglelabs.logrps.post, nameslookup, on = "SYS_NM")
+tanglelabs.logrps.post$shortnames <- str_to_sentence(word(tanglelabs.logrps.post$SYS_NM))
+clust.dist.cor.logrps.post[["labels"]] <- tanglelabs.logrps.post$shortnames
+dendlogrps.post <- as.dendrogram(clust.dist.cor.logrps.post)
+
+# Tanglegram
+tangle.logrps <- dendlist(dendlogrps.pre, dendlogrps.post)
+tanglegram(tangle.logrps, lab.cex = .8, margin_inner = 3, main = "Log RPS", main_left = "Pre-1980",
+           main_right = "Post-1980", cex_main = 1, highlight_distinct_edges = FALSE,
+           lwd = 2, edge.lwd = 1)
+
+#dev.off()
+
+```
+
+```{r, compute boxplot zscores, message = FALSE, error = FALSE, echo = FALSE, include = FALSE}
+pre<-data.frame(cor.z.pre)
+pre$stream1<-rownames(pre)
+post<-data.frame(cor.z.post)
+post$stream1<-rownames(post)
+pre<-pre%>%pivot_longer(1:ncol(pre)-1,names_to="stream2",values_to="cc")%>%
+  mutate(cc=replace(cc,cc==1,NA),
+         area="DG",period="Pre")
+post<-post%>%pivot_longer(1:ncol(post)-1,names_to="stream2",values_to="cc")%>%
+  mutate(cc=replace(cc,cc==1,NA),
+         area="DG",period="Post")
+dg.z<-rbind(pre,post)%>%mutate(metric="Z-score")
+u.pre<-mean(pre$cc,na.rm=TRUE)
+sd.pre<-sd(pre$cc,na.rm=TRUE)
+u.post<-mean(post$cc,na.rm=TRUE)
+sd.post<-sd(post$cc,na.rm=TRUE)
+#u.pre;sd.pre
+#u.post;sd.post
+precc<-pre$cc
+postcc<-post$cc
+t.test(pre$cc,post$cc)
+```
+
+```{r, compute boxplot logrps, message = FALSE, error = FALSE, echo = FALSE, include = FALSE}
+pre <- data.frame(cor.logrps.pre)
+pre$stream1<-rownames(pre)
+post<-data.frame(cor.logrps.post)
+post$stream1<-rownames(post)
+pre<-pre%>%pivot_longer(1:ncol(pre)-1,names_to="stream2",values_to="cc")%>%
+  mutate(cc=replace(cc,cc==1,NA),
+         area="DG",period="Pre")
+post<-post%>%pivot_longer(1:ncol(post)-1,names_to="stream2",values_to="cc")%>%
+  mutate(cc=replace(cc,cc==1,NA),
+         area="DG",period="Post")
+dg.rps<-rbind(pre,post)%>%mutate(metric="log(RPS)")
+u.pre<-mean(pre$cc,na.rm=TRUE)
+sd.pre<-sd(pre$cc,na.rm=TRUE)
+u.post<-mean(post$cc,na.rm=TRUE)
+sd.post<-sd(post$cc,na.rm=TRUE)
+#u.pre;sd.pre
+#u.post;sd.post
+precc<-pre$cc
+postcc<-post$cc
+t.test(pre$cc,post$cc)
+```
+
+
+\newpage
+
+```{r, message = FALSE, error = FALSE, warning = FALSE, echo = FALSE,fig.align = "center", fig.height = 5, fig.width = 6, fig.cap = "Comparison between correlation coefficients for all pairwise combinations of streams using Z-score and log(RPS) over the pre- and post-1980 periods."}
+
+cc.all<-rbind(dg.z,dg.rps)
+
+ggplot(cc.all,aes(x=factor(period,levels=c("Pre","Post")),y=cc,fill=period))+
+  geom_boxplot()+
+  scale_fill_brewer(palette="Set1",breaks=c("Pre","Post"))+
+  xlab("Period")+theme_bw()+
+  ylab("Correlation coefficient")+labs(fill="Period")+
+  facet_grid(.~metric)
+
+```
+
+\newpage
+
+# Pairwise stream to stream correlation versus distance
+
+```{r Pairwise distance plots, message = FALSE, warning = FALSE, echo = FALSE, fig.align = "center", fig.height = 7, fig.width = 7.5, fig.cap="Pairwise stream-stream correlation of Z-score (top) and log(RPS) (bottom) against pairwise distance."}
+ 
+par(mfrow=c(1,1))
+# NEW code re: pairwise distance matrix from Ben Skinner
+
+# Z-scores
+long.z <- as.data.frame(cor.z) %>%  
+  rownames_to_column('row') %>% 
+  pivot_longer(cols = -row)
+
+names(long.z) <- c("source_stream", "destination_stream", "zscore")
+
+dist_corr <- merge(pairwise, long.z, by = "source_stream")
+dist_corr <- dist_corr[dist_corr$destination_stream.x == dist_corr$destination_stream.y,]
+dist_corr <- dist_corr[,c(1, 2, 3, 6)]
+names(dist_corr) <- c("source_stream", "destination_stream", "distance", "zscore")
+dist_corr$plotlabels <- paste0(dist_corr$source_stream, "-", dist_corr$destination_stream)
+
+model.z <- nls(zscore ~ a * distance ^ b, 
+               data = dist_corr,
+               start = list(a = 0.1, b = 0.1))
+
+
+zpreds <- predict(model.z, interval = "confidence")
+zplot <- cbind(dist_corr, zpreds)
+zplot <- zplot %>%
+  distinct(zscore, .keep_all = TRUE)
+
+#png(file = "figures/fig02pairwise_correlations_outliers.png", width = 1024, height = 768, pointsize = 48)
+
+a<- ggplot(zplot, aes(distance/1000, zscore)) +
+  geom_point() + theme_bw()+
+  geom_line( aes(y = zpreds), size = 1) +
+  geom_label_repel(aes(label = plotlabels),
+                   data = subset(zplot, zscore < -0.25),  # These lines label negative outliers
+                   size = 2.5) +
+  labs(x = "Pairwise distance (km)", y = "Pairwise correlation (z-score)")
+#dev.off()
+
+
+#ggplot(zplot, aes(zscore)) +
+#  geom_histogram()
+
+
+# Log RPS
+long.logrps <- as.data.frame(cor.rpslog) %>%  
+  rownames_to_column('row') %>% 
+  pivot_longer(cols = -row)
+
+names(long.logrps) <- c("source_stream", "destination_stream", "logrps")
+
+dist_logrps <- merge(pairwise, long.logrps, by = "source_stream")
+dist_logrps <- dist_logrps[dist_logrps$destination_stream.x == dist_logrps$destination_stream.y,]
+dist_logrps <- dist_logrps[,c(1, 2, 3, 6)]
+names(dist_logrps) <- c("source_stream", "destination_stream", "distance", "logrps")
+dist_logrps$plotlabels <- paste0(dist_logrps$source_stream, "-", dist_logrps$destination_stream)
+
+model.logrps <- nls(logrps ~ a * distance ^ b, 
+               data = dist_logrps,
+               start = list(a = 1, b = 1))
+logrpspreds <- predict(model.logrps, interval = "confidence")
+logrpsplot <- cbind(dist_logrps, logrpspreds)
+
+logrpsplot <- logrpsplot %>%
+  distinct(logrps, .keep_all = TRUE)
+
+
+#png(file = "figures/fig03pairwise_logrps.png", width = 1024, height = 768, pointsize = 48)
+b<- ggplot(logrpsplot, aes(distance/1000, logrps)) +
+  geom_point() + theme_bw()+
+  geom_line( aes(y = logrpspreds), size = 1) +
+  geom_label_repel(aes(label = plotlabels),
+                   data = subset(logrpsplot, logrps < 0.3),  # These lines label negative outliers
+                   size = 2.5) +
+  labs(x = "Pairwise distance (km)", y = "Pairwise correlation (Log RPS)")
+#dev.off()
+
+grid.arrange(a, b)
+
+```
+
+\newpage 
+
+## Dendrogram of pairwise distances
+
+```{r Distance dendrogram, message = FALSE, warning = FALSE, echo = FALSE, fig.align = "center", fig.height = 8, fig.width = 7, fig.cap = "Dendrogram of pairwise distance between stream mouths. Red labels - Esperanza Inlet; Blue - Nootka Inlet; Green - Tahsis Inlet"}
+
+# Distance dendrogram
+
+pairwise <- pairwise %>%
+  filter(source_stream != "INNER BASIN RIVER") %>%
+  filter(destination_stream != "INNER BASIN RIVER")
+
+pairwide <- pairwise[,1:3] %>%
+  pivot_wider(names_from = c("source_stream"),
+              values_from = "distance_m")
+
+pairwide[is.na(pairwide)] <- 0
+pairwide <- as.data.frame(pairwide)
+rownames(pairwide) <- pairwide[,1]
+pairwide <- pairwide[,-1]
+pairwide <- mutate_all(pairwide, function(x) as.numeric(as.character(x)))
+cor.d <- cor(t(pairwide), use = "pairwise.complete.obs")
+dist.cor.d<- dist(cor.d)
+clust.dist.cor.d <- hclust(dist.cor.d)
+dendclust.d <- dendro_data(clust.dist.cor.d)
+
+dlabs <- as.data.frame(dendclust.d[["labels"]][["label"]])
+colnames(dlabs) <- "SYS_NM"
+dlabs$order <- c(1:length(dlabs$SYS_NM))
+dlabs <- merge(dlabs, rps.clean, by = "SYS_NM")
+dlabs <- dlabs %>%
+  select(SYS_NM, order, inlet)
+dlabs <- distinct(dlabs)
+dlabcols <- as.data.frame(unique(dlabs$inlet))
+colnames(dlabcols) <- "inlet"
+dlabcols <- dlabcols %>%
+  arrange(inlet)
+dlabcols$colour <- c("red", "blue", "forestgreen")
+dlabs <- merge(dlabcols, dlabs, by = "inlet")
+dlabs <- dlabs %>%
+  arrange(order)
+dlabs <- dlabs$colour
+
+clust.dist.cor.d[["labels"]] <- str_to_title(clust.dist.cor.d[["labels"]])
+
+dendd <- as.dendrogram(clust.dist.cor.d)
+
+#png(file = "figures/fig05distances_dendrogram.png", width = 800, height = 600, pointsize = 12)
+dendd %>%
+    set("labels_colors", dlabs) %>%
+    plot(horiz = TRUE, dLeaf = 0.25)
+#dev.off()
+
+
+```
+\newpage
+
+## Correlation metrics against distance, pre- and post-1980
+```{r Correlation vs distance pre- and post-1980, message = FALSE, warning = FALSE, echo = FALSE, fig.align = "center", fig.height = 7, fig.width = 7.5,fig.cap="Pairwise stream-stream correlation of Z-score (top) and log(RPS) (bottom) against pairwise distance by period (pre-enhancement and post-enhancement."}
+cor.data.z <-escdata.filt %>%
+  select(SYS_NM,Year,z) %>%
+  pivot_wider(names_from="Year",values_from="z") %>%
+  data.frame()
+
+cor.data.z.pre<-cor.data.z[,1:31]
+rownames(cor.data.z.pre)<-cor.data.z.pre$SYS_NM
+cor.data.z.pre<-cor.data.z.pre%>%select(-SYS_NM)
+cor.z.pre<-cor(t(cor.data.z.pre),use="pairwise.complete.obs")
+
+# Z-scores pre-1980
+long.z.pre <- as.data.frame(cor.z.pre) %>%  
+  rownames_to_column('row') %>% 
+  pivot_longer(cols = -row)
+
+names(long.z.pre) <- c("source_stream", "destination_stream", "zscore")
+
+dist_corr.pre <- merge(pairwise, long.z.pre, by = "source_stream")
+dist_corr.pre <- dist_corr.pre[dist_corr.pre$destination_stream.x == dist_corr.pre$destination_stream.y,]
+dist_corr.pre <- dist_corr.pre[,c(1, 2, 3, 6)]
+names(dist_corr.pre) <- c("source_stream", "destination_stream", "distance", "zscore")
+dist_corr.pre$plotlabels <- paste0(dist_corr.pre$source_stream, "-", dist_corr.pre$destination_stream)
+
+model.zpre <- nls(zscore ~ a * distance ^ b, 
+               data = dist_corr.pre,
+               start = list(a = 1, b = 1))
+zprepreds <- predict(model.zpre, interval = "confidence")
+zpreplot <- cbind(dist_corr.pre, zprepreds)
+
+
+#png(file = "figures/fig06pairwise_zscore_pre.png", width = 1024, height = 768, pointsize = 48)
+#ggplot(dist_corr.pre, aes(distance/1000, zscore)) +
+#  geom_point() +
+#  geom_line( aes(y = zprepreds), size = 1) +
+#  labs(x = "Pairwise distance (km)", y = "Pairwise correlation (z-scores pre-1980)")
+#dev.off()
+
+
+# Z-scores post-1980
+cor.data.z.post<-cor.data.z[,c(1,32:70)]
+rownames(cor.data.z.post)<-cor.data.z.post$SYS_NM
+cor.data.z.post<-cor.data.z.post%>%select(-SYS_NM)
+cor.z.post<-cor(t(cor.data.z.post),use="pairwise.complete.obs")
+
+long.z.post <- as.data.frame(cor.z.post) %>%  
+  rownames_to_column('row') %>% 
+  pivot_longer(cols = -row)
+
+names(long.z.post) <- c("source_stream", "destination_stream", "zscore")
+
+dist_corr.post <- merge(pairwise, long.z.post, by = "source_stream")
+dist_corr.post <- dist_corr.post[dist_corr.post$destination_stream.x == dist_corr.post$destination_stream.y,]
+dist_corr.post <- dist_corr.post[,c(1, 2, 3, 6)]
+names(dist_corr.post) <- c("source_stream", "destination_stream", "distance", "zscore")
+dist_corr.post$plotlabels <- paste0(dist_corr.post$source_stream, "-", dist_corr.post$destination_stream)
+
+model.zpost <- nls(zscore ~ a * distance ^ b, 
+               data = dist_corr.post,
+               start = list(a = .1, b = .1))
+zpostpreds <- predict(model.zpost, interval = "confidence")
+zpostplot <- cbind(dist_corr.post, zpostpreds)
+
+
+#png(file = "figures/fig07pairwise_zscore_post.png", width = 1024, height = 768, pointsize = 48)
+#ggplot(zpostplot, aes(distance/1000, zscore)) +
+#  geom_point() +
+#  geom_line( aes(y = zpostpreds), size = 1) +
+#  labs(x = "Pairwise distance (km)", y = "Pairwise correlation (z-scores post-1980)")
+#dev.off()
+
+# Combine plots
+
+zpreplot$prepost <- "pre"
+zpostplot$prepost <- "post"
+names(zpreplot)[names(zpreplot) == 'zprepreds'] <- 'preds'
+names(zpostplot)[names(zpostplot) == 'zpostpreds'] <- 'preds'
+z_all <- rbind(zpreplot, zpostplot)
+
+#png(file = "figures/fig10pairwise_zscore.png", width = 1024, height = 768, pointsize = 48)
+pw1<-ggplot(z_all, aes(distance/1000, zscore, color = prepost)) +
+  geom_point() + theme_bw()+
+  geom_line(aes(y = preds), size = 1) +
+  labs(x = "Pairwise distance (km)", y = "Pairwise correlation (z-scores pre- and post-1980)")
+#dev.off()
+
+cor.data.logrps <-rps.clean %>%
+  select(SYS_NM,Year,logrps) %>%
+  pivot_wider(names_from="Year",values_from="logrps") %>%
+  data.frame()
+
+cor.data.logrps.pre<-cor.data.logrps[,1:27]
+rownames(cor.data.logrps.pre)<-cor.data.logrps.pre$SYS_NM
+cor.data.logrps.pre<-cor.data.logrps.pre%>%select(-SYS_NM)
+cor.logrps.pre<-cor(t(cor.data.logrps.pre),use="pairwise.complete.obs")
+
+cor.data.logrps.post<-cor.data.logrps[,c(1,28:63)]
+rownames(cor.data.logrps.post)<-cor.data.logrps.post$SYS_NM
+cor.data.logrps.post<-cor.data.logrps.post%>%select(-SYS_NM)
+cor.logrps.post<-cor(t(cor.data.logrps.post),use="pairwise.complete.obs")
+
+# Log RPS pre-1980
+long.logrps.pre <- as.data.frame(cor.logrps.pre) %>%  
+  rownames_to_column('row') %>% 
+  pivot_longer(cols = -row)
+
+names(long.logrps.pre) <- c("source_stream", "destination_stream", "logrpsscore")
+
+dist_corr.pre <- merge(pairwise, long.logrps.pre, by = "source_stream")
+dist_corr.pre <- dist_corr.pre[dist_corr.pre$destination_stream.x == dist_corr.pre$destination_stream.y,]
+dist_corr.pre <- dist_corr.pre[,c(1, 2, 3, 6)]
+names(dist_corr.pre) <- c("source_stream", "destination_stream", "distance", "logrpsscore")
+dist_corr.pre$plotlabels <- paste0(dist_corr.pre$source_stream, "-", dist_corr.pre$destination_stream)
+
+model.logrpspre <- nls(logrpsscore ~ a * distance ^ b, 
+               data = dist_corr.pre,
+               start = list(a = 1, b = 1))
+
+logrpsprepreds <- predict(model.logrpspre, interval = "confidence")
+logrpspreplot <- cbind(dist_corr.pre, logrpsprepreds)
+
+
+#png(file = "figures/fig08_pairwise_logRPS.png", width = 1024, height = 768, pointsize = 48)
+#ggplot(dist_corr.pre, aes(distance/1000, logrpsscore)) +
+#  geom_point() +
+#  geom_line( aes(y = logrpsprepreds), size = 1) +
+#  labs(x = "Pairwise distance (km)", y = "Pairwise correlation (Log RPS pre-1980)")
+#dev.off()
+
+
+# Log RPS Post-1980
+long.logrps.post <- as.data.frame(cor.logrps.post) %>%  
+  rownames_to_column('row') %>% 
+  pivot_longer(cols = -row)
+
+names(long.logrps.post) <- c("source_stream", "destination_stream", "logrpsscore")
+
+dist_corr.post <- merge(pairwise, long.logrps.post, by = "source_stream")
+dist_corr.post <- dist_corr.post[dist_corr.post$destination_stream.x == dist_corr.post$destination_stream.y,]
+dist_corr.post <- dist_corr.post[,c(1, 2, 3, 6)]
+names(dist_corr.post) <- c("source_stream", "destination_stream", "distance", "logrpsscore")
+dist_corr.post$plotlabels <- paste0(dist_corr.post$source_stream, "-", dist_corr.post$destination_stream)
+
+model.logrpspost <- nls(logrpsscore ~ a * distance ^ b, 
+               data = dist_corr.post,
+               start = list(a = 1, b = 1))
+logrpspostpreds <- predict(model.logrpspost, interval = "confidence")
+logrpspostplot <- cbind(dist_corr.post, logrpspostpreds)
+
+
+#png(file = "figures/fig09_pairwise_logRPS.png", width = 1024, height = 768, pointsize = 48)
+#ggplot(logrpspostplot, aes(distance/1000, logrpsscore)) +
+#  geom_point() +
+#  geom_line( aes(y = logrpspostpreds), size = 1) +
+#  labs(x = "Pairwise distance (km)", y = "Pairwise correlation (Log RPS pre-1980)")
+#dev.off()
+
+# Combine plots
+
+logrpspreplot$prepost <- "pre"
+logrpspostplot$prepost <- "post"
+names(logrpspreplot)[names(logrpspreplot) == 'logrpsprepreds'] <- 'preds'
+names(logrpspostplot)[names(logrpspostplot) == 'logrpspostpreds'] <- 'preds'
+logrps_all <- rbind(logrpspreplot, logrpspostplot)
+
+#png(file = "figures/fig11pairwise_logRPS.png", width = 1024, height = 768, pointsize = 64)
+pw2<-ggplot(logrps_all, aes(distance/1000, logrpsscore, color = prepost)) +
+  geom_point() + theme_bw()+
+  geom_line(aes(y = preds), size = 1) +
+  labs(x = "Pairwise distance (km)", y = "Pairwise correlation (Log RPS pre- and post-1980)",color="Period")
+#dev.off()
+
+ggarrange(pw1,pw2,common.legend = TRUE,legend = "bottom",ncol=1)
+
+```
+
+\newpage
+
+# Statistical models
+
+## Candidate Models with AIC scores for log RPS and log escapement
+
+```{r, AIC Table for RPS candidate models, echo = FALSE, include=FALSE, message = FALSE, warning = FALSE}
+
+streaminlet <- read_csv("data/CM A25 filtered stream list_with inlets.csv")
+rpsdat <- read_csv("data/area 25 chum rps raw and clean.csv")
+totrel <- readRDS("RDS/totrel.rds")
+
+modeldat <- merge(streaminlet, rpsdat, by = "SYS_NM")
+
+colnames(totrel) <- c("Year", "totreleases")
+
+modeldat <- merge(totrel, modeldat, by = "Year")
+
+modeldat$logreleases <- log(modeldat$totreleases)
+modeldat$dist.t <- modeldat$distancefromconuma + 1
+modeldat$logdistance <- log(modeldat$dist.t)
+modeldat$SYS_NM <- as.factor(modeldat$SYS_NM)
+modeldat$inlet <- as.factor(modeldat$inlet)
+modeldat$subinlet <- as.factor(modeldat$subinlet)
+
+corcoefs <- as.data.frame(cor.z.post["CONUMA RIVER",])
+cornames <- as.vector(rownames(cor.z.post))
+corcoefs <- cbind(cornames, corcoefs)
+colnames(corcoefs) <- c("SYS_NM", "corcoef")
+modeldat <- merge(corcoefs, modeldat, by = "SYS_NM")
+
+a <- glm(logrpsclean ~ distancefromconuma + Year,
+         data = modeldat)
+summary(a)
+
+b <- glm(logrpsclean ~ distancefromconuma + totreleases + Year,
+        data = modeldat)
+summary(b)
+c <- glm(logrpsclean ~ totreleases + Year,   # Best Model by AIC
+        data = modeldat)
+summary(c)
+d <- glm(logrpsclean ~ totreleases + as.factor(Year),
+        data = modeldat)
+summary(d)
+e <- glm(logrpsclean ~ totreleases + as.factor(Year) + Year, 
+        data = modeldat)
+summary(e)
+f <- glm(logrpsclean ~ totreleases + Year + SYS_NM,
+        data = modeldat)
+summary(f)
+g <- glm(logrpsclean ~ totreleases + Year + subinlet,
+        data = modeldat)
+summary(g)
+h <- glm(logrpsclean ~ corcoef + Year,
+        data = modeldat)
+summary(h)
+i <- glm(logrpsclean ~ corcoef + Year + SYS_NM,
+        data = modeldat)
+summary(i)
+j <- glm(logrpsclean ~ corcoef + Year + totreleases,
+        data = modeldat)
+summary(j)
+
+library(jtools)
+
+EPC_RPS_YEAR <- effect_plot(c, pred = Year, interval = TRUE, plot.points = TRUE, jitter = .25,
+            x.label = "Year", y.label = "Log recruits per spawner")
+write_rds(EPC_RPS_YEAR, 'RDS/EPC_RPS_YEAR.rds')
+
+EPC_RPS_TOTREL <- effect_plot(c, pred = totreleases, interval = TRUE, plot.points = TRUE, 
+            jitter = .25, x.label = "Total releases", y.label = "Log recruits per spawner")
+write_rds(EPC_RPS_TOTREL, 'RDS/EPC_RPS_TOTREL.rds')
+
+AIC(b)
+
+rpsaic <- AIC(a, b, c, d, e, f, g, h, i, j)
+saveRDS(rpsaic, "RDS/rpsaic.rds")
+
+# Try filter for outlier to see if it fixes log(esc) x dist regression fit
+
+newmodeldat <- modeldat
+
+newmodeldat <- newmodeldat %>% filter(escapement < 100000)
+
+
+adist <- glm(log(escapement) ~ distancefromconuma + Year, 
+             data = modeldat)
+bdist <- glm(log(escapement) ~ distancefromconuma + totreleases + Year,
+             data = modeldat)
+cdist <- glm(log(escapement) ~ corcoef + totreleases + Year,
+             data = modeldat)
+ddist <- glm(log(escapement) ~ corcoef + totreleases + Year + inlet,
+             data = modeldat)
+edist <- glm(log(escapement) ~ corcoef + totreleases + Year + subinlet,
+             data = modeldat)
+fdist <- glm(log(escapement) ~ corcoef + distancefromconuma + totreleases + Year + subinlet,
+             data = modeldat)
+summary(adist)
+summary(bdist)
+summary(cdist)
+summary(ddist)
+summary(edist)
+summary(fdist)
+
+AIC(fdist)
+preds <- predict(fdist)
+
+escaic <- AIC(adist, bdist, cdist, ddist, edist, fdist)
+saveRDS(escaic, "RDS/escaic.rds")
+
+EP_ESC_COR <- effect_plot(fdist, pred = corcoef, interval = TRUE, plot.points = TRUE, jitter = .25,
+            x.label = "Correlation coefficient", y.label = "Log escapement")
+
+#EP_ESC_DIST <- effect_plot(fdist, 
+#                           pred = distancefromconuma,
+#                           plot.points = TRUE, 
+#                           jitter = 0,
+#                           x.label = "Distance from enhanced system", 
+#                           y.label = "Log escapement")
+EP_ESC_DIST <- ggplot(data = modeldat, aes(distancefromconuma, y = log(escapement))) +
+  geom_point() + geom_smooth(method = 'lm', color = "black") + theme_light() +
+  labs(x = "Distance from Conuma", y = "Log escapement")
+
+
+#EP_ESC_COR
+
+#EP_ESC_DIST# + geom_smooth()# + geom_line(y = preds)
+
+EP_ESC_TOTREL <- effect_plot(fdist, pred = totreleases, interval = TRUE, plot.points = TRUE, jitter = 0,x.label = "Total releases", y.label = "Log escapement")
+
+#plotsumms <- plot_summs(fdist)
+
+#saveRDS(plotsumms, "RDS/plotsumms.rds")
+#saveRDS(EP_ESC_COR, "RDS/EP_ESC_COR.rds")
+#saveRDS(EP_ESC_DIST, "RDS/EP_ESC_DIST.rds")
+#saveRDS(EP_ESC_TOTREL, "RDS/EP_ESC_TOTREL.rds")
+
+```
+
+
+```{r, AIC Table, echo = FALSE, message = FALSE, warning = FALSE}
+rpsaic <- readRDS("RDS/rpsaic.rds")
+rpstab <- readRDS("RDS/rpstab.rds")
+
+rpstab$`Degrees of freedom` <- rpsaic$df
+rpstab$AIC <- rpsaic$AIC
+
+rpstab <- rpstab %>%
+  arrange(AIC)
+
+kable(rpstab, format = "latex",caption="Candidate models for log RPS and distance from enhancement (dist), total releases (totrel), and year, with AIC scores.")%>%
+ kable_styling(latex_options = "hold_position")
+
+
+#rpstab %>%
+#  kbl(align = colaligns) %>%
+#  kable_paper(full_width = F, html_font = "Courier New") %>%
+#  kable_styling(latex_options = "HOLD_position")
+
+```
+
+```{r, AIC Table for Escapement candidate models, echo = FALSE, message = FALSE, warning = FALSE}
+
+escaic <- readRDS("RDS/escaic.rds")
+esctab <- readRDS("RDS/esctab.rds")
+
+esctab$`Degrees of freedom` <- escaic$df
+esctab$AIC <- escaic$AIC 
+
+esctab <- esctab %>%
+  arrange(AIC)
+
+kable(esctab, format = "latex",caption="Candidate models for log escapement and distance from enhancement (dist), total releases (totrel), and year, with AIC scores.")%>%
+   kable_styling(latex_options = "hold_position")
+
+#esctab %>%
+#  kbl(align = colaligns) %>%
+ # kable_paper(full_width = F, html_font = "Courier New") %>%
+  #kable_styling(latex_options = "HOLD_position")
+
+```
+
+
+\newpage
+
+## Effects plots for top model: log(RPS)
+
+```{r, Effects across all metrics, echo = FALSE, message = FALSE, warning = FALSE, fig.align = "center", fig.height = 5, fig.width = 6, fig.cap = "Plot of effects included in most parsimonious model."}
+
+plot_summs(fdist)+labs(x="log(escapement)")
+
+```
+
+\newpage
+
+```{r single effects plots for log rps, echo = FALSE, message = FALSE, warning = FALSE, fig.align = "center", fig.height = 6, fig.width = 6, fig.cap = "Effects plots of recruits per spawner by year (top) and total releases (bottom)."}
+
+ggarrange(EPC_RPS_YEAR,EPC_RPS_TOTREL,ncol=1)
+
+```
+
+\newpage
+
+## Effects plots for top model: log(escapement)
+
+```{r, Effects plots escapement all factors, echo = FALSE, message = FALSE, warning = FALSE, fig.align = "center", fig.height = 5, fig.width = 6, fig.cap = "Effects plots of Escapement by correlation coefficient."}
+
+plot_summs(c)+labs(x="log(RPS)")
+```
+
+\newpage
+
+```{r, Effects plots escapement, echo = FALSE, message = FALSE, warning = FALSE, fig.align = "center", fig.height = 7, fig.width = 6, fig.cap = "Effects plots of log(escapement) by correlation coefficient (top), distance from enhancement (middle) and total releases (bottom)."}
+ggarrange(EP_ESC_COR,EP_ESC_DIST,EP_ESC_TOTREL,ncol=1)
+
+```
