@@ -523,7 +523,8 @@ cor.z.long$inlet <- str_to_sentence(cor.z.long$inlet)
 p1 <- ggplot(cor.z.long, aes(x = factor(inlet), y = zscore, fill = factor(inlet))) +
   geom_boxplot() + 
   scale_fill_brewer(palette = "Set1") + 
-  labs(x = "Inlet", y = "Z-score correlation", fill = "Inlet") 
+  labs(x = "Inlet", y = "Z-score correlation", fill = "Inlet")  +
+  theme_bw()
 
 
 
@@ -538,7 +539,8 @@ cor.rpslog.long$inlet <- str_to_sentence(cor.rpslog.long$inlet)
 p3 <- ggplot(cor.rpslog.long, aes(x = factor(inlet), y = `log(RPS)`, fill = factor(inlet))) +
   geom_boxplot() + 
   scale_fill_brewer(palette = "Set1") + 
-  labs(x = "Inlet", y = "log(RPS) correlation", fill = "Inlet") 
+  labs(x = "Inlet", y = "log(RPS) correlation", fill = "Inlet")  +
+  theme_bw()
 
 p5 <- ggarrange(p1, p3, nrow = 2, common.legend = TRUE, legend = "right")
 
