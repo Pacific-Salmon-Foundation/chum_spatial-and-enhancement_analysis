@@ -506,6 +506,50 @@ corrplot(cor.rpslog, diag = FALSE, order="hclust", method="square", tl.col="blac
 
 ```
 
+
+
+```{r Olmos plots, include = FALSE, message = FALSE, warning = FALSE, echo = FALSE}
+
+streams <- inlets %>% select(SYS_NM, inlet)
+
+cor.z.long <- pivot_longer(as.data.frame(cor.z), 
+                           cols = c(1:27), 
+                           names_to = "SYS_NM", 
+                           values_to = "zscore") %>% filter(zscore != 1)
+cor.z.long <- merge(cor.z.long, streams, by = "SYS_NM")
+cor.z.long$inlet <- str_to_sentence(cor.z.long$inlet)
+
+# By inlet
+p1 <- ggplot(cor.z.long, aes(x = factor(inlet), y = zscore, fill = factor(inlet))) +
+  geom_boxplot() + 
+  scale_fill_brewer(palette = "Set1") + 
+  labs(x = "Inlet", y = "Z-score correlation", fill = "Inlet") 
+
+
+
+cor.rpslog.long <- pivot_longer(as.data.frame(cor.rpslog), 
+                           cols = c(1:27), 
+                           names_to = "SYS_NM", 
+                           values_to = "log(RPS)") %>% filter(`log(RPS)` != 1)
+cor.rpslog.long <- merge(cor.rpslog.long, streams, by = "SYS_NM")
+cor.rpslog.long$inlet <- str_to_sentence(cor.rpslog.long$inlet)
+
+# By inlet
+p3 <- ggplot(cor.rpslog.long, aes(x = factor(inlet), y = `log(RPS)`, fill = factor(inlet))) +
+  geom_boxplot() + 
+  scale_fill_brewer(palette = "Set1") + 
+  labs(x = "Inlet", y = "log(RPS) correlation", fill = "Inlet") 
+
+p5 <- ggarrange(p1, p3, nrow = 2, common.legend = TRUE, legend = "right")
+
+annotate_figure(p5, top = text_grob("Douglas-Gardner", 
+                face = "bold", size = 14))
+
+```
+
+
+
+
 \newpage
 
 # Pairwise comparisons of correlation metrics against distance
