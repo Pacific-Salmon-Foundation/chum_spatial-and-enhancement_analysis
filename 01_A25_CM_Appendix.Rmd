@@ -638,18 +638,19 @@ cor.z.long <- pivot_longer(as.data.frame(cor.z),
                            values_to = "zscore") %>% filter(zscore != 1)
 cor.z.long <- merge(cor.z.long, streams, by = "SYS_NM")
 cor.z.long$inlet <- str_to_sentence(cor.z.long$inlet)
+cor.z.long$subinlet <- str_to_sentence(cor.z.long$subinlet)
 
 # By inlet
 p1 <- ggplot(cor.z.long, aes(x = factor(inlet), y = zscore, fill = factor(inlet))) +
   geom_boxplot() + 
   scale_fill_brewer(palette = "Set1") + 
-  labs(x = "Inlet", y = "Z-score", fill = "Inlet") 
+  labs(x = "Inlet", y = "Z-score correlation", fill = "Inlet") 
 
 # By subinlet
 p2 <- ggplot(cor.z.long, aes(x = factor(subinlet), y = zscore, fill = factor(subinlet))) +
   geom_boxplot() + 
   scale_fill_brewer(palette = "Set1") + 
-  labs(x = "Subinlet", y = "Z-score", fill = "Subinlet") 
+  labs(x = "Subinlet", y = "Z-score correlation", fill = "Subinlet") 
 
 
 
@@ -659,18 +660,19 @@ cor.rpslog.long <- pivot_longer(as.data.frame(cor.rpslog),
                            values_to = "log(RPS)") %>% filter(`log(RPS)` != 1)
 cor.rpslog.long <- merge(cor.rpslog.long, streams, by = "SYS_NM")
 cor.rpslog.long$inlet <- str_to_sentence(cor.rpslog.long$inlet)
+cor.rpslog.long$subinlet <- str_to_sentence(cor.rpslog.long$subinlet)
 
 # By inlet
 p3 <- ggplot(cor.rpslog.long, aes(x = factor(inlet), y = `log(RPS)`, fill = factor(inlet))) +
   geom_boxplot() + 
   scale_fill_brewer(palette = "Set1") + 
-  labs(x = "Inlet", y = "log(RPS)", fill = "Inlet") 
+  labs(x = "Inlet", y = "log(RPS) correlation", fill = "Inlet") 
 
 # By subinlet
 p4 <- ggplot(cor.rpslog.long, aes(x = factor(subinlet), y = `log(RPS)`, fill = factor(subinlet))) +
   geom_boxplot() + 
   scale_fill_brewer(palette = "Set1") + 
-  labs(x = "Subinlet", y = "log(RPS)", fill = "Subinlet")
+  labs(x = "Subinlet", y = "log(RPS) correlation", fill = "Subinlet")
 
 p5 <- ggarrange(p1, p2, p3, p4)
 
