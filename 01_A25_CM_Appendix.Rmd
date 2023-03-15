@@ -644,13 +644,16 @@ cor.z.long$subinlet <- str_to_sentence(cor.z.long$subinlet)
 p1 <- ggplot(cor.z.long, aes(x = factor(inlet), y = zscore, fill = factor(inlet))) +
   geom_boxplot() + 
   scale_fill_brewer(palette = "Set1") + 
-  labs(x = "Inlet", y = "Z-score correlation", fill = "Inlet") 
+  labs(x = "Inlet", y = "Correlation in Z-scores", fill = "Inlet") +
+  theme_bw()
 
 # By subinlet
 p2 <- ggplot(cor.z.long, aes(x = factor(subinlet), y = zscore, fill = factor(subinlet))) +
   geom_boxplot() + 
   scale_fill_brewer(palette = "Set1") + 
-  labs(x = "Subinlet", y = "Z-score correlation", fill = "Subinlet") 
+  labs(x = "Subinlet", y = "Correlation in Z-scores", fill = "Subinlet")  +
+  theme_bw() +
+  scale_x_discrete(guide = guide_axis(n.dodge = 2))
 
 
 
@@ -666,13 +669,16 @@ cor.rpslog.long$subinlet <- str_to_sentence(cor.rpslog.long$subinlet)
 p3 <- ggplot(cor.rpslog.long, aes(x = factor(inlet), y = `log(RPS)`, fill = factor(inlet))) +
   geom_boxplot() + 
   scale_fill_brewer(palette = "Set1") + 
-  labs(x = "Inlet", y = "log(RPS) correlation", fill = "Inlet") 
+  labs(x = "Inlet", y = "Correlation in log(RPS)", fill = "Inlet")  +
+  theme_bw()
 
 # By subinlet
 p4 <- ggplot(cor.rpslog.long, aes(x = factor(subinlet), y = `log(RPS)`, fill = factor(subinlet))) +
   geom_boxplot() + 
   scale_fill_brewer(palette = "Set1") + 
-  labs(x = "Subinlet", y = "log(RPS) correlation", fill = "Subinlet")
+  labs(x = "Subinlet", y = "Correlation in log(RPS)", fill = "Subinlet") +
+  theme_bw() +
+  scale_x_discrete(guide = guide_axis(n.dodge = 2))
 
 p5 <- ggarrange(p1, p2, p3, p4)
 
