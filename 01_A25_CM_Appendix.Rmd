@@ -685,6 +685,79 @@ p5 <- ggarrange(p1, p2, p3, p4)
 annotate_figure(p5, top = text_grob("Area 25", 
                 face = "bold", size = 14))
 
+
+
+
+
+
+# Pre- and post-1980 for subinlet
+
+streams <- streaminlet %>% select(SYS_NM, inlet, subinlet)
+
+cor.z.pre.long <- pivot_longer(as.data.frame(cor.z.pre), 
+                           cols = c(1:24), 
+                           names_to = "SYS_NM", 
+                           values_to = "zscore") %>% filter(zscore != 1)
+cor.z.pre.long <- merge(cor.z.pre.long, streams, by = "SYS_NM")
+cor.z.pre.long$inlet <- str_to_sentence(cor.z.pre.long$inlet)
+cor.z.pre.long$subinlet <- str_to_sentence(cor.z.pre.long$subinlet)
+
+cor.z.post.long <- pivot_longer(as.data.frame(cor.z.post), 
+                           cols = c(1:24), 
+                           names_to = "SYS_NM", 
+                           values_to = "zscore") %>% filter(zscore != 1)
+cor.z.post.long <- merge(cor.z.post.long, streams, by = "SYS_NM")
+cor.z.post.long$inlet <- str_to_sentence(cor.z.post.long$inlet)
+cor.z.post.long$subinlet <- str_to_sentence(cor.z.post.long$subinlet)
+
+cor.z.pre.long$prepost <- "Pre-1980"
+cor.z.post.long$prepost <- "Post-1980"
+
+prepost.cor.z <- rbind(cor.z.pre.long, cor.z.post.long)
+
+p6 <- ggplot(prepost.cor.z, aes(x = factor(subinlet), y = zscore, fill = factor(prepost), group_by(prepost))) +
+  geom_boxplot() + 
+  scale_fill_brewer(palette = "Set1") + 
+  labs(x = "Subinlet", y = "Correlation in Z-scores", fill = "Period")  +
+  theme_bw()
+
+
+
+
+cor.logrps.pre.long <- pivot_longer(as.data.frame(cor.logrps.pre), 
+                           cols = c(1:24), 
+                           names_to = "SYS_NM", 
+                           values_to = "logrps") %>% filter(logrps != 1)
+cor.logrps.pre.long <- merge(cor.logrps.pre.long, streams, by = "SYS_NM")
+cor.logrps.pre.long$inlet <- str_to_sentence(cor.logrps.pre.long$inlet)
+cor.logrps.pre.long$subinlet <- str_to_sentence(cor.logrps.pre.long$subinlet)
+
+cor.logrps.post.long <- pivot_longer(as.data.frame(cor.logrps.post), 
+                           cols = c(1:24), 
+                           names_to = "SYS_NM", 
+                           values_to = "logrps") %>% filter(logrps != 1)
+cor.logrps.post.long <- merge(cor.logrps.post.long, streams, by = "SYS_NM")
+cor.logrps.post.long$inlet <- str_to_sentence(cor.logrps.post.long$inlet)
+cor.logrps.post.long$subinlet <- str_to_sentence(cor.logrps.post.long$subinlet)
+
+cor.logrps.pre.long$prepost <- "Pre-1980"
+cor.logrps.post.long$prepost <- "Post-1980"
+
+prepost.cor.logrps <- rbind(cor.logrps.pre.long, cor.logrps.post.long)
+
+p7 <- ggplot(prepost.cor.logrps, aes(x = factor(subinlet), y = logrps, fill = factor(prepost), group_by(prepost))) +
+  geom_boxplot() + 
+  scale_fill_brewer(palette = "Set1") + 
+  labs(x = "Subinlet", y = "Correlation in log(RPS)", fill = "Period")  +
+  theme_bw()
+
+p8 <- ggarrange(p6, p7, nrow = 2, common.legend = TRUE, legend = "right")
+
+annotate_figure(p8, top = text_grob("Area 25", 
+                face = "bold", size = 14))
+
+
+
 ```
 
 
