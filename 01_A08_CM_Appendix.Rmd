@@ -275,6 +275,22 @@ ggplot(rps.clean,aes(x=Year,y=rps))+
 
 ```
 
+```{r, Correlation coef against distances NOT INCLUDED, echo = FALSE, message = FALSE, include = FALSE, warning = FALSE}
+
+compare <- rps.clean %>% select(wt_dist_bel, wt_dist_mcl, z, logrps) 
+names(compare) <- c("Bella Coola", "McLoughlin", "Z-score", "log(RPS)")
+
+compare <- compare %>%
+  pivot_longer(c(`Z-score`, `log(RPS)`), names_to = "corcoef", values_to = "value") %>%
+  pivot_longer(c(`Bella Coola`, McLoughlin), names_to = "enhancement", values_to = "km")
+
+ggplot(compare, aes(x = km, y = value)) +
+  geom_point() + facet_grid(corcoef ~ enhancement, switch = "y") + geom_smooth() +
+  labs(x = "Weighted distance from enhancement (km)", y = "Correlation coefficient")
+
+
+```
+
 \newpage
 
 ### Log recruits per spawner by system by period
