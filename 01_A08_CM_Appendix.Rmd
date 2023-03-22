@@ -286,7 +286,8 @@ compare <- compare %>%
 
 ggplot(compare, aes(x = km, y = value)) +
   geom_point() + facet_grid(corcoef ~ enhancement, switch = "y") + geom_smooth() +
-  labs(x = "Weighted distance from enhancement (km)", y = "Correlation coefficient")
+  labs(x = "Weighted distance from enhancement (km)", y = "Correlation coefficient") +
+  theme_bw()
 
 
 ```
